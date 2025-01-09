@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Add New Product</h2>
+<form method="POST" action="">
+  <label>Product ID</label><br>
+  <input type="text" name="product_id" required><br><br>
+
+  <label>Product Category</label><br>
+  <input type="text" name="product_category" required><br><br>
+
+  <label>Product Group</label><br>
+  <input type="text" name="product_group"><br><br>
+
+  <label>Cutoff</label><br>
+  <input type="text" name="cutoff" value="12"><br><br>
+
+  <label>Days to Produce</label><br>
+  <input type="text" name="days_to_produce" value="2"><br><br>
+
+  <button type="submit">Add Product</button>
+</form>
+{% endblock %}

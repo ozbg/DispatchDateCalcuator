@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Product Info</h2>
+<a class="btn" href="/products/add">Add New Product</a>
+
+<table>
+  <tr>
+    <th>Product ID</th>
+    <th>Category</th>
+    <th>Group</th>
+    <th>Cutoff</th>
+    <th>Days to Produce</th>
+    <th>Edit</th>
+    <th>Delete</th>
+  </tr>
+  {% for pid, item in product_data.items() %}
+  <tr>
+    <td>{{ pid }}</td>
+    <td>{{ item.Product_Category }}</td>
+    <td>{{ item.Product_Group }}</td>
+    <td>{{ item.Cutoff }}</td>
+    <td>{{ item.Days_to_produce }}</td>
+    <td><a href="/products/edit/{{ pid }}">Edit</a></td>
+    <td><a href="/products/delete/{{ pid }}">Delete</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

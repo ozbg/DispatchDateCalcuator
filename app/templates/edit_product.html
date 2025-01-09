@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit Product ID: {{ product_id }}</h2>
+<form method="POST" action="">
+  <label>Product Category</label><br>
+  <input type="text" name="product_category" value="{{ product.Product_Category }}"/><br><br>
+
+  <label>Product Group</label><br>
+  <input type="text" name="product_group" value="{{ product.Product_Group }}"/><br><br>
+
+  <label>Cutoff</label><br>
+  <input type="text" name="cutoff" value="{{ product.Cutoff }}"/><br><br>
+
+  <label>Days to Produce</label><br>
+  <input type="text" name="days_to_produce" value="{{ product.Days_to_produce }}"/><br><br>
+
+  <button type="submit">Save Changes</button>
+</form>
+{% endblock %}
