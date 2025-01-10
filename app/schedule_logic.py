@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+import pytz
 from typing import Optional
 
 from app.models import ScheduleRequest, ScheduleResponse
@@ -37,11 +38,11 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     )
 
     # 3. Current time with offset
-    current_time = datetime.utcnow()
+    utc_now = datetime.now(pytz.utc)
     if req.misCurrentHub.lower() == "wa":
-        current_time += timedelta(hours=WA_TIME_ADJUST)
+        current_time = utc_now + timedelta(hours=WA_TIME_ADJUST)
     else:
-        current_time += timedelta(hours=TIME_ADJUST)
+        current_time = utc_now + timedelta(hours=TIME_ADJUST)
 
     # 4. If product not found, create a fallback
     if not product_obj:

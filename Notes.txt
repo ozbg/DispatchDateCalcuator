@@ -1,0 +1,13 @@
+scheduele_logic.py : process_order function 
+
+The provided code defines a function process_order that schedules an order by replicating core logic from a JavaScript codebase. This function takes a ScheduleRequest object as input and returns an optional ScheduleResponse object. The function follows a series of steps to determine the appropriate scheduling details for the order.
+
+First, the function retrieves product keywords data using get_product_keywords_data() and attempts to match the product ID from the request description using the match_product_id function. If no matching product is found, it defaults the product ID to 0. It then retrieves product information using get_product_info_data() and fetches the product object corresponding to the found product ID. If the product object is not found, it creates a fallback product object with default values.
+
+Next, the function determines the grain direction based on the orientation, width, height, and description from the request using the determine_grain_direction function. It then calculates the current time with an offset based on the current hub specified in the request. If the hub is "wa", it applies the WA_TIME_ADJUST offset; otherwise, it applies the TIME_ADJUST offset.
+
+The function then checks if the current time is past the cutoff hour specified in the product object. If it is, it sets the start date to the next day and marks the cutoff status as "After Cutoff"; otherwise, it sets the start date to the current date and marks the cutoff status as "Before Cutoff". It calculates the finishing days required for the order using the calculate_finishing_days function and adds these to the base production days from the product object to get the total production days.
+
+The function determines the actual hub state based on the delivery state and current hub, retrieves the closed dates for the state using get_closed_dates_for_state, and calculates the dispatch date by adding the total production days to the start date, excluding closed dates using the add_business_days function.
+
+Finally, the function builds a debug log with the scheduling details and logs it. It then constructs and returns a ScheduleResponse object containing the product group, dispatch date, grain direction ID, hub transfer information, dispatch date log, grain direction string, and development logs. This response encapsulates all the scheduling information determined by the function.

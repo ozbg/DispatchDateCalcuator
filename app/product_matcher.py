@@ -3,11 +3,7 @@ import logging
 logger = logging.getLogger("scheduler")
 
 def match_product_id(description: str, product_keywords: list) -> int:
-    """
-    Attempt to find a matching Product_ID based on 'description'.
-    Follows the 'Match_All', 'Exclude_All', and 'Match_Any' approach.
-    Returns the product ID or None if no match is found.
-    """
+    logger.debug(f"Matching product ID for description: {description}")
     desc_lower = description.lower()
 
     for item in product_keywords:
@@ -15,19 +11,23 @@ def match_product_id(description: str, product_keywords: list) -> int:
 
         # 1. Match all
         if not match_all(item.get("Match_All", []), desc_lower):
+            logger.debug(f"Description '{description}' did not match all keywords for product ID {product_id}.")
             continue
 
         # 2. Exclude all
         if not exclude_all(item.get("Exclude_All", []), desc_lower):
+            logger.debug(f"Description '{description}' excluded by keywords for product ID {product_id}.")
             continue
 
         # 3. Match any
         if not match_any(item.get("Match_Any", []), desc_lower):
+            logger.debug(f"Description '{description}' did not match any keywords for product ID {product_id}.")
             continue
 
         logger.debug(f"Matched product ID {product_id} for description='{description}'.")
         return product_id
 
+    logger.debug(f"No matching product ID found for description: {description}")
     return None
 
 def match_all(keywords, desc_lower):
@@ -47,18 +47,14 @@ def match_any(list_of_lists, desc_lower):
         # If no 'Match_Any', we skip
         return True
 
-    # Each sub-list represents an OR group. If at least one group is fully matched, return True.
+    # Each sub-list represents an OR group. At least one word from each group must be present.
     for sublist in list_of_lists:
-        if all(s.lower() in desc_lower for s in sublist):
-            return True
-    return False
+        if not any(s.lower() in desc_lower for s in sublist):
+            return False
+    return True
 
 def determine_grain_direction(orientation: str, width: float, height: float, description: str):
-    """
-    - portrait => grain=Vertical (ID=3)
-    - landscape or square => grain=Horizontal (ID=2)
-    - if not BC size => grain=Either (ID=1)
-    """
+    logger.debug(f"Determining grain direction for orientation: {orientation}, width: {width}, height: {height}, description: {description}")
     if orientation.lower() == "portrait":
         grain = "Vertical"
         grain_id = 3
@@ -82,4 +78,5 @@ def determine_grain_direction(orientation: str, width: float, height: float, des
         grain = "Either"
         grain_id = 1
 
+    logger.debug(f"Grain direction determined: {grain} (ID={grain_id})")
     return grain, grain_id
