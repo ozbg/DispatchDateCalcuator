@@ -11,3 +11,25 @@ The function then checks if the current time is past the cutoff hour specified i
 The function determines the actual hub state based on the delivery state and current hub, retrieves the closed dates for the state using get_closed_dates_for_state, and calculates the dispatch date by adding the total production days to the start date, excluding closed dates using the add_business_days function.
 
 Finally, the function builds a debug log with the scheduling details and logs it. It then constructs and returns a ScheduleResponse object containing the product group, dispatch date, grain direction ID, hub transfer information, dispatch date log, grain direction string, and development logs. This response encapsulates all the scheduling information determined by the function.
+
+
+
+## FUNCTION UNIT TESTING ## 
+
+PRODUCT KEYWORD LOOKUP = COMLPETE
+function name: match_product_id
+tests/test_product_matcher.py
+
+SETTING GRAIN DIRECTION FOR BC ONLY = COMLPETE
+function name: test_determine_grain_direction_portrait
+tests/test_set_grain.py
+
+
+TESTING API = PARTIALLY TESTED 
+tests/test_live_api.py
+
+
+
+TODO 
+test hub transfers - not working 
+Make sure all of the finishing rules are in , first look it seems some are missing
