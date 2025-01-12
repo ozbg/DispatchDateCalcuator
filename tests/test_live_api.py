@@ -10,7 +10,7 @@ import requests
 
 def test_schedule_live():
     payload = {
-       "misDeliversToPostcode":"000",
+       "misDeliversToPostcode":"2650",
        "misOrderQTY":50,
        "orientation":"landscape",
        "description":"100gsm Laser dril ",
@@ -18,9 +18,9 @@ def test_schedule_live():
        "kinds":1,
        "preflightedWidth":190,
        "preflightedHeight":255,
-       "misCurrentHub":"qld",
-       "misCurrentHubID":1,
-       "misDeliversToState":"qld"
+       "misCurrentHub":"nsw",
+       "misCurrentHubID":2,
+       "misDeliversToState":"nsw"
      }
     url = "http://127.0.0.1:8000/schedule"
     response = requests.post(url, json=payload)

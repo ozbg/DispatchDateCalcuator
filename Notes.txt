@@ -20,9 +20,22 @@ PRODUCT KEYWORD LOOKUP = COMLPETE
 function name: match_product_id
 tests/test_product_matcher.py
 
+
 SETTING GRAIN DIRECTION FOR BC ONLY = COMLPETE
 function name: test_determine_grain_direction_portrait
 tests/test_set_grain.py
+
+
+SETTING START DATES , END DATES , ADDING PRODUCTION DAYS  = COMLPETE
+function name: add_business_days.py
+tests/test_add_business_days.py
+Sets start date to production days only, not closed days or weekends.
+Then calcs the end date, skipping closed dates and weekends 
+
+
+NEXT BEST HUB 
+function name: find_next_best
+tests/find_next_best.py
 
 
 TESTING API = PARTIALLY TESTED 
@@ -31,5 +44,14 @@ tests/test_live_api.py
 
 
 TODO 
-test hub transfers - not working 
+hub transfers fixed - create test functions and test more thoroughly 
 Make sure all of the finishing rules are in , first look it seems some are missing
+re think and test cutoff times, continue to use current hub or use production hub 
+
+
+Make sure this functinoality is up front 
+
+
+Need to step back and review the entire sequencing of the process order function, 
+right now post code based transfers are not right
+also feel like some of process order needs reviewing to make sure we allocate to hub, then check closed dates etc and set schedule 
