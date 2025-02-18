@@ -1,0 +1,408 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>CMYK Hubs Management</h2>
+<p><a href="/" class="btn">Back to Admin</a></p>
+
+<div class="help-section">
+    <h3>Understanding Hub Configuration</h3>
+    <div class="rule-explanation">
+        <div class="rule-box">
+            <h4>Next Best Options</h4>
+            <p>Ordered list of alternative hubs when work needs to be moved.</p>
+            <p class="example">Example: If VIC can't produce, try NSW, then QLD</p>
+        </div>
+        <div class="rule-box">
+            <h4>Closed Dates</h4>
+            <p>Dates when the hub is not operating (holidays, maintenance, etc).</p>
+            <p class="example">Example: "2024-12-25" for Christmas Day closure</p>
+        </div>
+        <div class="rule-box">
+            <h4>Hub Details</h4>
+            <p>Basic hub information and identification.</p>
+            <p class="example">Hub Name, State, CMYK Hub ID for system reference</p>
+        </div>
+    </div>
+</div>
+
+<button onclick="showAddForm()" class="add-btn">Add New Hub</button>
+
+<div id="hubsTable">
+    <table>
+        <thead>
+            <tr>
+                <th>Hub</th>
+                <th>State</th>
+                <th>CMYK Hub ID</th>
+                <th>Next Best Options</th>
+                <th>Closed Dates</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hub in hubs %}
+            <tr>
+                <td>{{ hub.Hub }}</td>
+                <td>{{ hub.State }}</td>
+                <td>{{ hub.CMHKhubID }}</td>
+                <td>
+                    {% for next in hub.Next_Best %}
+                        {{ next }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for date in hub.Closed_Dates %}
+                        {{ date }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <button onclick="editHub({{ loop.index0 }})" class="edit-btn">Edit</button>
+                    <button onclick="deleteHub({{ loop.index0 }})" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="editForm" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3 id="formTitle">Edit Hub</h3>
+        
+        <div class="form-group">
+            <label for="hubName">Hub Name:</label>
+            <input type="text" id="hubName" required>
+            <small>Short name for the hub (e.g., vic, nsw, qld)</small>
+        </div>
+
+        <div class="form-group">
+            <label for="state">State:</label>
+            <input type="text" id="state" required>
+            <small>Full state name or identifier</small>
+        </div>
+
+        <div class="form-group">
+            <label for="hubId">CMYK Hub ID:</label>
+            <input type="number" id="hubId" required>
+            <small>Unique identifier for system reference</small>
+        </div>
+
+        <div class="form-group">
+            <label>Next Best Options:</label>
+            <div id="nextBestContainer">
+                <div class="next-best-list">
+                    <!-- Dynamic list items will be added here -->
+                </div>
+                <button type="button" onclick="addNextBestInput()" class="add-option-btn">Add Option</button>
+            </div>
+            <small>Order matters - list from most preferred to least preferred alternative</small>
+        </div>
+
+        <div class="form-group">
+            <label>Closed Dates:</label>
+            <div id="closedDatesContainer">
+                <div class="closed-dates-list">
+                    <!-- Dynamic date inputs will be added here -->
+                </div>
+                <button type="button" onclick="addClosedDateInput()" class="add-date-btn">Add Date</button>
+            </div>
+            <small>Select dates when the hub will be closed</small>
+        </div>
+
+        <div class="button-group">
+            <button onclick="saveHub()" class="save-btn">Save Hub</button>
+            <button onclick="closeForm()" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.help-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.rule-explanation {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.rule-box {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.rule-box h4 {
+    color: #007bff;
+    margin-top: 0;
+}
+
+.example {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-group small {
+    display: block;
+    color: #666;
+    margin-top: 5px;
+}
+
+.next-best-list,
+.closed-dates-list {
+    margin-bottom: 10px;
+}
+
+.next-best-item,
+.closed-date-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+    align-items: center;
+}
+
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.add-btn, .save-btn {
+    background: #28a745;
+}
+
+.edit-btn {
+    background: #007bff;
+}
+
+.delete-btn {
+    background: #dc3545;
+}
+
+.cancel-btn {
+    background: #6c757d;
+}
+
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background: #f8f9fa;
+}
+
+.add-option-btn,
+.add-date-btn {
+    background: #17a2b8;
+    margin-top: 5px;
+}
+</style>
+
+<script>
+let currentHubs = {{ hubs|tojson }};
+let editIndex = -1;
+
+function showAddForm() {
+    editIndex = -1;
+    document.getElementById('formTitle').textContent = 'Add New Hub';
+    resetForm();
+    document.getElementById('editForm').style.display = 'block';
+}
+
+function editHub(index) {
+    editIndex = index;
+    const hub = currentHubs[index];
+    document.getElementById('formTitle').textContent = 'Edit Hub';
+    
+    // Populate form
+    document.getElementById('hubName').value = hub.Hub;
+    document.getElementById('state').value = hub.State;
+    document.getElementById('hubId').value = hub.CMHKhubID;
+    
+    // Clear and repopulate Next Best options
+    const nextBestList = document.querySelector('.next-best-list');
+    nextBestList.innerHTML = '';
+    hub.Next_Best.forEach(option => addNextBestOption(option));
+    
+    // Clear and repopulate Closed Dates
+    const closedDatesList = document.querySelector('.closed-dates-list');
+    closedDatesList.innerHTML = '';
+    hub.Closed_Dates.forEach(date => addClosedDate(date));
+    
+    document.getElementById('editForm').style.display = 'block';
+}
+
+function resetForm() {
+    document.getElementById('hubName').value = '';
+    document.getElementById('state').value = '';
+    document.getElementById('hubId').value = '';
+    document.querySelector('.next-best-list').innerHTML = '';
+    document.querySelector('.closed-dates-list').innerHTML = '';
+}
+
+function addNextBestOption(value = '') {
+    const container = document.querySelector('.next-best-list');
+    const div = document.createElement('div');
+    div.className = 'next-best-item';
+    div.innerHTML = `
+        <input type="text" value="${value}" placeholder="Hub name">
+        <button type="button" onclick="this.parentElement.remove()" class="remove-btn">Remove</button>
+    `;
+    container.appendChild(div);
+}
+
+function addClosedDate(value = '') {
+    const container = document.querySelector('.closed-dates-list');
+    const div = document.createElement('div');
+    div.className = 'closed-date-item';
+    div.innerHTML = `
+        <input type="date" value="${value}">
+        <button type="button" onclick="this.parentElement.remove()" class="remove-btn">Remove</button>
+    `;
+    container.appendChild(div);
+}
+
+function addNextBestInput() {
+    addNextBestOption();
+}
+
+function addClosedDateInput() {
+    addClosedDate();
+}
+
+async function saveHub() {
+    const hub = {
+        Hub: document.getElementById('hubName').value,
+        State: document.getElementById('state').value,
+        CMHKhubID: parseInt(document.getElementById('hubId').value),
+        Next_Best: Array.from(document.querySelectorAll('.next-best-item input')).map(input => input.value),
+        Closed_Dates: Array.from(document.querySelectorAll('.closed-date-item input')).map(input => input.value)
+    };
+    
+    if (editIndex >= 0) {
+        currentHubs[editIndex] = hub;
+    } else {
+        currentHubs.push(hub);
+    }
+    
+    try {
+        const response = await fetch('/save-hubs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentHubs)
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error saving hub data');
+        }
+    } catch (error) {
+        alert('Error saving hub data: ' + error.message);
+    }
+}
+
+async function deleteHub(index) {
+    if (confirm('Are you sure you want to delete this hub?')) {
+        currentHubs.splice(index, 1);
+        try {
+            const response = await fetch('/save-hubs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(currentHubs)
+            });
+            
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting hub');
+            }
+        } catch (error) {
+            alert('Error deleting hub: ' + error.message);
+        }
+    }
+}
+
+function closeForm() {
+    document.getElementById('editForm').style.display = 'none';
+}
+</script>
+{% endblock %}

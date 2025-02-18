@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add Production Overrides</title>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  
+  <style>
+    html, body {
+      min-height: 100%;
+      margin-bottom: 10px;
+      margin-right: 10px;
+      margin-left: 10px;
+      margin-top: 10px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin-bottom: 5px;
+      margin-right: 0px;
+      margin-left: 0px;
+      margin-top: 0px;
+    }
+
+    body, div, form, input, select, p { 
+      margin-top: 0px;
+      padding: 0;
+      margin: 0;
+      outline: none;
+      font-family: Roboto, Arial, sans-serif;
+      font-size: 14px;
+      color: #666;
+      line-height: 16px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      margin-right: 10px;
+      margin-left: 0px;
+      margin-top: 30px;
+      font-weight: 900;
+      color: black;
+    }
+
+    h3 {
+      margin-bottom: 30px;
+      margin-right: 10px;
+      margin-left: 0px;
+      margin-top: 10px;
+      font-weight: 80;
+    }
+
+    .testbox {
+      outline: none;
+      margin-bottom: -10px;
+      margin-right: 0px;
+      margin-left: -10px;
+      margin-top: 10px;
+      display: flex;
+      justify-content: left;
+      align-items: center;
+      height: inherit;
+      padding: 3px;
+    }
+
+    form, input, select, textarea {
+      margin-bottom: 10px;
+      margin-right: 10px;
+      margin-left: 10px;
+      margin-top: 0px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    input:hover, select:hover, textarea:hover {
+      outline: none;
+      border: 1px solid #095484;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      margin-right: 20px;
+      margin-left: 20px;
+      margin-top: 10px;
+      font-weight: 300;
+      font-size: 16px;
+      line-height: 1.3
+      
+    }
+
+    label2 {
+      display: block;
+      margin-bottom: 0px;
+      margin-right: 0px;
+      margin-left: 0px;
+      margin-top: 20px;
+    	font-weight: 350;
+    	font-size: 16px;
+
+      text-align: right;
+    }
+
+    input[type="date"] {
+      margin-top: 0px;
+      height: 40px;
+      padding: 8px;
+      font-size: 14px;
+    background-color: #FAFAFA;
+
+    }
+
+    select,
+    input[type="checkbox"] {
+      display: block;
+      height: 310px;
+      padding: 3px;
+      position: left;
+      padding-left: 8px;
+      margin-top: 0px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 400;
+    }
+
+    input[type="checkbox"] {
+      position: relative;
+      top: 60px;
+      margin-top: 0px;
+      height: 26px;
+      width: 35px;
+      background-color: black;
+      align-items: left;
+    }    
+
+    .form-row {
+      margin-bottom: -10px;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .form-row label {
+      flex-basis: 120px;
+      margin-right: 10px;
+      font-weight: 450;
+    }
+
+    .form-row .form-field {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-row .form-field .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: -5px;
+    }
+
+    .form-row .form-field .input-group .input-item {
+      flex-basis: calc(50% - 5px);
+      margin-left: 5px;
+    }
+
+    .form-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .form-row.right-aligned {
+      justify-content: flex-end;
+    }
+
+    button[type="submit"], button.selectAllBtn {
+      position: relative;
+      top: -5px;
+      margin-left: 10px;
+      margin-bottom: 0px;
+      width: 200px;
+      padding: 10px;
+      border: none;
+      -webkit-border-radius: 5px; 
+      -moz-border-radius: 5px; 
+      border-radius: 5px; 
+      background-color: #095484;
+      font-size: 12px;
+      color: #fff;
+      cursor: pointer;
+      justify-content: center;
+    }
+
+    button:hover, button.selectAllBtn:hover {
+      background-color: #0666a3;
+      justify-content: center;
+      position: center;
+    }
+
+    .item {
+      font-size: 20px;
+      margin-bottom: 10px;
+      justify-content: left;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-weight: 400;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .delete-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      border-radius: 5px; 
+    }
+
+    #productInfoJSON {
+      width: 100%;
+      height: 600px;
+      margin-top: 10px;
+      font-family: Consolas, monospace;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Production Schedule Overrides</h1>
+  <div class="testbox">
+    <form id="overrideForm">
+      <div class="form-row">
+        <div class="item">
+          <label for="productID">Select Products to Override Schedule</label>
+          <select id="productID" multiple required></select>
+        </div>
+        <div class="item">
+          <label for="productionDate">Print <br> Date</label>
+          <input type="date" id="productionDate" required>
+        </div>
+        <div class="item">
+          <label for="newProductionDate">New Print<br> Date</label>
+          <input type="date" id="newProductionDate" required>
+        </div>
+        <div class="item">
+         <label for="dispatchDate">New Dispatch <br> Date</label>
+          <input type="date" id="dispatchDate" required>
+        </div>
+        <div class="item">
+          <label for="affectedStates">Apply<br> To</label>
+          
+          <label2 for="statensw">NSW</label2>
+          <label2 for="statevic">VIC</label2>
+          <label2 for="statewa">WA</label2>
+          <label2 for="stateQLD">QLD</label2>
+          <label2 for="stateNQLD">NQLD</label2>
+          <label2 for="product1">Offset</label2>
+          <label2 for="product2">Digital</label2>
+          <label2 for="product3">WF</label2>
+        </div>
+
+        <div class="item">
+          <label for="statensw"></label>
+      	 <input type="checkbox" id="statensw" value="nsw">
+      	 <input type="checkbox" id="statevic" value="vic">
+      	 <input type="checkbox" id="statewa" value="wa">
+      	<input type="checkbox" id="stateQLD" value="qld">        
+      	<input type="checkbox" id="stateNQLD" value="nqld">
+          <input type="checkbox" id="product1" value="1">
+          <input type="checkbox" id="product2" value="2">
+          <input type="checkbox" id="product3" value="4">
+        </div>
+      </div>
+      <button type="submit">Add Override</button>
+    </form>
+  </div>
+
+  <h1>Current Overrides</h1>
+  <table id="overrideTable">
+    <tr>
+      <th>Product ID</th>
+      <th>Product Category</th>
+      <th>Product Group</th>
+      <th>Print Date</th>
+      <th>New Print Date</th>
+      <th>New Dispatch Date</th>
+      <th>States</th>
+      <th>Products</th>
+      <th></th>
+    </tr>
+  </table>
+
+  <h1>Product Info JSON</h1>
+  <div class="testbox">
+    <textarea id="productInfoJSON" readonly></textarea>
+    <button class="selectAllBtn" onclick="selectAllJSON()">Select All</button>
+  </div>
+
+  <script>
+    // Retrieve product_info from localStorage or initialize an empty object
+   let product_info = JSON.parse(localStorage.getItem("product_info")) || {};
+
+
+
+    function displayOverrides() {
+      const table = document.getElementById("overrideTable");
+
+      // Clear existing table rows
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+      // Populate table with current overrides
+      for (const productId in product_info) {
+        const overrides = product_info[productId].Modified_run_date;
+
+        for (let i = 0; i < overrides.length; i++) {
+          const row = table.insertRow();
+
+          row.insertCell().textContent = productId;
+          row.insertCell().textContent = product_info[productId].Product_Category;
+          row.insertCell().textContent = product_info[productId].Product_Group;
+          row.insertCell().textContent = overrides[i][0];
+          row.insertCell().textContent = overrides[i][1];
+          row.insertCell().textContent = overrides[i][2];
+          row.insertCell().textContent = overrides[i][3].join(", ");
+          row.insertCell().textContent = overrides[i][4].join(", ");
+
+          const deleteCell = row.insertCell();
+          const deleteBtn = document.createElement("button");
+          deleteBtn.innerHTML = "Delete";
+          deleteBtn.className = "delete-btn";
+          deleteBtn.addEventListener("click", deleteOverride.bind(null, productId, i));
+          deleteCell.appendChild(deleteBtn);
+        }
+      }
+    }
+
+    function deleteOverride(productId, index) {
+      if (product_info.hasOwnProperty(productId)) {
+        product_info[productId].Modified_run_date.splice(index, 1);
+        displayOverrides();
+        saveData(); // save changes to localStorage
+
+        // Update productInfoJSON textarea
+        document.getElementById("productInfoJSON").value = JSON.stringify(product_info, null, 2);
+      }
+    }
+
+    function displayProductInfoJSON() {
+      document.getElementById("productInfoJSON").value = JSON.stringify(product_info, null, 2);
+    }
+
+    function saveData() {
+      localStorage.setItem("product_info", JSON.stringify(product_info));
+      displayProductInfoJSON();
+    }
+
+    function populateProductDropdown() {
+      const productDropdown = document.getElementById("productID");
+      productDropdown.innerHTML = "";
+
+      for (const productId in product_info) {
+        const option = document.createElement("option");
+        option.value = productId;
+        option.textContent = `${productId} - ${product_info[productId].Product_Category} - ${product_info[productId].Product_Group}`;
+        productDropdown.appendChild(option);
+      }
+    }
+
+    document.getElementById("overrideForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      // Get form input values
+      const productIDs = Array.from(document.getElementById("productID").selectedOptions).map(option => option.value);
+      const productionDate = document.getElementById("productionDate").value;
+      const newProductionDate = document.getElementById("newProductionDate").value;
+      const dispatchDate = document.getElementById("dispatchDate").value;
+      const affectedStates = Array.from(document.querySelectorAll('input[type="checkbox"][id^="state"]:checked')).map(checkbox => checkbox.value);
+      const affectedProducts = Array.from(document.querySelectorAll('input[type="checkbox"][id^="product"]:checked')).map(checkbox => checkbox.value);
+
+      // Create override object
+      const override = [
+        productionDate,
+        newProductionDate,
+        dispatchDate,
+        affectedStates,
+        affectedProducts
+      ];
+
+      // Add override to selected product_info entries
+      for (const productID of productIDs) {
+        if (product_info.hasOwnProperty(productID)) {
+          product_info[productID].Modified_run_date.push(override);
+        } else {
+          product_info[productID] = {
+            Product_Category: "",
+            Product_Group: "",
+            Product_ID: parseInt(productID),
+            Production_Hub: [],
+            Cutoff: 0,
+            SynergyPreflight: 0,
+            SynergyImpose: 0,
+            EnableAutoHubTransfer: 0,
+            OffsetOnly: "",
+            Start_days: [],
+            Days_to_produce: 0,
+            Modified_run_date: [override]
+          };
+        }
+      }
+
+      // Reset form
+      document.getElementById("overrideForm").reset();
+
+      // Display current overrides
+      displayOverrides();
+
+      // Save data to localStorage and update productInfoJSON textarea
+      saveData();
+
+      // Refresh the page
+      location.reload();
+    });
+
+    function selectAllJSON() {
+      const productInfoJSON = document.getElementById("productInfoJSON");
+      productInfoJSON.select();
+      productInfoJSON.setSelectionRange(0, productInfoJSON.value.length);
+    }
+
+    // Initial display of overrides and productInfoJSON
+    displayOverrides();
+    displayProductInfoJSON();
+    populateProductDropdown();
+  </script>
+</body>
+</html>

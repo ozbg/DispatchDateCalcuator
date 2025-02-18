@@ -1,7 +1,14 @@
-from fastapi import FastAPI, Request, Form, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request
+from fastapi import HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+import json
+import json
+from pathlib import Path
+from typing import List
+import json
 import pytz
 import logging
 
@@ -26,25 +33,64 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 # Set up Jinja2 templates folder
 templates = Jinja2Templates(directory="app/templates")
 
+@app.get("/api-test", response_class=HTMLResponse)
+async def api_test(request: Request):
+    return templates.TemplateResponse("api_test.html", {"request": request})
 
-@app.get("/", response_class=HTMLResponse)
-def read_root(request: Request):
-    """
-    Simple homepage that links to the different sections (Products, etc.).
-    """
-    logger.debug("Rendering homepage.")
+@app.get("/cmyk-hubs", response_class=HTMLResponse)
+async def cmyk_hubs(request: Request):
+    try:
+        hubs_data = get_cmyk_hubs_data()
+        return templates.TemplateResponse(
+            "cmyk_hubs.html",
+            {"request": request, "hubs": hubs_data}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/save-hubs")
+async def save_hubs(request: Request):
+    try:
+        hubs_data = await request.json()
+        save_cmyk_hubs_data(hubs_data)
+        return JSONResponse({"success": True, "message": "Hubs saved successfully"})
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "message": f"Error saving hubs: {str(e)}"},
+            status_code=500
+        )
+
+@app.get("/product-keywords", response_class=HTMLResponse)
+async def product_keywords(request: Request):
+    try:
+        keywords_data = get_product_keywords_data()
+        return templates.TemplateResponse(
+            "product_keywords.html",
+            {"request": request, "keywords": keywords_data}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/save-keywords")
+async def save_keywords(request: Request):
+    try:
+        keywords_data = await request.json()
+        keywords_path = Path("data/product_keywords.json")
+        with open(keywords_path, "w") as f:
+            json.dump(keywords_data, f, indent=2)
+        return JSONResponse({"success": True, "message": "Keywords saved successfully"})
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "message": f"Error saving keywords: {str(e)}"},
+            status_code=500
+        )
+
+@app.get("/")
+async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-
-# ---------------------
-# Scheduling Endpoint
-# ---------------------
 @app.post("/schedule", response_model=ScheduleResponse)
 def schedule_order(request_data: ScheduleRequest):
-    """
-    Endpoint for scheduling an order. Accepts JSON of the order details,
-    runs the business logic, and returns a ScheduleResponse.
-    """
     logger.debug(f"Received scheduling request: {request_data}")
     result = process_order(request_data)
     if not result:
@@ -53,25 +99,49 @@ def schedule_order(request_data: ScheduleRequest):
     logger.debug(f"Scheduling result: {result}")
     return result
 
+@app.get("/schedule-overrides", response_class=HTMLResponse)
+async def schedule_overrides(request: Request):
+    try:
+        product_info = get_product_info_data()
+        return templates.TemplateResponse(
+            "schedule_overrides.html",
+            {"request": request}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-# ---------------------
-# Example: Product Info Management (HTML UI)
-# ---------------------
+@app.post("/save-overrides")
+async def save_overrides(request: Request):
+    try:
+        data = await request.json()
+        save_product_info_data(data)
+        return JSONResponse({"success": True, "message": "Overrides saved successfully"})
+    except Exception as e:
+        return JSONResponse(
+            {"success": False, "message": f"Error saving overrides: {str(e)}"},
+            status_code=500
+        )
+
+@app.get("/get-products")
+async def get_products():
+    try:
+        return JSONResponse(get_product_info_data())
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.get("/products", response_class=HTMLResponse)
-def products_html(request: Request):
-    """
-    Render a page showing the product_info.json data.
-    """
-    logger.debug("Fetching product info data.")
+async def products_html(request: Request):
+    logger.debug("Fetching product info and CMYK hubs data.")
     data = get_product_info_data()
-    return templates.TemplateResponse("products.html", {"request": request, "product_data": data})
-
+    cmyk_hubs = get_cmyk_hubs_data()
+    return templates.TemplateResponse("products.html", {
+        "request": request,
+        "product_data": data,
+        "cmyk_hubs": cmyk_hubs
+    })
 
 @app.get("/products/edit/{product_id}", response_class=HTMLResponse)
-def edit_product_html(request: Request, product_id: str):
-    """
-    Render a form to edit a specific product by ID.
-    """
+async def edit_product_html(request: Request, product_id: str):
     logger.debug(f"Editing product with ID: {product_id}")
     data = get_product_info_data()
     if product_id not in data:
@@ -84,88 +154,80 @@ def edit_product_html(request: Request, product_id: str):
         "product": product
     })
 
+@app.post("/products/save")
+async def save_all_products(request: Request):
+    try:
+        products_data = await request.json()
+        save_product_info_data(products_data)
+        return JSONResponse({"success": True, "message": "Products saved successfully"})
+    except Exception as e:
+        logger.error(f"Error saving products: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/products/edit/{product_id}")
-def update_product(product_id: str,
-                   product_category: str = Form(...),
-                   product_group: str = Form(...),
-                   cutoff: str = Form(...),
-                   days_to_produce: str = Form(...)):
-    """
-    Handle form submission to update a product.
-    """
+async def update_product(request: Request, product_id: str):
+    form_data = await request.form()
     logger.debug(f"Updating product with ID: {product_id}")
     data = get_product_info_data()
     if product_id not in data:
         logger.error(f"Product with ID {product_id} not found.")
         raise HTTPException(status_code=404, detail="Product not found.")
 
-    data[product_id]["Product_Category"] = product_category
-    data[product_id]["Product_Group"] = product_group
-    data[product_id]["Cutoff"] = cutoff
-    data[product_id]["Days_to_produce"] = days_to_produce
+    data[product_id].update({
+        "Product_Category": form_data.get("product_category"),
+        "Product_Group": form_data.get("product_group"),
+        "Cutoff": form_data.get("cutoff"),
+        "Days_to_produce": form_data.get("days_to_produce")
+    })
 
     save_product_info_data(data)
     logger.debug(f"Product with ID {product_id} updated successfully.")
-    return RedirectResponse(url="/products", status_code=303)
-
+    return JSONResponse({"success": True, "message": "Product updated successfully"})
 
 @app.get("/products/add", response_class=HTMLResponse)
-def add_product_html(request: Request):
-    """
-    Render a form to add a new product.
-    """
+async def add_product_html(request: Request):
     logger.debug("Rendering add product form.")
     return templates.TemplateResponse("add_product.html", {"request": request})
 
-
 @app.post("/products/add")
-def create_new_product(product_id: str = Form(...),
-                       product_category: str = Form(...),
-                       product_group: str = Form(...),
-                       cutoff: str = Form(...),
-                       days_to_produce: str = Form(...)):
-    """
-    Handle form submission to add a new product.
-    """
+async def create_new_product(request: Request):
+    form_data = await request.form()
+    product_id = form_data.get("product_id")
     logger.debug(f"Creating new product with ID: {product_id}")
+    
     data = get_product_info_data()
     if product_id in data:
         logger.error(f"Product ID {product_id} already exists.")
         raise HTTPException(status_code=400, detail="Product ID already exists.")
 
     data[product_id] = {
-        "Product_Category": product_category,
-        "Product_Group": product_group,
+        "Product_Category": form_data.get("product_category"),
+        "Product_Group": form_data.get("product_group"),
         "Product_ID": int(product_id),
         "Production_Hub": ["vic"],
-        "Cutoff": cutoff,
+        "Cutoff": form_data.get("cutoff"),
         "SynergyPreflight": 0,
         "SynergyImpose": 0,
         "EnableAutoHubTransfer": 1,
         "OffsetOnly": "",
         "Start_days": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
-        "Days_to_produce": days_to_produce,
+        "Days_to_produce": form_data.get("days_to_produce"),
         "Modified_run_date": []
     }
 
     save_product_info_data(data)
     logger.debug(f"New product with ID {product_id} created successfully.")
-    return RedirectResponse(url="/products", status_code=303)
-
+    return JSONResponse({"success": True, "message": "Product created successfully"})
 
 @app.get("/products/delete/{product_id}")
-def delete_product(product_id: str):
-    """
-    Deletes a product record from JSON data.
-    """
+async def delete_product(product_id: str):
     logger.debug(f"Deleting product with ID: {product_id}")
     data = get_product_info_data()
     if product_id in data:
         del data[product_id]
         save_product_info_data(data)
         logger.debug(f"Product with ID {product_id} deleted successfully.")
+        return JSONResponse({"success": True, "message": "Product deleted successfully"})
     else:
         logger.error(f"Product with ID {product_id} not found.")
         raise HTTPException(status_code=404, detail="Product not found.")
-    return RedirectResponse(url="/products", status_code=303)

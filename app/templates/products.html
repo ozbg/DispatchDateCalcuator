@@ -1,28 +1,582 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Product Info</h2>
-<a class="btn" href="/products/add">Add New Product</a>
+<h2>Products Management</h2>
+<p><a href="/" class="btn">Back to Admin</a></p>
 
-<table>
-  <tr>
-    <th>Product ID</th>
-    <th>Category</th>
-    <th>Group</th>
-    <th>Cutoff</th>
-    <th>Days to Produce</th>
-    <th>Edit</th>
-    <th>Delete</th>
-  </tr>
-  {% for pid, item in product_data.items() %}
-  <tr>
-    <td>{{ pid }}</td>
-    <td>{{ item.Product_Category }}</td>
-    <td>{{ item.Product_Group }}</td>
-    <td>{{ item.Cutoff }}</td>
-    <td>{{ item.Days_to_produce }}</td>
-    <td><a href="/products/edit/{{ pid }}">Edit</a></td>
-    <td><a href="/products/delete/{{ pid }}">Delete</a></td>
-  </tr>
-  {% endfor %}
-</table>
+<div class="help-section">
+    <h3>Understanding Product Configuration</h3>
+    <div class="rule-explanation">
+        <div class="rule-box">
+            <h4>Production Hubs</h4>
+            <p>Select which hubs can manufacture this product.</p>
+            <p class="example">Example: Product can be made in VIC and NSW hubs</p>
+        </div>
+        <div class="rule-box">
+            <h4>Start Days</h4>
+            <p>Days when production can begin on this product.</p>
+            <p class="example">Example: Only start on Monday and Wednesday</p>
+        </div>
+        <div class="rule-box">
+            <h4>Modified Run Dates</h4>
+            <p>Special date ranges with modified production settings.</p>
+            <p class="example">Example: Different production times during holidays</p>
+        </div>
+    </div>
+</div>
+
+<div class="controls">
+    <button onclick="showAddForm()" class="add-btn">Add New Product</button>
+    <label class="toggle-label">
+        <input type="checkbox" id="showTechnicalFields" onchange="toggleTechnicalFields()">
+        Show Technical Fields
+    </label>
+</div>
+
+<div id="productsTable">
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Category</th>
+                <th>Group</th>
+                <th>Production Hubs</th>
+                <th>Cutoff</th>
+                <th>Days to Produce</th>
+                <th>Start Days</th>
+                <th class="technical-field">Synergy Preflight</th>
+                <th class="technical-field">Synergy Impose</th>
+                <th class="technical-field">Enable Hub Transfer</th>
+                <th>Modified Run Dates</th>
+                <th>Actions</th>
+    <tr>
+        <th>Modified Run Dates</th>
+        <td>
+            {% if product.Modified_run_date %}
+                <div class="modified-dates">
+                    {% for override in product.Modified_run_date %}
+                        <div class="override-entry">
+                            Print Date: {{ override[0] }}<br>
+                            New Print: {{ override[1] }}<br>
+                            Dispatch: {{ override[2] }}<br>
+                            States: {{ override[3]|join(", ") }}<br>
+                            Products: {{ override[4]|join(", ") }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                No modified run dates
+            {% endif %}
+            <small>Edit modified run dates in Schedule Overrides</small>
+        </td>
+    </tr>
+                <td>{{ product.Product_Category }}</td>
+                <td>{{ product.Product_Group }}</td>
+                <td>{{ product.Production_Hub|join(", ") }}</td>
+                <td>{{ product.Cutoff }}</td>
+                <td>{{ product.Days_to_produce }}</td>
+                <td>{{ product.Start_days|join(", ") }}</td>
+                <td class="technical-field">{{ product.SynergyPreflight }}</td>
+                <td class="technical-field">{{ product.SynergyImpose }}</td>
+                <td class="technical-field">{{ product.EnableAutoHubTransfer }}</td>
+                <td>
+                    {% if product.Modified_run_date %}
+                        <button onclick="viewModifiedDates({{ loop.index0 }})" class="view-dates-btn">View Dates</button>
+                    {% endif %}
+                </td>
+                <td>
+                    <button onclick="editProduct({{ loop.index0 }})" class="edit-btn">Edit</button>
+                    <button onclick="deleteProduct('{{ id }}')" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="editForm" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3 id="formTitle">Edit Product</h3>
+        
+        <div class="form-group">
+            <label for="productId">Product ID:</label>
+            <input type="text" id="productId" required>
+        </div>
+
+        <div class="form-group">
+            <label for="productCategory">Product Category:</label>
+            <input type="text" id="productCategory" required>
+        </div>
+
+        <div class="form-group">
+            <label for="productGroup">Product Group:</label>
+            <input type="text" id="productGroup" required>
+        </div>
+
+        <div class="form-group">
+            <label>Production Hubs:</label>
+            <div id="productionHubs" class="checkbox-group">
+                <!-- Populated from CMYK hubs data -->
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="cutoff">Cutoff Hour (24h):</label>
+            <input type="number" id="cutoff" min="0" max="23" required>
+        </div>
+
+        <div class="form-group">
+            <label for="daysToProduce">Days to Produce:</label>
+            <input type="number" id="daysToProduce" min="1" required>
+        </div>
+
+        <div class="form-group">
+            <label>Start Days:</label>
+            <div id="startDays" class="checkbox-group">
+                <label><input type="checkbox" value="Monday"> Monday</label>
+                <label><input type="checkbox" value="Tuesday"> Tuesday</label>
+                <label><input type="checkbox" value="Wednesday"> Wednesday</label>
+                <label><input type="checkbox" value="Thursday"> Thursday</label>
+                <label><input type="checkbox" value="Friday"> Friday</label>
+            </div>
+        </div>
+
+        <div class="form-group technical-field">
+            <label for="synergyPreflight">Synergy Preflight:</label>
+            <input type="number" id="synergyPreflight" min="0" max="1">
+        </div>
+
+        <div class="form-group technical-field">
+            <label for="synergyImpose">Synergy Impose:</label>
+            <input type="number" id="synergyImpose" min="0" max="1">
+        </div>
+
+        <div class="form-group technical-field">
+            <label for="enableHubTransfer">Enable Hub Transfer:</label>
+            <input type="number" id="enableHubTransfer" min="0" max="1">
+        </div>
+
+        <div class="form-group">
+            <label>Modified Run Dates:</label>
+            <div id="modifiedRunDates">
+                <!-- Dynamic modified run date entries -->
+            </div>
+            <button type="button" onclick="addModifiedRunDate()" class="add-date-btn">Add Modified Run Date</button>
+        </div>
+
+        <div class="button-group">
+            <button onclick="saveProduct()" class="save-btn">Save Product</button>
+            <button onclick="closeForm()" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modified-dates {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.override-entry {
+    background: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.override-entry:last-child {
+    margin-bottom: 0;
+}
+.help-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.rule-explanation {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.rule-box {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.rule-box h4 {
+    color: #007bff;
+    margin-top: 0;
+}
+
+.example {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.technical-field {
+    display: none;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.checkbox-group {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.modified-run-date {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.add-btn, .save-btn {
+    background: #28a745;
+}
+
+.edit-btn {
+    background: #007bff;
+}
+
+.delete-btn {
+    background: #dc3545;
+}
+
+.cancel-btn {
+    background: #6c757d;
+}
+
+.view-dates-btn {
+    background: #17a2b8;
+}
+
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background: #f8f9fa;
+}
+</style>
+
+<script>
+let currentProducts = {{ product_data|tojson }};
+let cmykHubs = {{ cmyk_hubs|tojson }};
+let editIndex = -1;
+
+function showAddForm() {
+    editIndex = -1;
+    document.getElementById('formTitle').textContent = 'Add New Product';
+    resetForm();
+    populateHubsCheckboxes();
+    document.getElementById('editForm').style.display = 'block';
+}
+
+function editProduct(index) {
+    editIndex = index;
+    const productId = Object.keys(currentProducts)[index];
+    const product = currentProducts[productId];
+    document.getElementById('formTitle').textContent = 'Edit Product';
+    
+    // Populate form
+    document.getElementById('productId').value = productId;
+    document.getElementById('productId').disabled = true;
+    document.getElementById('productCategory').value = product.Product_Category;
+    document.getElementById('productGroup').value = product.Product_Group;
+    document.getElementById('cutoff').value = product.Cutoff;
+    document.getElementById('daysToProduce').value = product.Days_to_produce;
+    document.getElementById('synergyPreflight').value = product.SynergyPreflight;
+    document.getElementById('synergyImpose').value = product.SynergyImpose;
+    document.getElementById('enableHubTransfer').value = product.EnableAutoHubTransfer;
+    
+    // Populate hubs checkboxes
+    populateHubsCheckboxes(product.Production_Hub);
+    
+    // Set start days
+    const startDayInputs = document.querySelectorAll('#startDays input');
+    startDayInputs.forEach(input => {
+        input.checked = product.Start_days.includes(input.value);
+    });
+    
+    // Populate modified run dates
+    const modifiedDatesContainer = document.getElementById('modifiedRunDates');
+    modifiedDatesContainer.innerHTML = '';
+    product.Modified_run_date.forEach(dateGroup => {
+        addModifiedRunDate(dateGroup);
+    });
+    
+    document.getElementById('editForm').style.display = 'block';
+}
+
+function populateHubsCheckboxes(selectedHubs = []) {
+    const container = document.getElementById('productionHubs');
+    container.innerHTML = '';
+    
+    cmykHubs.forEach(hub => {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = hub.Hub.toLowerCase();
+        input.checked = selectedHubs.includes(hub.Hub.toLowerCase());
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(` ${hub.Hub}`));
+        container.appendChild(label);
+    });
+}
+
+function addModifiedRunDate(dateGroup = null) {
+    const container = document.getElementById('modifiedRunDates');
+    const dateEntry = document.createElement('div');
+    dateEntry.className = 'modified-run-date';
+    
+    dateEntry.innerHTML = `
+        <div class="form-group">
+            <label>Date Range:</label>
+            <input type="date" class="start-date" required>
+            <input type="date" class="end-date" required>
+        </div>
+        <div class="form-group">
+            <label>Apply to Hubs:</label>
+            <div class="hub-checkboxes">
+                ${cmykHubs.map(hub => `
+                    <label>
+                        <input type="checkbox" value="${hub.Hub.toLowerCase()}">
+                        ${hub.Hub}
+                    </label>
+                `).join('')}
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Production Days:</label>
+            <input type="number" class="prod-days" min="1" required>
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="delete-btn">Remove</button>
+    `;
+    
+    // If we have existing data, populate it
+    if (dateGroup) {
+        const [startDate, endDate, dispatchDate, hubs, days] = dateGroup;
+        dateEntry.querySelector('.start-date').value = startDate;
+        dateEntry.querySelector('.end-date').value = endDate;
+        dateEntry.querySelector('.prod-days').value = days[0];
+        
+        // Set hub checkboxes
+        const hubInputs = dateEntry.querySelectorAll('.hub-checkboxes input');
+        hubInputs.forEach(input => {
+            input.checked = hubs.includes(input.value);
+        });
+    }
+    
+    container.appendChild(dateEntry);
+}
+
+function getModifiedRunDates() {
+    const dates = [];
+    document.querySelectorAll('.modified-run-date').forEach(entry => {
+        const startDate = entry.querySelector('.start-date').value;
+        const endDate = entry.querySelector('.end-date').value;
+        const prodDays = entry.querySelector('.prod-days').value;
+        
+        const selectedHubs = Array.from(entry.querySelectorAll('.hub-checkboxes input'))
+            .filter(input => input.checked)
+            .map(input => input.value);
+            
+        if (startDate && endDate && prodDays && selectedHubs.length > 0) {
+            dates.push([
+                startDate,
+                endDate,
+                endDate, // dispatch date same as end date for now
+                selectedHubs,
+                [prodDays]
+            ]);
+        }
+    });
+    return dates;
+}
+
+async function saveProduct() {
+    const productId = document.getElementById('productId').value;
+    
+    const product = {
+        Product_Category: document.getElementById('productCategory').value,
+        Product_Group: document.getElementById('productGroup').value,
+        Product_ID: parseInt(productId),
+        Production_Hub: Array.from(document.querySelectorAll('#productionHubs input:checked'))
+            .map(input => input.value),
+        Cutoff: document.getElementById('cutoff').value,
+        SynergyPreflight: parseInt(document.getElementById('synergyPreflight').value) || 0,
+        SynergyImpose: parseInt(document.getElementById('synergyImpose').value) || 0,
+        EnableAutoHubTransfer: parseInt(document.getElementById('enableHubTransfer').value) || 0,
+        Start_days: Array.from(document.querySelectorAll('#startDays input:checked'))
+            .map(input => input.value),
+        Days_to_produce: document.getElementById('daysToProduce').value,
+        Modified_run_date: getModifiedRunDates()
+    };
+    
+    if (editIndex >= 0) {
+        currentProducts[productId] = product;
+    } else {
+        currentProducts[productId] = product;
+    }
+    
+    try {
+        const response = await fetch('/products/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentProducts)
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error saving product');
+        }
+    } catch (error) {
+        alert('Error saving product: ' + error.message);
+    }
+}
+
+async function deleteProduct(productId) {
+    if (confirm('Are you sure you want to delete this product?')) {
+        try {
+            const response = await fetch(`/products/delete/${productId}`);
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting product');
+            }
+        } catch (error) {
+            alert('Error deleting product: ' + error.message);
+        }
+    }
+}
+
+function toggleTechnicalFields() {
+    const show = document.getElementById('showTechnicalFields').checked;
+    document.querySelectorAll('.technical-field').forEach(el => {
+        el.style.display = show ? 'table-cell' : 'none';
+    });
+}
+
+function closeForm() {
+    document.getElementById('editForm').style.display = 'none';
+}
+
+function resetForm() {
+    document.getElementById('productId').value = '';
+    document.getElementById('productId').disabled = false;
+    document.getElementById('productCategory').value = '';
+    document.getElementById('productGroup').value = '';
+    document.getElementById('cutoff').value = '';
+    document.getElementById('daysToProduce').value = '';
+    document.getElementById('synergyPreflight').value = '0';
+    document.getElementById('synergyImpose').value = '0';
+    document.getElementById('enableHubTransfer').value = '0';
+    
+    // Reset checkboxes
+    document.querySelectorAll('#startDays input').forEach(input => {
+        input.checked = false;
+    });
+    
+    // Clear modified run dates
+    document.getElementById('modifiedRunDates').innerHTML = '';
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    toggleTechnicalFields();
+});
+</script>
 {% endblock %}

@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Product Keywords Management</h2>
+<p><a href="/" class="btn">Back to Admin</a></p>
+
+<div class="help-section">
+    <h3>Understanding Keyword Rules</h3>
+    <div class="rule-explanation">
+        <div class="rule-box">
+            <h4>Match All</h4>
+            <p>ALL these keywords must be present. Like AND logic.</p>
+            <p class="example">Example: ["BC", "450+"] means both "BC" AND "450+" must appear</p>
+        </div>
+        <div class="rule-box">
+            <h4>Exclude All</h4>
+            <p>NONE of these keywords can be present. Like NOT logic.</p>
+            <p class="example">Example: ["Digital", "UV"] means neither word can appear</p>
+        </div>
+        <div class="rule-box">
+            <h4>Match Any Groups</h4>
+            <p>For each group, AT LEAST ONE keyword must match. Like OR logic within each group.</p>
+            <p class="example">Example: [["Branding","BC"]] means either "Branding" OR "BC" must appear</p>
+        </div>
+    </div>
+</div>
+
+<button onclick="showAddForm()" class="add-btn">Add New Keyword Rule</button>
+
+<div id="keywordTable">
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Match All (Required)</th>
+                <th>Exclude All (Blocked)</th>
+                <th>Match Any Groups (Options)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rule in keywords %}
+            <tr>
+                <td>{{ rule.Product_ID }}</td>
+                <td>{{ rule.Match_All|join(", ") }}</td>
+                <td>{{ rule.Exclude_All|join(", ") }}</td>
+                <td>
+                    {% for group in rule.Match_Any %}
+                        Group {{ loop.index }}: ({{ group|join(" OR ") }})
+                        {% if not loop.last %}<br>{% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <button onclick="editRule({{ loop.index0 }})" class="edit-btn">Edit</button>
+                    <button onclick="deleteRule({{ loop.index0 }})" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="editForm" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3 id="formTitle">Edit Keyword Rule</h3>
+        <div class="form-group">
+            <label for="productId">Product ID:</label>
+            <input type="number" id="productId" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Match All Keywords:</label>
+            <div class="tag-input-container">
+                <input type="text" id="matchAllInput" placeholder="Type and press Enter">
+                <div id="matchAllTags" class="tag-container"></div>
+            </div>
+            <small>All these keywords must be present in the description</small>
+        </div>
+
+        <div class="form-group">
+            <label>Exclude All Keywords:</label>
+            <div class="tag-input-container">
+                <input type="text" id="excludeAllInput" placeholder="Type and press Enter">
+                <div id="excludeAllTags" class="tag-container"></div>
+            </div>
+            <small>Order will be rejected if any of these keywords are present</small>
+        </div>
+
+        <div class="form-group">
+            <label>Match Any Groups:</label>
+            <div id="matchAnyGroups">
+                <!-- Dynamic groups will be added here -->
+            </div>
+            <button onclick="addMatchAnyGroup()" type="button" class="add-group-btn">Add New Group</button>
+            <small>For each group, at least one keyword must match</small>
+        </div>
+
+        <div class="button-group">
+            <button onclick="saveRule()" class="save-btn">Save Rule</button>
+            <button onclick="closeForm()" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.help-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.rule-explanation {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.rule-box {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.rule-box h4 {
+    color: #007bff;
+    margin-top: 0;
+}
+
+.example {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group small {
+    display: block;
+    color: #666;
+    margin-top: 5px;
+}
+
+.tag-input-container {
+    margin-top: 10px;
+}
+
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.tag {
+    background: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.tag .remove {
+    margin-left: 5px;
+    cursor: pointer;
+    color: #dc3545;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.add-btn, .save-btn {
+    background: #28a745;
+}
+
+.edit-btn {
+    background: #007bff;
+}
+
+.delete-btn {
+    background: #dc3545;
+}
+
+.cancel-btn {
+    background: #6c757d;
+}
+
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.match-any-group {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+th {
+    background: #f8f9fa;
+}
+</style>
+
+<script>
+let currentKeywords = {{ keywords|tojson }};
+let editIndex = -1;
+
+function showAddForm() {
+    editIndex = -1;
+    document.getElementById('formTitle').textContent = 'Add New Keyword Rule';
+    resetForm();
+    document.getElementById('editForm').style.display = 'block';
+}
+
+function editRule(index) {
+    editIndex = index;
+    const rule = currentKeywords[index];
+    document.getElementById('formTitle').textContent = 'Edit Keyword Rule';
+    
+    // Populate form
+    document.getElementById('productId').value = rule.Product_ID;
+    
+    // Clear and repopulate tags
+    document.getElementById('matchAllTags').innerHTML = '';
+    rule.Match_All.forEach(keyword => addTag(keyword, 'matchAllTags'));
+    
+    document.getElementById('excludeAllTags').innerHTML = '';
+    rule.Exclude_All.forEach(keyword => addTag(keyword, 'excludeAllTags'));
+    
+    // Clear and repopulate match any groups
+    const groupsContainer = document.getElementById('matchAnyGroups');
+    groupsContainer.innerHTML = '';
+    rule.Match_Any.forEach(group => {
+        const groupDiv = addMatchAnyGroup();
+        group.forEach(keyword => addTag(keyword, groupDiv.querySelector('.tag-container').id));
+    });
+    
+    document.getElementById('editForm').style.display = 'block';
+}
+
+function closeForm() {
+    document.getElementById('editForm').style.display = 'none';
+}
+
+function resetForm() {
+    document.getElementById('productId').value = '';
+    document.getElementById('matchAllTags').innerHTML = '';
+    document.getElementById('excludeAllTags').innerHTML = '';
+    document.getElementById('matchAnyGroups').innerHTML = '';
+}
+
+function addTag(value, containerId) {
+    const container = document.getElementById(containerId);
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = `
+        ${value.trim()}
+        <span class="remove" onclick="this.parentElement.remove()">&times;</span>
+    `;
+    container.appendChild(tag);
+}
+
+let groupCounter = 0;
+function addMatchAnyGroup() {
+    const groupsContainer = document.getElementById('matchAnyGroups');
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'match-any-group';
+    const groupId = `matchAnyGroup${groupCounter++}`;
+    
+    groupDiv.innerHTML = `
+        <div class="group-header">
+            <span>Option Group</span>
+            <button onclick="this.parentElement.parentElement.remove()" class="delete-btn">Remove Group</button>
+        </div>
+        <div class="tag-input-container">
+            <input type="text" placeholder="Type and press Enter">
+            <div id="${groupId}" class="tag-container"></div>
+        </div>
+        <small>At least one keyword in this group must match</small>
+    `;
+    
+    groupsContainer.appendChild(groupDiv);
+    
+    // Add event listener for the input
+    const input = groupDiv.querySelector('input');
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && this.value.trim()) {
+            addTag(this.value.trim(), groupId);
+            this.value = '';
+        }
+    });
+    
+    return groupDiv;
+}
+
+// Add event listeners for the main tag inputs
+document.getElementById('matchAllInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+        addTag(this.value.trim(), 'matchAllTags');
+        this.value = '';
+    }
+});
+
+document.getElementById('excludeAllInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+        addTag(this.value.trim(), 'excludeAllTags');
+        this.value = '';
+    }
+});
+
+async function saveRule() {
+    const rule = {
+        Product_ID: parseInt(document.getElementById('productId').value),
+        Match_All: Array.from(document.getElementById('matchAllTags').children)
+            .map(tag => tag.textContent.replace(/[×\n\s]+/g, '').trim()),
+        Exclude_All: Array.from(document.getElementById('excludeAllTags').children)
+            .map(tag => tag.textContent.replace(/[×\n\s]+/g, '').trim()),
+        Match_Any: Array.from(document.getElementById('matchAnyGroups').children)
+            .map(group =>
+                Array.from(group.querySelector('.tag-container').children)
+                    .map(tag => tag.textContent.replace(/[×\n\s]+/g, '').trim())
+            )
+    };
+    
+    if (editIndex >= 0) {
+        currentKeywords[editIndex] = rule;
+    } else {
+        currentKeywords.push(rule);
+    }
+    
+    try {
+        const response = await fetch('/save-keywords', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(currentKeywords)
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error saving keywords');
+        }
+    } catch (error) {
+        alert('Error saving keywords: ' + error.message);
+    }
+}
+
+async function deleteRule(index) {
+    if (confirm('Are you sure you want to delete this rule?')) {
+        currentKeywords.splice(index, 1);
+        try {
+            const response = await fetch('/save-keywords', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(currentKeywords)
+            });
+            
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting rule');
+            }
+        } catch (error) {
+            alert('Error deleting rule: ' + error.message);
+        }
+    }
+}
+</script>
+{% endblock %}

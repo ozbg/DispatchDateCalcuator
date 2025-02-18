@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Schedule API Test</h2>
+<p><a href="/" class="btn">Back to Admin</a></p>
+
+<div class="api-test-container">
+    <div class="input-section">
+        <h3>Request Payload</h3>
+        <textarea id="requestPayload" rows="15" cols="60">{
+    "misDeliversToPostcode": "3000",
+    "misOrderQTY": 1000,
+    "orientation": "portrait",
+    "description": "business cards",
+    "printType": 1,
+    "kinds": 1,
+    "preflightedWidth": 90,
+    "preflightedHeight": 55,
+    "misCurrentHub": "vic",
+    "misCurrentHubID": 1,
+    "misDeliversToState": "vic",
+    "orderNotes": "",
+    "additionalProductionDays": 0
+}</textarea>
+    </div>
+    <button onclick="runTest()" class="test-btn">Run API Test</button>
+    <div class="result-section">
+        <h3>Response</h3>
+        <pre id="responseOutput"></pre>
+    </div>
+</div>
+
+<script>
+async function runTest() {
+    try {
+        const payload = JSON.parse(document.getElementById('requestPayload').value);
+        const response = await fetch('/schedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        const formattedResult = JSON.stringify(result, null, 2);
+        document.getElementById('responseOutput').textContent = formattedResult;
+    } catch (error) {
+        document.getElementById('responseOutput').textContent = 'Error: ' + error.message;
+    }
+}
+</script>
+
+<style>
+.api-test-container {
+    max-width: 1400px;
+    margin: 35px auto;
+}
+
+.input-section, .result-section {
+    margin: 35px 0;
+}
+
+textarea {
+    width: 100%;
+    font-family: monospace;
+    padding: 17px;
+    border: 2px solid #ccc;
+    border-radius: 7px;
+    font-size: 1.75em;
+}
+
+.test-btn {
+    display: block;
+    margin: 35px 0;
+    padding: 17px 35px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 1.75em;
+}
+
+.test-btn:hover {
+    background: #218838;
+}
+
+pre {
+    background: #f8f9fa;
+    padding: 26px;
+    border-radius: 7px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+    font-size: 1.75em;
+}
+
+h3 {
+    font-size: 1.75em;
+}
+</style>
+{% endblock %}

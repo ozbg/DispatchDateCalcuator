@@ -1,0 +1,527 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Production Schedule Overrides</h2>
+<p><a href="/" class="btn">Back to Admin</a></p>
+
+<div class="help-section">
+    <h3>Understanding Schedule Overrides</h3>
+    <div class="rule-explanation">
+        <div class="rule-box">
+            <h4>Print Dates</h4>
+            <p>Specify when production starts and ends for special cases.</p>
+            <p class="example">Example: Moving Christmas period work earlier</p>
+        </div>
+        <div class="rule-box">
+            <h4>State Selection</h4>
+            <p>Choose which states this override applies to.</p>
+            <p class="example">Example: NSW, VIC closed on different dates</p>
+        </div>
+        <div class="rule-box">
+            <h4>Product Types</h4>
+            <p>Select which product categories are affected.</p>
+            <p class="example">Example: Only Offset products moved forward</p>
+        </div>
+    </div>
+</div>
+
+<div class="testbox">
+    <form id="overrideForm">
+        <div class="form-row">
+            <div class="item">
+                <label for="productID">Select Products to Override Schedule</label>
+                <select id="productID" multiple required></select>
+            </div>
+            <div class="date-group">
+                <div class="date-item">
+                    <label for="productionDate">Print Date</label>
+                    <input type="date" id="productionDate" required>
+                </div>
+                <div class="date-item">
+                    <label for="newProductionDate">New Print Date</label>
+                    <input type="date" id="newProductionDate" required>
+                </div>
+                <div class="date-item">
+                    <label for="dispatchDate">New Dispatch Date</label>
+                    <input type="date" id="dispatchDate" required>
+                </div>
+            </div>
+            <div class="item">
+                <label>Apply To</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-row">
+                        <label><input type="checkbox" id="statensw" value="nsw"> NSW</label>
+                        <label><input type="checkbox" id="statevic" value="vic"> VIC</label>
+                        <label><input type="checkbox" id="statewa" value="wa"> WA</label>
+                        <label><input type="checkbox" id="stateQLD" value="qld"> QLD</label>
+                        <label><input type="checkbox" id="stateNQLD" value="nqld"> NQLD</label>
+                    </div>
+                    <div class="checkbox-row">
+                        <label><input type="checkbox" id="product1" value="1"> Offset</label>
+                        <label><input type="checkbox" id="product2" value="2"> Digital</label>
+                        <label><input type="checkbox" id="product3" value="4"> WF</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="submit-btn">Add Override</button>
+    </form>
+</div>
+
+<h3>Current Overrides</h3>
+<div class="table-container">
+    <table id="overrideTable">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Category</th>
+                <th>Product Group</th>
+                <th>Print Date</th>
+                <th>New Print Date</th>
+                <th>New Dispatch Date</th>
+                <th>States</th>
+                <th>Products</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<div class="json-preview">
+    <h3>Product Info JSON</h3>
+    <textarea id="productInfoJSON" readonly></textarea>
+    <button class="select-btn" onclick="selectAllJSON()">Select All</button>
+</div>
+
+<style>
+.help-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.rule-explanation {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.rule-box {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.rule-box h4 {
+    color: #007bff;
+    margin-top: 0;
+}
+
+.example {
+    font-style: italic;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.item {
+    flex: 1;
+}
+
+.item label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.item select {
+    width: 100%;
+    padding: 17px;
+    border: 1px solid #ddd;
+    height: 310px;
+    font-size: 1em;
+}
+
+.date-group {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+.date-item {
+    flex: 1;
+}
+
+.date-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 1.0em;
+}
+
+.date-item input[type="date"] {
+    width: 50%;
+    padding: 17px;
+    border: 1px solid #ddd;
+    font-size: 1.0em;
+}
+
+.checkbox-group {
+    border: 2px solid #ccc;
+    padding: 26px;
+    background: #f8f9fa;
+}
+
+.checkbox-row {
+    display: flex;
+    gap: 35px;
+    margin-bottom: 20px;
+    font-size: 1.0em;
+}
+
+.checkbox-row label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: normal;
+}
+
+.checkbox-row input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+}
+
+.table-container {
+    margin: 35px 0;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.0em;
+}
+
+th, td {
+    padding: 17px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background: #f8f9fa;
+    font-weight: bold;
+}
+
+.json-preview {
+    margin: 35px 0;
+}
+
+#productInfoJSON {
+    width: 98.5%;
+    height: 600px;
+    padding: 17px;
+    border: 2px solid #ccc;
+    font-size: 1.0em;
+}
+
+.submit-btn, .select-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 17px 35px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 1.0em;
+}
+
+.submit-btn:hover, .select-btn:hover {
+    background: #218838;
+}
+
+.delete-btn, .edit-btn {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 1em;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.edit-btn {
+    background: #007bff;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #c82333;
+}
+
+.edit-btn:hover {
+    background: #0056b3;
+}
+
+/* Edit mode styles */
+.edit-mode input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #007bff;
+    border-radius: 3px;
+    font-size: 1em;
+}
+
+.edit-mode .checkbox-cell {
+    padding: 8px;
+}
+
+.edit-mode .save-edit-btn,
+.edit-mode .cancel-edit-btn {
+    padding: 8px 16px;
+    margin: 2px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.edit-mode .save-edit-btn {
+    background: #28a745;
+    color: white;
+}
+
+.edit-mode .cancel-edit-btn {
+    background: #6c757d;
+    color: white;
+}
+</style>
+
+<script>
+let product_info = {};
+
+function displayOverrides() {
+    const table = document.getElementById("overrideTable").getElementsByTagName('tbody')[0];
+    table.innerHTML = '';
+
+    for (const productId in product_info) {
+        const overrides = product_info[productId].Modified_run_date;
+        
+        for (let i = 0; i < overrides.length; i++) {
+            const row = table.insertRow();
+            
+            row.insertCell().textContent = productId;
+            row.insertCell().textContent = product_info[productId].Product_Category;
+            row.insertCell().textContent = product_info[productId].Product_Group;
+            row.insertCell().textContent = overrides[i][0];
+            row.insertCell().textContent = overrides[i][1];
+            row.insertCell().textContent = overrides[i][2];
+            row.insertCell().textContent = overrides[i][3].join(", ");
+            row.insertCell().textContent = overrides[i][4].join(", ");
+
+            const actionCell = row.insertCell();
+            const editBtn = document.createElement("button");
+            editBtn.textContent = "Edit";
+            editBtn.className = "edit-btn";
+            editBtn.onclick = () => editOverride(row, productId, i);
+            
+            const deleteBtn = document.createElement("button");
+            deleteBtn.textContent = "Delete";
+            deleteBtn.className = "delete-btn";
+            deleteBtn.onclick = () => deleteOverride(productId, i);
+            
+            actionCell.appendChild(editBtn);
+            actionCell.appendChild(deleteBtn);
+        }
+    }
+}
+
+function editOverride(row, productId, index) {
+    const override = product_info[productId].Modified_run_date[index];
+    const cells = row.cells;
+    
+    // Save original content for cancel
+    const originalContent = {
+        printDate: override[0],
+        newPrintDate: override[1],
+        dispatchDate: override[2],
+        states: override[3],
+        products: override[4]
+    };
+
+    // Convert cells to edit mode
+    cells[3].innerHTML = `<input type="date" value="${override[0]}">`;
+    cells[4].innerHTML = `<input type="date" value="${override[1]}">`;
+    cells[5].innerHTML = `<input type="date" value="${override[2]}">`;
+    
+    // States checkboxes
+    const statesCell = cells[6];
+    statesCell.innerHTML = '';
+    statesCell.className = 'checkbox-cell';
+    const states = ['nsw', 'vic', 'wa', 'qld', 'nqld'];
+    states.forEach(state => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = state;
+        checkbox.checked = override[3].includes(state);
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(state.toUpperCase()));
+        statesCell.appendChild(label);
+    });
+
+    // Products checkboxes
+    const productsCell = cells[7];
+    productsCell.innerHTML = '';
+    productsCell.className = 'checkbox-cell';
+    const products = [
+        {value: '1', label: 'Offset'},
+        {value: '2', label: 'Digital'},
+        {value: '4', label: 'WF'}
+    ];
+    products.forEach(product => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = product.value;
+        checkbox.checked = override[4].includes(product.value);
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(product.label));
+        productsCell.appendChild(label);
+    });
+
+    // Replace action buttons
+    const actionCell = cells[8];
+    actionCell.innerHTML = '';
+    
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Save';
+    saveBtn.className = 'save-edit-btn';
+    saveBtn.onclick = () => saveEditedOverride(row, productId, index);
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.className = 'cancel-edit-btn';
+    cancelBtn.onclick = () => cancelEdit(row, originalContent);
+    
+    actionCell.appendChild(saveBtn);
+    actionCell.appendChild(cancelBtn);
+    
+    row.className = 'edit-mode';
+}
+
+function saveEditedOverride(row, productId, index) {
+    const cells = row.cells;
+    const newOverride = [
+        cells[3].querySelector('input').value,
+        cells[4].querySelector('input').value,
+        cells[5].querySelector('input').value,
+        Array.from(cells[6].querySelectorAll('input:checked')).map(cb => cb.value),
+        Array.from(cells[7].querySelectorAll('input:checked')).map(cb => cb.value)
+    ];
+    
+    product_info[productId].Modified_run_date[index] = newOverride;
+    saveOverrides();
+}
+
+function cancelEdit(row, originalContent) {
+    displayOverrides(); // Refresh the entire table
+}
+
+function deleteOverride(productId, index) {
+    if (confirm('Are you sure you want to delete this override?')) {
+        product_info[productId].Modified_run_date.splice(index, 1);
+        saveOverrides();
+    }
+}
+
+function populateProductDropdown() {
+    const select = document.getElementById("productID");
+    select.innerHTML = '';
+    
+    for (const productId in product_info) {
+        const option = document.createElement("option");
+        option.value = productId;
+        option.textContent = `${productId} - ${product_info[productId].Product_Category} - ${product_info[productId].Product_Group}`;
+        select.appendChild(option);
+    }
+}
+
+document.getElementById("overrideForm").onsubmit = function(e) {
+    e.preventDefault();
+    
+    const productIDs = Array.from(document.getElementById("productID").selectedOptions).map(opt => opt.value);
+    const override = [
+        document.getElementById("productionDate").value,
+        document.getElementById("newProductionDate").value,
+        document.getElementById("dispatchDate").value,
+        Array.from(document.querySelectorAll('input[type="checkbox"][id^="state"]:checked')).map(cb => cb.value),
+        Array.from(document.querySelectorAll('input[type="checkbox"][id^="product"]:checked')).map(cb => cb.value)
+    ];
+
+    for (const productId of productIDs) {
+        if (!product_info[productId].Modified_run_date) {
+            product_info[productId].Modified_run_date = [];
+        }
+        product_info[productId].Modified_run_date.push(override);
+    }
+
+    saveOverrides();
+    this.reset();
+};
+
+function saveOverrides() {
+    fetch('/save-overrides', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(product_info)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayOverrides();
+            document.getElementById("productInfoJSON").value = JSON.stringify(product_info, null, 2);
+        } else {
+            alert('Error saving overrides: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Error saving overrides: ' + error);
+    });
+}
+
+function selectAllJSON() {
+    const textarea = document.getElementById("productInfoJSON");
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+}
+
+// Initial load
+fetch('/get-products')
+    .then(response => response.json())
+    .then(data => {
+        product_info = data;
+        populateProductDropdown();
+        displayOverrides();
+        document.getElementById("productInfoJSON").value = JSON.stringify(product_info, null, 2);
+    })
+    .catch(error => {
+        alert('Error loading product data: ' + error);
+    });
+</script>
+{% endblock %}
