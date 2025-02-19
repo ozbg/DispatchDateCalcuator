@@ -1,3 +1,5 @@
+#models.py contains the Pydantic models that are used to define the structure of the JSON data that is sent to and received from the API.
+#These models are used to validate the data and ensure that it conforms to the expected structure.
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Union
 

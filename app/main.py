@@ -1,3 +1,5 @@
+#main.py
+#main.py is the main application file that defines the FastAPI application and the routes.
 from fastapi import FastAPI, Request
 from fastapi import FastAPI, Request
 from fastapi import HTTPException
@@ -57,6 +59,55 @@ async def save_hubs(request: Request):
     except Exception as e:
         return JSONResponse(
             {"success": False, "message": f"Error saving hubs: {str(e)}"},
+            status_code=500
+        )
+
+@app.post("/finishing-rules/save")
+async def save_finishing_rule(request: Request):
+    try:
+        data = await request.json()
+        logger.debug(f"Received rule data: {data}")
+        
+        rules_path = Path("data/finishing_rules.json")
+        with open(rules_path, "r") as f:
+            rules = json.load(f)
+            
+        rule_type = data.get("type")
+        new_rule = data.get("rule")
+        
+        if not new_rule or not rule_type:
+            raise ValueError("Missing rule data or type")
+            
+        if rule_type == "keyword":
+            # Find and update existing rule or add new one
+            rule_index = next((i for i, r in enumerate(rules["keywordRules"])
+                             if r["id"] == new_rule["id"]), None)
+            if rule_index is not None:
+                rules["keywordRules"][rule_index] = new_rule
+            else:
+                rules["keywordRules"].append(new_rule)
+        else:
+            # Handle center rules
+            rule_index = next((i for i, r in enumerate(rules["centerRules"])
+                             if r["id"] == new_rule["id"]), None)
+            if rule_index is not None:
+                rules["centerRules"][rule_index] = new_rule
+            else:
+                rules["centerRules"].append(new_rule)
+        
+        # Save updated rules
+        with open(rules_path, "w", encoding='utf-8') as f:
+            json.dump(rules, f, indent=2, ensure_ascii=False)
+            
+        return JSONResponse({
+            "success": True,
+            "message": "Rule saved successfully",
+            "rule": new_rule
+        })
+    except Exception as e:
+        logger.error(f"Error saving rule: {str(e)}")
+        return JSONResponse(
+            {"success": False, "message": f"Error saving rule: {str(e)}"},
             status_code=500
         )
 
@@ -131,8 +182,8 @@ async def save_rule(request: Request):
                 rules["centerRules"].remove(existing_rule)
             rules["centerRules"].append(new_rule)
 
-        with open(rules_path, "w") as f:
-            json.dump(rules, f, indent=2)
+        with open(rules_path, "w", encoding='utf-8') as f:
+            json.dump(rules, f, indent=2, ensure_ascii=False)
 
         return JSONResponse({"success": True, "message": "Rule saved successfully"})
     except Exception as e:

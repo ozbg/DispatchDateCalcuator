@@ -108,19 +108,6 @@
       "enabled": true
     },
     {
-      "id": "presentation_large",
-      "description": "Presentation Folder Large Quantity",
-      "addDays": 2,
-      "conditions": {
-        "productIdIn": [
-          29,
-          30
-        ],
-        "quantityGreaterThan": 500
-      },
-      "enabled": true
-    },
-    {
       "id": "presentation_glue",
       "description": "Presentation Folder with Glue",
       "keywords": [
@@ -193,25 +180,57 @@
       "enabled": true
     },
     {
-      "id": "strut_large",
-      "description": "Mounted Strut Large Quantity",
-      "addDays": 1,
-      "conditions": {
-        "productIdEqual": 44,
-        "quantityGreaterThan": 250
-      },
-      "enabled": true
-    },
-    {
       "id": "saddle_stitch",
       "description": "Saddle Stitching",
       "addDays": 2,
       "enabled": true,
       "keywords": [
-        "saddle\n        \u00d7\n        \u00d7\n        \u00d7\n        \u00d7"
+        "saddle"
       ],
       "excludeKeywords": [],
       "matchType": "any"
+    },
+    {
+      "id": "BT",
+      "description": "BenTest",
+      "addDays": 5,
+      "enabled": true,
+      "keywords": [
+        "Benny"
+      ],
+      "excludeKeywords": [],
+      "matchType": "all"
+    },
+    {
+      "id": "presentation_large",
+      "description": "Presentation Folder Large Quantity",
+      "addDays": 2,
+      "enabled": true,
+      "keywords": [],
+      "excludeKeywords": [],
+      "matchType": "any"
+    },
+    {
+      "id": "strut_large",
+      "description": "Mounted Strut Large Quantity",
+      "addDays": 1,
+      "enabled": true,
+      "keywords": [],
+      "excludeKeywords": [],
+      "matchType": "any"
+    },
+    {
+      "id": "SST",
+      "description": "SaddleTest",
+      "addDays": 55,
+      "enabled": true,
+      "keywords": [],
+      "excludeKeywords": [],
+      "matchType": "any",
+      "conditions": {
+        "quantityGreaterThan": 10,
+        "quantityLessThan": 20
+      }
     }
   ],
   "centerRules": [

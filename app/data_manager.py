@@ -1,3 +1,6 @@
+#data_manager.py is responsible for reading and writing data to and from JSON files.
+#This module is used by the main application to read and write data to and from JSON files.
+#The data is stored in the 'data/' directory, which is one level up from the 'app/' directory.
 import json
 from pathlib import Path
 

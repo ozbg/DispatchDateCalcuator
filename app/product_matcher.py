@@ -1,3 +1,5 @@
+#product_matcher.py
+#This module contains the logic for matching product IDs based on description and determining the grain direction based on orientation, width, height, and description.
 import logging
 
 logger = logging.getLogger("scheduler")

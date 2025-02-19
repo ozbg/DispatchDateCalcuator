@@ -1,3 +1,5 @@
+#shcedule_logic.py
+#This module contains the main scheduling logic for processing an order request. It includes steps such as state overrides, hub selection, product matching, finishing days calculation, and date adjustments.
 import json
 import logging
 from datetime import datetime, timedelta, timezone

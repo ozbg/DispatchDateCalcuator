@@ -26,8 +26,8 @@
 
 <button onclick="showAddForm()" class="add-btn">Add New Rule</button>
 
-<div id="rulesContainer">
-    <h3>Keyword Rules</h3>
+<div id="rulesContainer" class="rules-container">
+    <h3 class="section-title">Keyword Rules</h3>
     <table class="rules-table">
         <thead>
             <tr>
@@ -68,8 +68,8 @@
                 </td>
                 <td>{{ "Active" if rule.enabled else "Disabled" }}</td>
                 <td>
-                    <button onclick="editRule('{{ rule.id }}')" class="edit-btn">Edit</button>
-                    <button onclick="deleteRule('{{ rule.id }}')" class="delete-btn">Delete</button>
+                    <button type="button" class="edit-btn" data-rule-id="{{ rule.id }}" onclick="editRule('{{ rule.id }}')">Edit</button>
+                    <button class="delete-btn" data-rule-id="{{ rule.id }}">Delete</button>
                 </td>
             </tr>
             {% endfor %}
@@ -157,21 +157,12 @@
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="conditions">Conditions:</label>
-                <div id="conditionsContainer">
-                    <div class="condition-row">
-                        <select class="condition-type">
-                            <option value="quantityLessThan">Quantity Less Than</option>
-                            <option value="quantityGreaterThan">Quantity Greater Than</option>
-                            <option value="productIdEqual">Product ID Equals</option>
-                            <option value="productGroupNotContains">Product Group Not Contains</option>
-                        </select>
-                        <input type="number" class="condition-value">
-                        <button onclick="removeCondition(this)" class="remove-btn">Remove</button>
-                    </div>
+            <div class="form-group condition-group">
+                <label for="conditions">Rule Conditions:</label>
+                <div id="conditionsContainer" class="conditions-container">
+                    <!-- Condition rows/groups will be dynamically added here -->
                 </div>
-                <button onclick="addCondition()" type="button">Add Condition</button>
+                <button onclick="addConditionGroup()" type="button" class="add-condition-btn">Add Condition Group</button>
             </div>
         </div>
 
@@ -203,11 +194,25 @@
 </div>
 
 <style>
+.rules-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.section-title {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eee;
+}
+
 .help-section {
     background: #f8f9fa;
     padding: 20px;
     margin-bottom: 30px;
     border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .rule-explanation {
@@ -222,6 +227,11 @@
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.section-title {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
 }
 
 .conditions-list {
@@ -256,6 +266,11 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.modal.show {
+    display: block;
 }
 
 .modal-content {
@@ -267,6 +282,11 @@
     border-radius: 8px;
     max-height: 80vh;
     overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.tag-input-container {
+    position: relative;
 }
 
 .tag-container {
@@ -293,10 +313,113 @@
     color: #dc3545;
 }
 
+.conditions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.condition-group {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
 .condition-row {
     display: flex;
+    align-items: center;
     gap: 8px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
     margin-bottom: 8px;
+}
+
+.condition-join {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 5px 0;
+    padding-left: 20px;
+}
+
+.join-select {
+    padding: 4px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    background: #f8f9fa;
+}
+
+.condition-type {
+    flex: 2;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.condition-value {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.add-condition-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.remove-condition-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background: #007bff;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.save-btn {
+    background: #28a745;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
 }
 
 .button-group {
@@ -305,88 +428,57 @@
     justify-content: flex-end;
     margin-top: 20px;
 }
-
-.edit-btn, .delete-btn, .save-btn, .cancel-btn {
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: none;
-    cursor: pointer;
-    color: white;
-}
-
-.edit-btn { background: #007bff; }
-.delete-btn { background: #dc3545; }
-.save-btn { background: #28a745; }
-.cancel-btn { background: #6c757d; }
 </style>
 
 <script>
+// Store rules in a JS variable
 let currentRules = {{ rules|tojson }};
+console.log('Initialized currentRules:', currentRules);
 
+document.addEventListener('DOMContentLoaded', function() {
+    // Debug logging
+    console.log('Current rules data:', currentRules);
+    console.log('Number of keyword rules:', currentRules.keywordRules.length);
+    console.log('Number of center rules:', currentRules.centerRules.length);
+
+    // Bind existing edit/delete buttons
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const ruleId = this.getAttribute('data-rule-id');
+            if (ruleId) {
+                editRule(ruleId);
+            }
+        });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const ruleId = this.getAttribute('data-rule-id');
+            if (ruleId) {
+                deleteRule(ruleId);
+            }
+        });
+    });
+});
+
+/* ======================
+   Show/Hide Modal Logic
+   ====================== */
 function showAddForm() {
+    console.log('Showing add form');
     document.getElementById('modalTitle').textContent = 'Add New Rule';
     resetForm();
     document.getElementById('ruleEditor').style.display = 'block';
 }
 
-function editRule(ruleId) {
-    const rule = currentRules.keywordRules.find(r => r.id === ruleId);
-    if (!rule) return;
-
-    document.getElementById('modalTitle').textContent = 'Edit Rule';
-    document.getElementById('ruleType').value = 'keyword';
-    document.getElementById('ruleId').value = rule.id;
-    document.getElementById('description').value = rule.description;
-    document.getElementById('addDays').value = rule.addDays;
-    document.getElementById('enabled').checked = rule.enabled;
-    document.getElementById('matchType').value = rule.matchType || 'any';
-
-    // Clear and populate keywords
-    document.getElementById('keywordTags').innerHTML = '';
-    if (rule.keywords) {
-        rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
-    }
-
-    // Clear and populate exclude keywords
-    document.getElementById('excludeKeywordTags').innerHTML = '';
-    if (rule.excludeKeywords) {
-        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
-    }
-
-    // Show appropriate fields
-    toggleRuleFields();
-    document.getElementById('ruleEditor').style.display = 'block';
+function closeEditor() {
+    document.getElementById('ruleEditor').style.display = 'none';
+    resetForm();
 }
 
-function editCenterRule(ruleId) {
-    const rule = currentRules.centerRules.find(r => r.id === ruleId);
-    if (!rule) return;
-
-    document.getElementById('modalTitle').textContent = 'Edit Center Rule';
-    document.getElementById('ruleType').value = 'center';
-    document.getElementById('ruleId').value = rule.id;
-    document.getElementById('description').value = rule.description;
-    document.getElementById('centerId').value = rule.centerId;
-    document.getElementById('addDays').value = rule.addDays;
-    document.getElementById('enabled').checked = rule.enabled;
-
-    // Clear and populate exclude keywords
-    document.getElementById('excludeKeywordTags').innerHTML = '';
-    if (rule.excludeKeywords) {
-        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
-    }
-
-    // Show appropriate fields
-    toggleRuleFields();
-    document.getElementById('ruleEditor').style.display = 'block';
-}
-
-function toggleRuleFields() {
-    const type = document.getElementById('ruleType').value;
-    document.getElementById('keywordFields').style.display = type === 'keyword' ? 'block' : 'none';
-    document.getElementById('centerFields').style.display = type === 'center' ? 'block' : 'none';
-}
-
+/* ======================
+   Reset / Toggle Fields
+   ====================== */
 function resetForm() {
     document.getElementById('ruleId').value = '';
     document.getElementById('description').value = '';
@@ -396,30 +488,258 @@ function resetForm() {
     document.getElementById('enabled').checked = true;
     document.getElementById('matchType').value = 'any';
     document.getElementById('centerId').value = '';
+    document.getElementById('conditionsContainer').innerHTML = '';
     toggleRuleFields();
 }
 
-function closeEditor() {
-    document.getElementById('ruleEditor').style.display = 'none';
-    resetForm();
+function toggleRuleFields() {
+    const type = document.getElementById('ruleType').value;
+    document.getElementById('keywordFields').style.display = (type === 'keyword') ? 'block' : 'none';
+    document.getElementById('centerFields').style.display = (type === 'center') ? 'block' : 'none';
 }
 
+/* ======================
+   Editing Rules
+   ====================== */
+function editRule(ruleId) {
+    // This specifically handles keyword rules in the original code
+    console.log('Editing keyword rule:', ruleId);
+
+    const rule = currentRules.keywordRules.find(r => r.id === ruleId);
+    if (!rule) {
+        console.error('Keyword rule not found:', ruleId);
+        return;
+    }
+
+    // Show modal
+    const modal = document.getElementById('ruleEditor');
+    if (!modal) {
+        console.error('Modal element not found');
+        return;
+    }
+    modal.style.display = 'block';
+
+    // Populate form
+    document.getElementById('modalTitle').textContent = 'Edit Rule';
+    document.getElementById('ruleType').value = 'keyword';
+    document.getElementById('ruleId').value = rule.id;
+    document.getElementById('description').value = rule.description;
+    document.getElementById('addDays').value = rule.addDays;
+    document.getElementById('enabled').checked = rule.enabled;
+    document.getElementById('matchType').value = rule.matchType || 'any';
+
+    // Clear and populate keywords
+    const keywordTags = document.getElementById('keywordTags');
+    keywordTags.innerHTML = '';
+    if (rule.keywords) {
+        rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
+    }
+
+    // Clear and populate exclude keywords
+    const excludeKeywordTags = document.getElementById('excludeKeywordTags');
+    excludeKeywordTags.innerHTML = '';
+    if (rule.excludeKeywords) {
+        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
+    }
+
+    // Clear condition container, then load from rule
+    const conditionsContainer = document.getElementById('conditionsContainer');
+    conditionsContainer.innerHTML = '';
+    if (rule.conditions) {
+        loadConditionsToModal(rule.conditions);
+    }
+
+    toggleRuleFields();
+}
+
+function editCenterRule(ruleId) {
+    const rule = currentRules.centerRules.find(r => r.id === ruleId);
+    if (!rule) {
+        console.error('Center rule not found:', ruleId);
+        return;
+    }
+
+    document.getElementById('modalTitle').textContent = 'Edit Center Rule';
+    document.getElementById('ruleType').value = 'center';
+    document.getElementById('ruleId').value = rule.id;
+    document.getElementById('description').value = rule.description;
+    document.getElementById('centerId').value = rule.centerId;
+    document.getElementById('addDays').value = rule.addDays;
+    document.getElementById('enabled').checked = rule.enabled;
+
+    // Clear and populate exclude keywords (for center rules)
+    document.getElementById('keywordTags').innerHTML = '';
+    document.getElementById('excludeKeywordTags').innerHTML = '';
+    if (rule.excludeKeywords) {
+        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
+    }
+
+    // We don't show conditions for center rules by default in the original code
+    document.getElementById('conditionsContainer').innerHTML = '';
+
+    toggleRuleFields();
+    document.getElementById('ruleEditor').style.display = 'block';
+}
+
+/* ======================
+   Condition Management
+   ====================== */
+function addConditionGroup() {
+    const container = document.getElementById('conditionsContainer');
+    const groupDiv = document.createElement('div');
+    groupDiv.className = 'condition-group';
+
+    // Add a single condition row initially
+    const row = createConditionRow();
+    groupDiv.appendChild(row);
+
+    // If there is already something in the container, we can add a join
+    if (container.children.length > 0) {
+        const joinDiv = document.createElement('div');
+        joinDiv.className = 'condition-join';
+        joinDiv.innerHTML = `
+            <select class="join-select">
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+            </select>
+        `;
+        container.appendChild(joinDiv);
+    }
+
+    container.appendChild(groupDiv);
+}
+
+function createConditionRow(isSubsequent = false) {
+    const row = document.createElement('div');
+    row.className = 'condition-row';
+
+    let html = '';
+    // If it's a sub-condition, add a join type
+    if (isSubsequent) {
+        html += `
+            <select class="join-select">
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+            </select>
+        `;
+    }
+
+    html += `
+        <select class="condition-type">
+            <option value="quantityLessThan">Quantity Less Than</option>
+            <option value="quantityGreaterThan">Quantity Greater Than</option>
+            <option value="productIdEqual">Product ID Equals</option>
+            <option value="productIdNotEqual">Product ID Not Equals</option>
+            <option value="productGroupContains">Product Group Contains</option>
+            <option value="productGroupNotContains">Product Group Not Contains</option>
+            <option value="descriptionContains">Description Contains</option>
+            <option value="descriptionNotContains">Description Not Contains</option>
+        </select>
+        <input type="text" class="condition-value" placeholder="Value">
+        <button onclick="addSubCondition(this)" class="add-btn">Add Sub-Condition</button>
+        <button onclick="removeCondition(this)" class="remove-condition-btn">Remove</button>
+    `;
+
+    row.innerHTML = html;
+    return row;
+}
+
+function addSubCondition(btn) {
+    const group = btn.closest('.condition-group');
+    const newRow = createConditionRow(true);
+    group.appendChild(newRow);
+}
+
+function removeCondition(btn) {
+    const row = btn.closest('.condition-row');
+    const group = row.closest('.condition-group');
+
+    // If this is the only condition row in its group, remove the group entirely
+    if (group.querySelectorAll('.condition-row').length === 1) {
+        // Remove the group and any preceding join
+        const joinDiv = group.previousElementSibling;
+        if (joinDiv && joinDiv.classList.contains('condition-join')) {
+            joinDiv.remove();
+        }
+        group.remove();
+    } else {
+        row.remove();
+    }
+}
+
+function loadConditionsToModal(conditions) {
+    const container = document.getElementById('conditionsContainer');
+    container.innerHTML = '';
+
+    if (!conditions) return;
+
+    // Loop over each key-value in conditions
+    const entries = Object.entries(conditions);
+    entries.forEach(([key, value], index) => {
+        // Skip hubOverrides if present
+        if (key === 'hubOverrides') return;
+
+        const group = document.createElement('div');
+        group.className = 'condition-group';
+
+        // If there's more than one condition, add a join
+        if (index > 0) {
+            const joinDiv = document.createElement('div');
+            joinDiv.className = 'condition-join';
+            joinDiv.innerHTML = `
+                <select class="join-select">
+                    <option value="AND" selected>AND</option>
+                    <option value="OR">OR</option>
+                </select>
+            `;
+            container.appendChild(joinDiv);
+        }
+
+        // Create row
+        const row = createConditionRow();
+        const typeSelect = row.querySelector('.condition-type');
+        const valueInput = row.querySelector('.condition-value');
+        typeSelect.value = key;
+        valueInput.value = value;
+
+        group.appendChild(row);
+        container.appendChild(group);
+    });
+}
+
+/* ======================
+   Tag Input Logic
+   ====================== */
 function addTag(value, containerId) {
     const container = document.getElementById(containerId);
+    if (!container) return;
+
     const tag = document.createElement('span');
     tag.className = 'tag';
-    tag.innerHTML = `
-        ${value.trim()}
-        <span class="remove" onclick="this.parentElement.remove()">&times;</span>
-    `;
+
+    // Clean the value to remove problematic characters
+    const cleanValue = value.trim().replace(/[^\w\s-]/g, '');
+    const textNode = document.createTextNode(cleanValue);
+    tag.appendChild(textNode);
+
+    // Remove button
+    const removeBtn = document.createElement('span');
+    removeBtn.className = 'remove';
+    removeBtn.innerHTML = '&times;';
+    removeBtn.onclick = function() {
+        tag.remove();
+    };
+
+    tag.appendChild(removeBtn);
     container.appendChild(tag);
 }
 
-// Add event listeners for the tag inputs
+// Handle Enter key in the tag inputs
 document.getElementById('keywordInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter' && this.value.trim()) {
         addTag(this.value.trim(), 'keywordTags');
         this.value = '';
+        e.preventDefault();
     }
 });
 
@@ -427,30 +747,83 @@ document.getElementById('excludeKeywordInput').addEventListener('keypress', func
     if (e.key === 'Enter' && this.value.trim()) {
         addTag(this.value.trim(), 'excludeKeywordTags');
         this.value = '';
+        e.preventDefault();
     }
 });
 
+/* ======================
+   Save / Delete Logic
+   ====================== */
 async function saveRule() {
+    console.log('Starting saveRule function');
     const type = document.getElementById('ruleType').value;
+    const ruleId = document.getElementById('ruleId').value;
+    const description = document.getElementById('description').value;
+    const addDays = parseInt(document.getElementById('addDays').value || 0, 10);
+    const enabled = document.getElementById('enabled').checked;
+
+    if (!ruleId || !description) {
+        alert('Rule ID and Description are required');
+        return;
+    }
+
     const rule = {
-        id: document.getElementById('ruleId').value,
-        description: document.getElementById('description').value,
-        addDays: parseInt(document.getElementById('addDays').value),
-        enabled: document.getElementById('enabled').checked
+        id: ruleId,
+        description: description,
+        addDays: addDays,
+        enabled: enabled
     };
 
     if (type === 'keyword') {
+        // Gather keywords
         rule.keywords = Array.from(document.getElementById('keywordTags').children)
-            .map(tag => tag.textContent.trim());
+            .map(tag => tag.firstChild.textContent.trim());
+        // Gather exclude keywords
         rule.excludeKeywords = Array.from(document.getElementById('excludeKeywordTags').children)
-            .map(tag => tag.textContent.trim());
+            .map(tag => tag.firstChild.textContent.trim());
+        // Match type
         rule.matchType = document.getElementById('matchType').value;
-        // Add conditions handling here
+        
+        // Collect conditions
+        const conditions = {};
+        const conditionGroups = document.querySelectorAll('.condition-group');
+        
+        conditionGroups.forEach((group, groupIndex) => {
+            const rows = group.querySelectorAll('.condition-row');
+            
+            rows.forEach((row) => {
+                const type = row.querySelector('.condition-type').value;
+                const value = row.querySelector('.condition-value').value;
+                
+                // Convert value based on condition type
+                if (type.includes('quantity')) {
+                    conditions[type] = parseInt(value, 10);
+                } else if (type === 'productIdEqual' || type === 'productIdNotEqual') {
+                    conditions[type] = parseInt(value, 10);
+                } else if (type === 'hubOverrides') {
+                    try {
+                        conditions.hubOverrides = JSON.parse(value);
+                    } catch (e) {
+                        console.error('Invalid hub overrides JSON:', e);
+                    }
+                } else {
+                    conditions[type] = value;
+                }
+            });
+        });
+
+        if (Object.keys(conditions).length > 0) {
+            rule.conditions = conditions;
+        }
+        
+        console.log('Collected conditions:', conditions);
     } else {
-        rule.centerId = parseInt(document.getElementById('centerId').value);
+        rule.centerId = parseInt(document.getElementById('centerId').value || 0, 10);
         rule.excludeKeywords = Array.from(document.getElementById('excludeKeywordTags').children)
-            .map(tag => tag.textContent.trim());
+            .map(tag => tag.firstChild.textContent.trim());
     }
+
+    console.log('Saving rule:', rule);
 
     try {
         const response = await fetch('/finishing-rules/save', {
@@ -458,37 +831,54 @@ async function saveRule() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                type: type,
-                rule: rule
-            })
+            body: JSON.stringify({ type, rule })
         });
 
         if (response.ok) {
+            const result = await response.json();
+            console.log('Save response:', result);
             window.location.reload();
         } else {
-            alert('Error saving rule');
+            const errorText = await response.text();
+            console.error('Error saving rule:', errorText);
+            alert('Error saving rule: ' + errorText);
         }
     } catch (error) {
+        console.error('Error in save operation:', error);
         alert('Error saving rule: ' + error.message);
     }
 }
 
 async function deleteRule(ruleId) {
-    if (confirm('Are you sure you want to delete this rule?')) {
-        try {
-            const response = await fetch(`/finishing-rules/delete/${ruleId}`, {
-                method: 'POST'
-            });
-
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Error deleting rule');
-            }
-        } catch (error) {
-            alert('Error deleting rule: ' + error.message);
+    // For keyword rules triggered by data-rule-id attribute
+    ruleId = ruleId.replace(/['"]+/g, '');
+    if (!confirm('Are you sure you want to delete this rule?')) return;
+    try {
+        const response = await fetch(`/finishing-rules/delete/${ruleId}`, { method: 'POST' });
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error deleting rule');
         }
+    } catch (error) {
+        alert('Error deleting rule: ' + error.message);
+    }
+}
+
+// Separate function for center rule deletion if needed
+async function deleteCenterRule(ruleId) {
+    ruleId = ruleId.replace(/['"]+/g, '');
+    if (!confirm('Are you sure you want to delete this center rule?')) return;
+    try {
+        // Assuming same endpoint; adjust if there's a separate center deletion route
+        const response = await fetch(`/finishing-rules/delete/${ruleId}`, { method: 'POST' });
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error deleting center rule');
+        }
+    } catch (error) {
+        alert('Error deleting center rule: ' + error.message);
     }
 }
 </script>
