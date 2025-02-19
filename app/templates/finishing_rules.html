@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Finishing Rules Management</h2>
+<p><a href="/" class="btn">Back to Admin</a></p>
+
+<div class="help-section">
+    <h3>Understanding Finishing Rules</h3>
+    <div class="rule-explanation">
+        <div class="rule-box">
+            <h4>Keyword Rules</h4>
+            <p>Rules that check for specific keywords in the order description</p>
+            <p class="example">Example: Adding days for "fold", "crease", etc.</p>
+        </div>
+        <div class="rule-box">
+            <h4>Center Rules</h4>
+            <p>Special rules for specific production centers</p>
+            <p class="example">Example: Different processing times for certain facilities</p>
+        </div>
+        <div class="rule-box">
+            <h4>Conditions</h4>
+            <p>Additional checks like quantity limits or product types</p>
+            <p class="example">Example: Extra day for quantities > 10,000</p>
+        </div>
+    </div>
+</div>
+
+<button onclick="showAddForm()" class="add-btn">Add New Rule</button>
+
+<div id="rulesContainer">
+    <h3>Keyword Rules</h3>
+    <table class="rules-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Keywords</th>
+                <th>Exclude Keywords</th>
+                <th>Days Added</th>
+                <th>Conditions</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="keywordRulesBody">
+            {% for rule in rules.keywordRules %}
+            <tr>
+                <td>{{ rule.id }}</td>
+                <td>{{ rule.description }}</td>
+                <td>{{ rule.keywords|join(", ") if rule.keywords else "N/A" }}</td>
+                <td>{{ rule.excludeKeywords|join(", ") if rule.excludeKeywords else "N/A" }}</td>
+                <td>{{ rule.addDays }}</td>
+                <td>
+                    {% if rule.conditions %}
+                    <ul class="conditions-list">
+                        {% if rule.conditions.quantityLessThan %}
+                            <li>Qty < {{ rule.conditions.quantityLessThan }}</li>
+                        {% endif %}
+                        {% if rule.conditions.quantityGreaterThan %}
+                            <li>Qty > {{ rule.conditions.quantityGreaterThan }}</li>
+                        {% endif %}
+                        {% if rule.conditions.productIdEqual %}
+                            <li>Product ID = {{ rule.conditions.productIdEqual }}</li>
+                        {% endif %}
+                    </ul>
+                    {% else %}
+                    None
+                    {% endif %}
+                </td>
+                <td>{{ "Active" if rule.enabled else "Disabled" }}</td>
+                <td>
+                    <button onclick="editRule('{{ rule.id }}')" class="edit-btn">Edit</button>
+                    <button onclick="deleteRule('{{ rule.id }}')" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Center Rules</h3>
+    <table class="rules-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Center ID</th>
+                <th>Exclude Keywords</th>
+                <th>Days Added</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="centerRulesBody">
+            {% for rule in rules.centerRules %}
+            <tr>
+                <td>{{ rule.id }}</td>
+                <td>{{ rule.description }}</td>
+                <td>{{ rule.centerId }}</td>
+                <td>{{ rule.excludeKeywords|join(", ") if rule.excludeKeywords else "N/A" }}</td>
+                <td>{{ rule.addDays }}</td>
+                <td>{{ "Active" if rule.enabled else "Disabled" }}</td>
+                <td>
+                    <button onclick="editCenterRule('{{ rule.id }}')" class="edit-btn">Edit</button>
+                    <button onclick="deleteCenterRule('{{ rule.id }}')" class="delete-btn">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Rule Editor Modal -->
+<div id="ruleEditor" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Edit Rule</h3>
+        
+        <div class="form-group">
+            <label for="ruleType">Rule Type:</label>
+            <select id="ruleType" onchange="toggleRuleFields()">
+                <option value="keyword">Keyword Rule</option>
+                <option value="center">Center Rule</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="ruleId">Rule ID:</label>
+            <input type="text" id="ruleId" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" id="description" required>
+        </div>
+
+        <!-- Keyword Rule Fields -->
+        <div id="keywordFields">
+            <div class="form-group">
+                <label>Keywords:</label>
+                <div class="tag-input-container">
+                    <input type="text" id="keywordInput" placeholder="Type and press Enter">
+                    <div id="keywordTags" class="tag-container"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Exclude Keywords:</label>
+                <div class="tag-input-container">
+                    <input type="text" id="excludeKeywordInput" placeholder="Type and press Enter">
+                    <div id="excludeKeywordTags" class="tag-container"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="matchType">Match Type:</label>
+                <select id="matchType">
+                    <option value="any">Any (OR)</option>
+                    <option value="all">All (AND)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="conditions">Conditions:</label>
+                <div id="conditionsContainer">
+                    <div class="condition-row">
+                        <select class="condition-type">
+                            <option value="quantityLessThan">Quantity Less Than</option>
+                            <option value="quantityGreaterThan">Quantity Greater Than</option>
+                            <option value="productIdEqual">Product ID Equals</option>
+                            <option value="productGroupNotContains">Product Group Not Contains</option>
+                        </select>
+                        <input type="number" class="condition-value">
+                        <button onclick="removeCondition(this)" class="remove-btn">Remove</button>
+                    </div>
+                </div>
+                <button onclick="addCondition()" type="button">Add Condition</button>
+            </div>
+        </div>
+
+        <!-- Center Rule Fields -->
+        <div id="centerFields" style="display: none;">
+            <div class="form-group">
+                <label for="centerId">Center ID:</label>
+                <input type="number" id="centerId">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="addDays">Days to Add:</label>
+            <input type="number" id="addDays" required>
+        </div>
+
+        <div class="form-group">
+            <label>
+                <input type="checkbox" id="enabled" checked>
+                Rule Enabled
+            </label>
+        </div>
+
+        <div class="button-group">
+            <button onclick="saveRule()" class="save-btn">Save Rule</button>
+            <button onclick="closeEditor()" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.help-section {
+    background: #f8f9fa;
+    padding: 20px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+}
+
+.rule-explanation {
+    display: flex;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.rule-box {
+    flex: 1;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.conditions-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 0.9em;
+}
+
+.rules-table {
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    border-collapse: collapse;
+}
+
+.rules-table th {
+    background: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+}
+
+.rules-table td {
+    padding: 12px;
+    border-top: 1px solid #dee2e6;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background: white;
+    margin: 5% auto;
+    padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.tag-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    min-height: 40px;
+}
+
+.tag {
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tag .remove {
+    cursor: pointer;
+    color: #dc3545;
+}
+
+.condition-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.edit-btn, .delete-btn, .save-btn, .cancel-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    color: white;
+}
+
+.edit-btn { background: #007bff; }
+.delete-btn { background: #dc3545; }
+.save-btn { background: #28a745; }
+.cancel-btn { background: #6c757d; }
+</style>
+
+<script>
+let currentRules = {{ rules|tojson }};
+
+function showAddForm() {
+    document.getElementById('modalTitle').textContent = 'Add New Rule';
+    resetForm();
+    document.getElementById('ruleEditor').style.display = 'block';
+}
+
+function editRule(ruleId) {
+    const rule = currentRules.keywordRules.find(r => r.id === ruleId);
+    if (!rule) return;
+
+    document.getElementById('modalTitle').textContent = 'Edit Rule';
+    document.getElementById('ruleType').value = 'keyword';
+    document.getElementById('ruleId').value = rule.id;
+    document.getElementById('description').value = rule.description;
+    document.getElementById('addDays').value = rule.addDays;
+    document.getElementById('enabled').checked = rule.enabled;
+    document.getElementById('matchType').value = rule.matchType || 'any';
+
+    // Clear and populate keywords
+    document.getElementById('keywordTags').innerHTML = '';
+    if (rule.keywords) {
+        rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
+    }
+
+    // Clear and populate exclude keywords
+    document.getElementById('excludeKeywordTags').innerHTML = '';
+    if (rule.excludeKeywords) {
+        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
+    }
+
+    // Show appropriate fields
+    toggleRuleFields();
+    document.getElementById('ruleEditor').style.display = 'block';
+}
+
+function editCenterRule(ruleId) {
+    const rule = currentRules.centerRules.find(r => r.id === ruleId);
+    if (!rule) return;
+
+    document.getElementById('modalTitle').textContent = 'Edit Center Rule';
+    document.getElementById('ruleType').value = 'center';
+    document.getElementById('ruleId').value = rule.id;
+    document.getElementById('description').value = rule.description;
+    document.getElementById('centerId').value = rule.centerId;
+    document.getElementById('addDays').value = rule.addDays;
+    document.getElementById('enabled').checked = rule.enabled;
+
+    // Clear and populate exclude keywords
+    document.getElementById('excludeKeywordTags').innerHTML = '';
+    if (rule.excludeKeywords) {
+        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
+    }
+
+    // Show appropriate fields
+    toggleRuleFields();
+    document.getElementById('ruleEditor').style.display = 'block';
+}
+
+function toggleRuleFields() {
+    const type = document.getElementById('ruleType').value;
+    document.getElementById('keywordFields').style.display = type === 'keyword' ? 'block' : 'none';
+    document.getElementById('centerFields').style.display = type === 'center' ? 'block' : 'none';
+}
+
+function resetForm() {
+    document.getElementById('ruleId').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('addDays').value = '';
+    document.getElementById('keywordTags').innerHTML = '';
+    document.getElementById('excludeKeywordTags').innerHTML = '';
+    document.getElementById('enabled').checked = true;
+    document.getElementById('matchType').value = 'any';
+    document.getElementById('centerId').value = '';
+    toggleRuleFields();
+}
+
+function closeEditor() {
+    document.getElementById('ruleEditor').style.display = 'none';
+    resetForm();
+}
+
+function addTag(value, containerId) {
+    const container = document.getElementById(containerId);
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = `
+        ${value.trim()}
+        <span class="remove" onclick="this.parentElement.remove()">&times;</span>
+    `;
+    container.appendChild(tag);
+}
+
+// Add event listeners for the tag inputs
+document.getElementById('keywordInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+        addTag(this.value.trim(), 'keywordTags');
+        this.value = '';
+    }
+});
+
+document.getElementById('excludeKeywordInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && this.value.trim()) {
+        addTag(this.value.trim(), 'excludeKeywordTags');
+        this.value = '';
+    }
+});
+
+async function saveRule() {
+    const type = document.getElementById('ruleType').value;
+    const rule = {
+        id: document.getElementById('ruleId').value,
+        description: document.getElementById('description').value,
+        addDays: parseInt(document.getElementById('addDays').value),
+        enabled: document.getElementById('enabled').checked
+    };
+
+    if (type === 'keyword') {
+        rule.keywords = Array.from(document.getElementById('keywordTags').children)
+            .map(tag => tag.textContent.trim());
+        rule.excludeKeywords = Array.from(document.getElementById('excludeKeywordTags').children)
+            .map(tag => tag.textContent.trim());
+        rule.matchType = document.getElementById('matchType').value;
+        // Add conditions handling here
+    } else {
+        rule.centerId = parseInt(document.getElementById('centerId').value);
+        rule.excludeKeywords = Array.from(document.getElementById('excludeKeywordTags').children)
+            .map(tag => tag.textContent.trim());
+    }
+
+    try {
+        const response = await fetch('/finishing-rules/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: type,
+                rule: rule
+            })
+        });
+
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Error saving rule');
+        }
+    } catch (error) {
+        alert('Error saving rule: ' + error.message);
+    }
+}
+
+async function deleteRule(ruleId) {
+    if (confirm('Are you sure you want to delete this rule?')) {
+        try {
+            const response = await fetch(`/finishing-rules/delete/${ruleId}`, {
+                method: 'POST'
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting rule');
+            }
+        } catch (error) {
+            alert('Error deleting rule: ' + error.message);
+        }
+    }
+}
+</script>
+{% endblock %}

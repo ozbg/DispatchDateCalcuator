@@ -1,0 +1,130 @@
+
+///  Add up how many days are required for FINISHING processes
+
+lcOrderDescription = orderDescription.toLowerCase()
+               
+if (lcOrderDescription.includes("Fold ".toLowerCase())|| lcOrderDescription.includes("Crease".toLowerCase()) || lcOrderDescription.includes("Perf".toLowerCase())|| lcOrderDescription.includes("Score".toLowerCase())) {
+    finishingDays = finishingDays+1
+    console.log("Add 1 day for Fold,Crease,Perf or Score")
+}
+if (lcOrderDescription.includes("Round corner".toLowerCase()) || lcOrderDescription.includes("Dril".toLowerCase())) {
+    finishingDays = finishingDays+1
+    console.log("Add 1 day for Round Corner or Drill")
+}
+if (((misOrderQTY*orderKinds) < 500 ) && (lcOrderDescription.includes("Double sided tape".toLowerCase())|| lcOrderDescription.includes("Patch magnet".toLowerCase()))) {
+    finishingDays = finishingDays+1
+    console.log("Add 1 days for Patch Magnet or Doubel Sided Tape QTY less than 500, 2 days for WA")
+    if (productProductionHub == 'wa'){  finishingDays = finishingDays+1 }
+
+
+}
+if (((misOrderQTY*orderKinds) >= 500 ) && (lcOrderDescription.includes("Double sided tape".toLowerCase())|| lcOrderDescription.includes("Patch magnet".toLowerCase()))) {
+    finishingDays = finishingDays+2
+    console.log("Add 2 days for Patch Magnet or Doubel Sided Tape QTY 500+, 3 days for WA")
+    if (productProductionHub == 'wa'){  finishingDays = finishingDays+1 }
+}
+if (((misOrderQTY*orderKinds) > 10000 ) && (lcOrderDescription.includes("Banding".toLowerCase())|| lcOrderDescription.includes("Shrink Wrapping".toLowerCase())  || lcOrderDescription.includes("Rubber Band".toLowerCase()))) {
+    finishingDays = finishingDays+1
+    console.log("Add 1 days for Banding, Rubber Band or Shrink Wrap QTY 10K+")
+}
+
+if (lcOrderDescription.includes("padding") && productId != 31 ){
+  finishingDays = finishingDays+2
+  console.log("Add 2 days for Padding not  Offset 100gsm Laser ")
+}
+
+// Order not Presentation Folder, but requires diectuting 
+if ((lcOrderDescription.includes("forme".toLowerCase()) || lcOrderDescription.includes("diecut".toLowerCase())) && !lcOrderDescription.includes("presentation")) {
+    finishingDays = finishingDays+4
+   console.log("Add 4 days for Diecutting")
+}
+
+// Presentation Folder Product, QTY greater than 500 , + 2 days
+if ( (productId == 29 || productId == 30 ) && ((misOrderQTY*orderKinds) > 500) ) {
+  finishingDays = finishingDays+2
+ console.log("Add 2 days for Presentation Folder QTY greater than 500")
+}
+
+// Presentation Folder + Glue , add 1 day
+if ( (productId == 29 || productId == 30 ) && lcOrderDescription.includes("glue")) {
+  finishingDays = finishingDays+1
+ console.log("Add 1 days for Presentation Folder + Glue, 3 days for WA")
+ if (productProductionHub == 'wa'){  finishingDays = finishingDays+2 }
+}
+
+// Presentation Folder New or Custom Forme , add 1 day
+if ( (productId == 29 || productId == 30 ) && (lcOrderDescription.includes("custom forme") || lcOrderDescription.includes("new forme"))) {
+  finishingDays = finishingDays+1
+ console.log("Add 1 days for Presentation Folder new or custom forme, 2 days for WA")
+ if (productProductionHub == 'wa'){  finishingDays = finishingDays+1 }
+}
+
+
+// If the product schedule does not include Laminating, but the order requires it, add 1 day for Laminating
+if (lcOrderDescription.includes("Lamin".toLowerCase()) && !product.Product_Group.toLowerCase().includes("Lamin".toLowerCase()) && !lcOrderDescription.includes("No Lamin".toLowerCase()) && !lcOrderDescription.includes("bc".toLowerCase())&& !lcOrderDescription.includes("strut".toLowerCase()) && !lcOrderDescription.includes("branding".toLowerCase()) && !lcOrderDescription.includes("roll label".toLowerCase()) && !lcOrderDescription.includes("Presentation".toLowerCase())) {
+finishingDays = finishingDays+1
+console.log("Add 1 day for Laminating")
+}
+
+
+// Order requires Saddle Stitching ,  add 2 days 
+if (lcOrderDescription.includes("saddle".toLowerCase())){
+  finishingDays = finishingDays+2
+ console.log("Add 2 days for Saddle Staple Binding")
+}
+
+
+
+if ((misOrderQTY*orderKinds) > 10000) {
+finishingDays = finishingDays+1
+console.log("Add 1 days for Quantity 10k+")
+}
+
+
+
+// Mounted Strut, QTY greater than 250 , + 1 days
+if ( productId == 44  && ((misOrderQTY*orderKinds) > 250) ) {
+  finishingDays = finishingDays+1
+ console.log("Add 1 days for Strut QTY greater than 250")
+}
+
+
+// Roll Label + Van Delivery , add 1 day
+if ( (productId == 48) && (additionalProductionDays !== "") ) {
+
+  additionalProductionDays = parseInt(additionalProductionDays, 10); // ensure's its an integer
+
+// Optional: Handle NaN cases (for if its cant be converted to an integer)
+if (isNaN(additionalProductionDays)) {
+  // Set a default value or handle the error
+  additionalProductionDays = 1;
+
+}
+
+
+  finishingDays = finishingDays+additionalProductionDays
+ console.log("Add "+additionalProductionDays+" days for Roll Label + Van Deliery")
+}
+
+// Paperlust (centreID 7785) orders without embellishments should have 1 day removed from the dispatch date
+if (
+  centreID === 7785 &&
+  !(
+    lcOrderDescription.includes("scodix") ||
+    lcOrderDescription.includes("spot uv") ||
+    lcOrderDescription.includes("foil - gold") ||
+    lcOrderDescription.includes("foil - rose") ||
+    lcOrderDescription.includes("foil - silver") ||
+    lcOrderDescription.includes("metal - gold") ||
+    lcOrderDescription.includes("metal - rose") ||
+    lcOrderDescription.includes("metal - silver")
+  )
+) {
+  finishingDays -= 1;
+  console.log("Minus 1 days for centreID 7785 & no Embellishments");
+}
+
+
+
+
+

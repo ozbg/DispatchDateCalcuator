@@ -1,0 +1,238 @@
+{
+  "keywordRules": [
+    {
+      "id": "fold_crease",
+      "description": "Folding, Creasing, Perfing, Scoring",
+      "keywords": [
+        "fold",
+        "crease",
+        "perf",
+        "score"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 1,
+      "enabled": true
+    },
+    {
+      "id": "round_corner",
+      "description": "Round Corner or Drilling",
+      "keywords": [
+        "round corner",
+        "dril"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 1,
+      "enabled": true
+    },
+    {
+      "id": "tape_magnet_small",
+      "description": "Double sided tape or Patch magnet (QTY < 500)",
+      "keywords": [
+        "double sided tape",
+        "patch magnet"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 1,
+      "conditions": {
+        "quantityLessThan": 500,
+        "hubOverrides": {
+          "wa": 2
+        }
+      },
+      "enabled": true
+    },
+    {
+      "id": "tape_magnet_large",
+      "description": "Double sided tape or Patch magnet (QTY >= 500)",
+      "keywords": [
+        "double sided tape",
+        "patch magnet"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 2,
+      "conditions": {
+        "quantityGreaterOrEqual": 500,
+        "hubOverrides": {
+          "wa": 3
+        }
+      },
+      "enabled": true
+    },
+    {
+      "id": "banding_large",
+      "description": "Banding, Shrink Wrap, Rubber Band (QTY > 10k)",
+      "keywords": [
+        "banding",
+        "shrink wrapping",
+        "rubber band"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 1,
+      "conditions": {
+        "quantityGreaterThan": 10000
+      },
+      "enabled": true
+    },
+    {
+      "id": "padding_non_standard",
+      "description": "Padding (not Offset 100gsm Laser)",
+      "keywords": [
+        "padding"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 2,
+      "conditions": {
+        "productIdNotEqual": 31
+      },
+      "enabled": true
+    },
+    {
+      "id": "diecut_non_presentation",
+      "description": "Diecutting (not Presentation Folder)",
+      "keywords": [
+        "forme",
+        "diecut"
+      ],
+      "excludeKeywords": [
+        "presentation"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 4,
+      "enabled": true
+    },
+    {
+      "id": "presentation_large",
+      "description": "Presentation Folder Large Quantity",
+      "addDays": 2,
+      "conditions": {
+        "productIdIn": [
+          29,
+          30
+        ],
+        "quantityGreaterThan": 500
+      },
+      "enabled": true
+    },
+    {
+      "id": "presentation_glue",
+      "description": "Presentation Folder with Glue",
+      "keywords": [
+        "glue"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 1,
+      "conditions": {
+        "productIdIn": [
+          29,
+          30
+        ],
+        "hubOverrides": {
+          "wa": 3
+        }
+      },
+      "enabled": true
+    },
+    {
+      "id": "presentation_new_forme",
+      "description": "Presentation Folder New/Custom Forme",
+      "keywords": [
+        "custom forme",
+        "new forme"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 1,
+      "conditions": {
+        "productIdIn": [
+          29,
+          30
+        ],
+        "hubOverrides": {
+          "wa": 2
+        }
+      },
+      "enabled": true
+    },
+    {
+      "id": "laminating",
+      "description": "Additional Laminating",
+      "keywords": [
+        "lamin"
+      ],
+      "excludeKeywords": [
+        "no lamin",
+        "bc",
+        "strut",
+        "branding",
+        "roll label",
+        "presentation"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": 1,
+      "conditions": {
+        "productGroupNotContains": "lamin"
+      },
+      "enabled": true
+    },
+    {
+      "id": "large_quantity",
+      "description": "Large Quantity > 10k",
+      "addDays": 1,
+      "conditions": {
+        "quantityGreaterThan": 10000
+      },
+      "enabled": true
+    },
+    {
+      "id": "strut_large",
+      "description": "Mounted Strut Large Quantity",
+      "addDays": 1,
+      "conditions": {
+        "productIdEqual": 44,
+        "quantityGreaterThan": 250
+      },
+      "enabled": true
+    },
+    {
+      "id": "saddle_stitch",
+      "description": "Saddle Stitching",
+      "addDays": 2,
+      "enabled": true,
+      "keywords": [
+        "saddle\n        \u00d7\n        \u00d7\n        \u00d7\n        \u00d7"
+      ],
+      "excludeKeywords": [],
+      "matchType": "any"
+    }
+  ],
+  "centerRules": [
+    {
+      "id": "paperlust_no_embellish",
+      "description": "Paperlust orders without embellishments",
+      "centerId": 7785,
+      "excludeKeywords": [
+        "scodix",
+        "spot uv",
+        "foil - gold",
+        "foil - rose",
+        "foil - silver",
+        "metal - gold",
+        "metal - rose",
+        "metal - silver"
+      ],
+      "matchType": "any",
+      "caseSensitive": false,
+      "addDays": -1,
+      "enabled": true
+    }
+  ]
+}
