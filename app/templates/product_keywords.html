@@ -31,6 +31,7 @@
         <thead>
             <tr>
                 <th>Product ID</th>
+                <th>Product Group</th>
                 <th>Match All (Required)</th>
                 <th>Exclude All (Blocked)</th>
                 <th>Match Any Groups (Options)</th>
@@ -41,6 +42,7 @@
             {% for rule in keywords %}
             <tr>
                 <td>{{ rule.Product_ID }}</td>
+                <td>{{ product_info[rule.Product_ID|string].Product_Group if rule.Product_ID|string in product_info else "Unknown Group" }}</td>
                 <td>{{ rule.Match_All|join(", ") }}</td>
                 <td>{{ rule.Exclude_All|join(", ") }}</td>
                 <td>

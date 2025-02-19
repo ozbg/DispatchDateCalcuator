@@ -1,12 +1,12 @@
 {
   "1": {
     "Product_Category": "Offset 450+ NV Branding Cards",
-    "Product_Group": "NV Print 1S or 2S + New Velvet Laminate 2S **",
+    "Product_Group": "NV Print 1S or 2S + New Velvet Laminate 2S ",
     "Product_ID": 1,
     "Production_Hub": [
       "vic"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -18,7 +18,7 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "2",
+    "Days_to_produce": 2,
     "Modified_run_date": []
   },
   "2": {
@@ -43,12 +43,12 @@
   },
   "3": {
     "Product_Category": "Offset 450+ NV Branding Cards",
-    "Product_Group": "NVU Print 1S or 2S + New Velvet Laminate 2S + UV 1S **",
+    "Product_Group": "NVU Print 1S or 2S + New Velvet Laminate 2S + UV 1S ",
     "Product_ID": 3,
     "Production_Hub": [
       "vic"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -57,7 +57,7 @@
       "Wednesday",
       "Friday"
     ],
-    "Days_to_produce": "3",
+    "Days_to_produce": 3,
     "Modified_run_date": []
   },
   "4": {

@@ -23,34 +23,79 @@
 }</textarea>
     </div>
     <button onclick="runTest()" class="test-btn">Run API Test</button>
+    
+    <div class="formatted-response" id="formattedResponse" style="display: none;">
+        <h3>Formatted Response</h3>
+        <table class="response-table">
+            <tr>
+                <th>Field</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>Product Group</td>
+                <td id="productGroup"></td>
+            </tr>
+            <tr>
+                <td>Dispatch Date</td>
+                <td id="dispatchDate"></td>
+            </tr>
+            <tr>
+                <td>Grain Direction</td>
+                <td id="grainDirection"></td>
+            </tr>
+            <tr>
+                <td>Hub Transfer To</td>
+                <td id="hubTransfer"></td>
+            </tr>
+            <tr>
+                <td>Development Logging</td>
+                <td id="developmentLog"></td>
+            </tr>
+        </table>
+    </div>
+
     <div class="result-section">
-        <h3>Response</h3>
+        <h3>Raw JSON Response</h3>
         <pre id="responseOutput"></pre>
     </div>
 </div>
 
-<script>
-async function runTest() {
-    try {
-        const payload = JSON.parse(document.getElementById('requestPayload').value);
-        const response = await fetch('/schedule', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-        
-        const result = await response.json();
-        const formattedResult = JSON.stringify(result, null, 2);
-        document.getElementById('responseOutput').textContent = formattedResult;
-    } catch (error) {
-        document.getElementById('responseOutput').textContent = 'Error: ' + error.message;
-    }
-}
-</script>
-
 <style>
+.formatted-response {
+    margin: 35px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 7px;
+}
+
+.response-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1.2em;
+}
+
+.response-table th,
+.response-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.response-table th {
+    background-color: #f1f1f1;
+    font-weight: bold;
+}
+
+.response-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.response-table td:first-child {
+    font-weight: bold;
+    width: 200px;
+}
+
 .api-test-container {
     max-width: 1400px;
     margin: 35px auto;
@@ -99,4 +144,34 @@ h3 {
     font-size: 1.75em;
 }
 </style>
+
+<script>
+async function runTest() {
+    try {
+        const payload = JSON.parse(document.getElementById('requestPayload').value);
+        const response = await fetch('/schedule', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        const formattedResult = JSON.stringify(result, null, 2);
+        document.getElementById('responseOutput').textContent = formattedResult;
+        
+        // Update formatted table
+        document.getElementById('formattedResponse').style.display = 'block';
+        document.getElementById('productGroup').textContent = result.productGroup || 'N/A';
+        document.getElementById('dispatchDate').textContent = result.dispatchDate || 'N/A';
+        document.getElementById('grainDirection').textContent = result.setGrainDirectionString || 'N/A';
+        document.getElementById('hubTransfer').textContent = result.hubTransferTo || 'N/A';
+        document.getElementById('developmentLog').textContent = result.developmentLogging || 'N/A';
+    } catch (error) {
+        document.getElementById('responseOutput').textContent = 'Error: ' + error.message;
+        document.getElementById('formattedResponse').style.display = 'none';
+    }
+}
+</script>
 {% endblock %}

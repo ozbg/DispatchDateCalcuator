@@ -64,9 +64,14 @@ async def save_hubs(request: Request):
 async def product_keywords(request: Request):
     try:
         keywords_data = get_product_keywords_data()
+        product_info = get_product_info_data()
         return templates.TemplateResponse(
             "product_keywords.html",
-            {"request": request, "keywords": keywords_data}
+            {
+                "request": request,
+                "keywords": keywords_data,
+                "product_info": product_info
+            }
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -140,49 +145,37 @@ async def products_html(request: Request):
         "cmyk_hubs": cmyk_hubs
     })
 
-@app.get("/products/edit/{product_id}", response_class=HTMLResponse)
-async def edit_product_html(request: Request, product_id: str):
-    logger.debug(f"Editing product with ID: {product_id}")
-    data = get_product_info_data()
-    if product_id not in data:
-        logger.error(f"Product with ID {product_id} not found.")
-        raise HTTPException(status_code=404, detail="Product not found.")
-    product = data[product_id]
-    return templates.TemplateResponse("edit_product.html", {
-        "request": request,
-        "product_id": product_id,
-        "product": product
-    })
-
-@app.post("/products/save")
-async def save_all_products(request: Request):
-    try:
-        products_data = await request.json()
-        save_product_info_data(products_data)
-        return JSONResponse({"success": True, "message": "Products saved successfully"})
-    except Exception as e:
-        logger.error(f"Error saving products: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-
 @app.post("/products/edit/{product_id}")
 async def update_product(request: Request, product_id: str):
-    form_data = await request.form()
-    logger.debug(f"Updating product with ID: {product_id}")
-    data = get_product_info_data()
-    if product_id not in data:
-        logger.error(f"Product with ID {product_id} not found.")
-        raise HTTPException(status_code=404, detail="Product not found.")
+    try:
+        # Get JSON data from request
+        product_data = await request.json()
+        logger.debug(f"Updating product with ID: {product_id} with data: {product_data}")
+        
+        data = get_product_info_data()
+        if product_id not in data:
+            logger.error(f"Product with ID {product_id} not found.")
+            raise HTTPException(status_code=404, detail="Product not found.")
 
-    data[product_id].update({
-        "Product_Category": form_data.get("product_category"),
-        "Product_Group": form_data.get("product_group"),
-        "Cutoff": form_data.get("cutoff"),
-        "Days_to_produce": form_data.get("days_to_produce")
-    })
+        # Update the product data
+        data[product_id].update({
+            "Product_Category": product_data.get("Product_Category"),
+            "Product_Group": product_data.get("Product_Group"),
+            "Cutoff": product_data.get("Cutoff"),
+            "Days_to_produce": product_data.get("Days_to_produce"),
+            "Production_Hub": product_data.get("Production_Hub", [])
+        })
 
-    save_product_info_data(data)
-    logger.debug(f"Product with ID {product_id} updated successfully.")
-    return JSONResponse({"success": True, "message": "Product updated successfully"})
+        save_product_info_data(data)
+        logger.debug(f"Product with ID {product_id} updated successfully.")
+        return JSONResponse({
+            "success": True,
+            "message": "Product updated successfully",
+            "data": data[product_id]
+        })
+    except Exception as e:
+        logger.error(f"Error updating product: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/products/add", response_class=HTMLResponse)
 async def add_product_html(request: Request):
