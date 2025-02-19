@@ -4,9 +4,11 @@
 <p><a href="/" class="btn">Back to Admin</a></p>
 
 <div class="api-test-container">
-    <div class="input-section">
-        <h3>Request Payload</h3>
-        <textarea id="requestPayload" rows="15" cols="60">{
+    <div class="layout-container">
+        <div class="left-panel">
+            <div class="input-section">
+                <h3>Request Payload</h3>
+                <textarea id="requestPayload" rows="15">{
     "misDeliversToPostcode": "3000",
     "misOrderQTY": 1000,
     "orientation": "portrait",
@@ -21,48 +23,196 @@
     "orderNotes": "",
     "additionalProductionDays": 0
 }</textarea>
-    </div>
-    <button onclick="runTest()" class="test-btn">Run API Test</button>
-    
-    <div class="formatted-response" id="formattedResponse" style="display: none;">
-        <h3>Formatted Response</h3>
-        <table class="response-table">
-            <tr>
-                <th>Field</th>
-                <th>Value</th>
-            </tr>
-            <tr>
-                <td>Product Group</td>
-                <td id="productGroup"></td>
-            </tr>
-            <tr>
-                <td>Dispatch Date</td>
-                <td id="dispatchDate"></td>
-            </tr>
-            <tr>
-                <td>Grain Direction</td>
-                <td id="grainDirection"></td>
-            </tr>
-            <tr>
-                <td>Hub Transfer To</td>
-                <td id="hubTransfer"></td>
-            </tr>
-            <tr>
-                <td>Development Logging</td>
-                <td id="developmentLog"></td>
-            </tr>
-        </table>
-    </div>
+            </div>
+            <button onclick="runTest()" class="test-btn">Run API Test</button>
+            
+            <div class="result-section">
+                <h3>Raw JSON Response</h3>
+                <pre id="responseOutput"></pre>
+            </div>
+        </div>
 
-    <div class="result-section">
-        <h3>Raw JSON Response</h3>
-        <pre id="responseOutput"></pre>
+        <div class="right-panel">
+            <div class="formatted-response" id="formattedResponse" style="display: none;">
+                <h3>Formatted Response</h3>
+                <table class="response-table">
+                    <tr>
+                        <th>Field</th>
+                        <th>Value</th>
+                    </tr>
+                    <!-- Product Info -->
+                    <tr><td colspan="2" class="section-header">Product Information</td></tr>
+                    <tr>
+                        <td>Product ID</td>
+                        <td id="productId"></td>
+                    </tr>
+                    <tr>
+                        <td>Product Group</td>
+                        <td id="productGroup"></td>
+                    </tr>
+                    <tr>
+                        <td>Product Category</td>
+                        <td id="productCategory"></td>
+                    </tr>
+                    <tr>
+                        <td>Production Hubs</td>
+                        <td id="productionHubs"></td>
+                    </tr>
+
+                    <!-- Production Details -->
+                    <tr><td colspan="2" class="section-header">Production Details</td></tr>
+                    <tr>
+                        <td>Cutoff Status</td>
+                        <td id="cutoffStatus"></td>
+                    </tr>
+                    <tr>
+                        <td>Product Start Days</td>
+                        <td id="productStartDays"></td>
+                    </tr>
+                    <tr>
+                        <td>Product Cutoff</td>
+                        <td id="productCutoff"></td>
+                    </tr>
+                    <tr>
+                        <td>Base Production Days</td>
+                        <td id="daysToProduceBase"></td>
+                    </tr>
+                    <tr>
+                        <td>Finishing Days</td>
+                        <td id="finishingDays"></td>
+                    </tr>
+                    <tr>
+                        <td>Total Production Days</td>
+                        <td id="totalProductionDays"></td>
+                    </tr>
+
+                    <!-- Location Info -->
+                    <tr><td colspan="2" class="section-header">Location Information</td></tr>
+                    <tr>
+                        <td>Order Postcode</td>
+                        <td id="orderPostcode"></td>
+                    </tr>
+                    <tr>
+                        <td>Chosen Production Hub</td>
+                        <td id="chosenProductionHub"></td>
+                    </tr>
+                    <tr>
+                        <td>Hub Transfer To</td>
+                        <td id="hubTransferTo"></td>
+                    </tr>
+
+                    <!-- Dates -->
+                    <tr><td colspan="2" class="section-header">Production Dates</td></tr>
+                    <tr>
+                        <td>Start Date</td>
+                        <td id="startDate"></td>
+                    </tr>
+                    <tr>
+                        <td>Adjusted Start Date</td>
+                        <td id="adjustedStartDate"></td>
+                    </tr>
+                    <tr>
+                        <td>Dispatch Date</td>
+                        <td id="dispatchDate"></td>
+                    </tr>
+
+                    <!-- Processing Info -->
+                    <tr><td colspan="2" class="section-header">Processing Information</td></tr>
+                    <tr>
+                        <td>Grain Direction</td>
+                        <td id="grainDirection"></td>
+                    </tr>
+                    <tr>
+                        <td>Order Quantity</td>
+                        <td id="orderQuantity"></td>
+                    </tr>
+                    <tr>
+                        <td>Order Kinds</td>
+                        <td id="orderKinds"></td>
+                    </tr>
+                    <tr>
+                        <td>Total Quantity</td>
+                        <td id="totalQuantity"></td>
+                    </tr>
+
+                    <!-- Configuration -->
+                    <tr><td colspan="2" class="section-header">System Configuration</td></tr>
+                    <tr>
+                        <td>Synergy Preflight</td>
+                        <td id="synergyPreflight"></td>
+                    </tr>
+                    <tr>
+                        <td>Synergy Impose</td>
+                        <td id="synergyImpose"></td>
+                    </tr>
+                    <tr>
+                        <td>Enable Auto Hub Transfer</td>
+                        <td id="enableAutoHubTransfer"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
+.api-test-container {
+    padding: 20px;
+    max-width: 95%;
+    margin: 35px auto;
+}
+
+.layout-container {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.left-panel {
+    flex: 0 0 800px;
+    display: flex;
+    flex-direction: column;
+}
+
+.right-panel {
+    flex: 1;
+    position: sticky;
+    top: 20px;
+}
+
+.input-section {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.result-section {
+    width: 100%;
+}
+
+textarea {
+    width: 100%;
+    font-family: monospace;
+    padding: 17px;
+    border: 2px solid #ccc;
+    border-radius: 7px;
+    font-size: 1.4em;
+    min-height: 300px;
+}
+
+pre {
+    width: 100%;
+    background: #f8f9fa;
+    padding: 26px;
+    border-radius: 7px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+    font-size: 1.4em;
+    min-height: 300px;
+}
+
 .formatted-response {
-    margin: 35px 0;
+    margin: 0;
     padding: 20px;
     background: #f8f9fa;
     border-radius: 7px;
@@ -96,52 +246,33 @@
     width: 200px;
 }
 
-.api-test-container {
-    max-width: 1400px;
-    margin: 35px auto;
-}
-
-.input-section, .result-section {
-    margin: 35px 0;
-}
-
-textarea {
-    width: 100%;
-    font-family: monospace;
-    padding: 17px;
-    border: 2px solid #ccc;
-    border-radius: 7px;
-    font-size: 1.75em;
+.response-table .section-header {
+    background-color: #e9ecef;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px;
+    color: #495057;
 }
 
 .test-btn {
     display: block;
-    margin: 35px 0;
+    margin: 20px 0;
     padding: 17px 35px;
     background: #28a745;
     color: white;
     border: none;
     border-radius: 7px;
     cursor: pointer;
-    font-size: 1.75em;
+    font-size: 1.4em;
 }
 
 .test-btn:hover {
     background: #218838;
 }
 
-pre {
-    background: #f8f9fa;
-    padding: 26px;
-    border-radius: 7px;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    font-family: monospace;
-    font-size: 1.75em;
-}
-
 h3 {
     font-size: 1.75em;
+    margin-bottom: 15px;
 }
 </style>
 
@@ -163,11 +294,49 @@ async function runTest() {
         
         // Update formatted table
         document.getElementById('formattedResponse').style.display = 'block';
-        document.getElementById('productGroup').textContent = result.productGroup || 'N/A';
-        document.getElementById('dispatchDate').textContent = result.dispatchDate || 'N/A';
-        document.getElementById('grainDirection').textContent = result.setGrainDirectionString || 'N/A';
-        document.getElementById('hubTransfer').textContent = result.hubTransferTo || 'N/A';
-        document.getElementById('developmentLog').textContent = result.developmentLogging || 'N/A';
+        
+        // Helper function to safely set content
+        const setContent = (id, value) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = value ?? 'N/A';
+            }
+        };
+
+        // Product Info
+        setContent('productId', result.productId);
+        setContent('productGroup', result.productGroup);
+        setContent('productCategory', result.productCategory);
+        setContent('productionHubs', result.productionHubs?.join(', '));
+
+        // Production Details
+        setContent('cutoffStatus', result.cutoffStatus);
+        setContent('productStartDays', result.productStartDays?.join(', '));
+        setContent('productCutoff', result.productCutoff);
+        setContent('daysToProduceBase', result.daysToProduceBase);
+        setContent('finishingDays', result.finishingDays);
+        setContent('totalProductionDays', result.totalProductionDays);
+
+        // Location Info
+        setContent('orderPostcode', result.orderPostcode);
+        setContent('chosenProductionHub', result.chosenProductionHub);
+        setContent('hubTransferTo', result.hubTransferTo);
+
+        // Dates
+        setContent('startDate', result.startDate);
+        setContent('adjustedStartDate', result.adjustedStartDate);
+        setContent('dispatchDate', result.dispatchDate);
+
+        // Processing Info
+        setContent('grainDirection', result.grainDirection);
+        setContent('orderQuantity', result.orderQuantity);
+        setContent('orderKinds', result.orderKinds);
+        setContent('totalQuantity', result.totalQuantity);
+
+        // Configuration
+        setContent('synergyPreflight', result.synergyPreflight);
+        setContent('synergyImpose', result.synergyImpose);
+        setContent('enableAutoHubTransfer', result.enableAutoHubTransfer);
     } catch (error) {
         document.getElementById('responseOutput').textContent = 'Error: ' + error.message;
         document.getElementById('formattedResponse').style.display = 'none';

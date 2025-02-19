@@ -35,6 +35,7 @@
             <th>Production Hubs</th>
             <th>Days to Produce</th>
             <th>Cutoff</th>
+            <th>Start Days</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -47,6 +48,7 @@
             <td>{{ product.Production_Hub|join(", ") }}</td>
             <td>{{ product.Days_to_produce }}</td>
             <td>{{ product.Cutoff }}</td>
+            <td>{{ product.Start_days|join(", ") }}</td>
             <td>
                 <button onclick="editProduct('{{ id }}')" class="edit-btn">Edit</button>
                 <button onclick="deleteProduct('{{ id }}')" class="delete-btn">Delete</button>
@@ -80,6 +82,20 @@
             <label for="daysToProduce">Days to Produce:</label>
             <input type="number" id="daysToProduce" required>
             <small>Number of days needed for production</small>
+        </div>
+
+        <div class="form-group">
+            <label>Start Days:</label>
+            <div class="checkbox-group">
+                <div class="checkbox-row">
+                    <label><input type="checkbox" name="start_days" value="Monday"> Monday</label>
+                    <label><input type="checkbox" name="start_days" value="Tuesday"> Tuesday</label>
+                    <label><input type="checkbox" name="start_days" value="Wednesday"> Wednesday</label>
+                    <label><input type="checkbox" name="start_days" value="Thursday"> Thursday</label>
+                    <label><input type="checkbox" name="start_days" value="Friday"> Friday</label>
+                </div>
+            </div>
+            <small>Select which days production can start</small>
         </div>
 
         <div class="form-group">
@@ -296,10 +312,17 @@ function editProduct(id) {
     document.getElementById('productGroup').value = product.Product_Group;
     document.getElementById('cutoff').value = product.Cutoff;
     document.getElementById('daysToProduce').value = product.Days_to_produce;
+
+    // Set start days checkboxes
+    const startDaysCheckboxes = document.querySelectorAll('input[name="start_days"]');
+    const productStartDays = product.Start_days.map(day => day.toLowerCase());
+    startDaysCheckboxes.forEach(cb => {
+        cb.checked = productStartDays.includes(cb.value.toLowerCase());
+    });
     
     // Reset and set hub checkboxes
-    const checkboxes = document.querySelectorAll('.checkbox-row input[type="checkbox"]');
-    checkboxes.forEach(cb => {
+    const hubCheckboxes = document.querySelectorAll('.checkbox-row input[type="checkbox"]:not([name="start_days"])');
+    hubCheckboxes.forEach(cb => {
         cb.checked = product.Production_Hub.includes(cb.value);
     });
     
@@ -319,7 +342,10 @@ async function saveProduct() {
         Product_Group: document.getElementById('productGroup').value,
         Cutoff: parseInt(document.getElementById('cutoff').value),
         Days_to_produce: parseInt(document.getElementById('daysToProduce').value),
+        Start_days: Array.from(document.querySelectorAll('input[name="start_days"]:checked'))
+            .map(cb => cb.value),
         Production_Hub: Array.from(document.querySelectorAll('.checkbox-row input[type="checkbox"]:checked'))
+            .filter(cb => !cb.name || cb.name !== 'start_days')
             .map(cb => cb.value)
     };
     
@@ -346,6 +372,7 @@ async function saveProduct() {
                 row.cells[3].textContent = result.data.Production_Hub.join(", ");
                 row.cells[4].textContent = result.data.Days_to_produce;
                 row.cells[5].textContent = result.data.Cutoff;
+                row.cells[6].textContent = result.data.Start_days.join(", ");
             }
             
             closeForm();

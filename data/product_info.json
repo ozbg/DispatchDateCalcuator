@@ -76,7 +76,25 @@
       "Wednesday"
     ],
     "Days_to_produce": "3",
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-02-26",
+        "2025-02-27",
+        "2025-02-27",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ],
+        [
+          "1",
+          "2",
+          "4"
+        ]
+      ]
+    ]
   },
   "5": {
     "Product_Category": "Offset 450+ NV Branding Cards",
@@ -338,13 +356,13 @@
     "Modified_run_date": []
   },
   "16": {
-    "Product_Category": "Digital Standard Stock",
+    "Product_Category": "Digital Standard Stock + EMB",
     "Product_Group": "Digital Standard Stock Print Print 1S or 2S + UV or Scodix or Metal or Laminating",
     "Product_ID": 16,
     "Production_Hub": [
       "vic"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -356,7 +374,7 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "3",
+    "Days_to_produce": 3,
     "Modified_run_date": []
   },
   "17": {
@@ -415,7 +433,25 @@
       "Thursday"
     ],
     "Days_to_produce": "1",
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-02-20",
+        "2025-02-27",
+        "2025-02-28",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ],
+        [
+          "1",
+          "2",
+          "4"
+        ]
+      ]
+    ]
   },
   "20": {
     "Product_Category": "Offset Flyer",
@@ -647,16 +683,16 @@
     "Modified_run_date": []
   },
   "29": {
-    "Product_Category": "Presentation Folder or Diecut Artboard",
-    "Product_Group": "Standard Presentation Folder incl Laminate",
+    "Product_Category": "Diecut Artboard",
+    "Product_Group": "Standard Presentation Folder or Diecut Artboard Including Laminate",
     "Product_ID": 29,
     "Production_Hub": [
-      "vic",
       "nsw",
-      "qld",
-      "wa"
+      "vic",
+      "wa",
+      "qld"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -668,17 +704,17 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "3",
+    "Days_to_produce": 3,
     "Modified_run_date": []
   },
   "30": {
-    "Product_Category": "Presentation Folder or Diecut Artboard + Scodix or Metal",
-    "Product_Group": "Standard Presentation Folder + Scodix or Metal",
+    "Product_Category": "Diecut Artboard + Scodix or Metal",
+    "Product_Group": "Standard Presentation Folder or Diecut Artboard Including Laminate",
     "Product_ID": 30,
     "Production_Hub": [
       "vic"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -690,7 +726,7 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "4",
+    "Days_to_produce": 4,
     "Modified_run_date": []
   },
   "31": {

@@ -1,22 +1,22 @@
 [
   {
-    "Product_ID": 1,
-    "Match_All": [
-      "NV",
-      "450+"
-    ],
     "Exclude_All": [
       "NVS",
       "NVU",
       "NVM",
       "Digital"
     ],
+    "Match_All": [
+      "NV",
+      "450+"
+    ],
     "Match_Any": [
       [
         "Branding",
         "BC"
       ]
-    ]
+    ],
+    "Product_ID": 1
   },
   {
     "Exclude_All": [
@@ -1594,5 +1594,11 @@
       ]
     ],
     "Product_ID": 62
+  },
+  {
+    "Product_ID": 1,
+    "Match_All": [],
+    "Exclude_All": [],
+    "Match_Any": []
   }
 ]

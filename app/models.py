@@ -1,8 +1,7 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 
 class ScheduleRequest(BaseModel):
-    # Input data structure
     misDeliversToPostcode: str
     misOrderQTY: int
     orientation: str
@@ -18,11 +17,37 @@ class ScheduleRequest(BaseModel):
     additionalProductionDays: Optional[int] = 0
 
 class ScheduleResponse(BaseModel):
-    # Output data structure
+    # Core Product Info
+    productId: int
     productGroup: str
-    dispatchDate: str
-    setGrainDirection: int
+    productCategory: str
+    productionHubs: List[str]
+    
+    # Production Details
+    cutoffStatus: str
+    productStartDays: List[str]
+    productCutoff: str
+    daysToProduceBase: int
+    finishingDays: int
+    totalProductionDays: int
+    
+    # Location Info
+    orderPostcode: str
+    chosenProductionHub: str
     hubTransferTo: int
-    dispatchDateLog: str
-    setGrainDirectionString: str
-    developmentLogging: str
+    
+    # Dates
+    startDate: str
+    adjustedStartDate: str
+    dispatchDate: str
+    
+    # Processing Info
+    grainDirection: str
+    orderQuantity: int
+    orderKinds: int
+    totalQuantity: int
+    
+    # Configuration
+    synergyPreflight: Optional[int] = None
+    synergyImpose: Optional[int] = None
+    enableAutoHubTransfer: Optional[int] = None

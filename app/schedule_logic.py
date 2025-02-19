@@ -62,12 +62,20 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     product_obj = product_info.get(str(found_product_id), None)
     if not product_obj:
         logger.debug("product_id=%s not found in product_info => fallback schedule", found_product_id)
-        # fallback product
+        # fallback product with all required fields
         product_obj = {
             "Product_Group": "No Group Found",
+            "Product_Category": "Unmatched Product",
+            "Product_ID": 0,
             "Cutoff": "12",
             "Days_to_produce": "2",
-            "Production_Hub": ["vic"]
+            "Production_Hub": ["vic"],
+            "Start_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "SynergyPreflight": 0,
+            "SynergyImpose": 0,
+            "EnableAutoHubTransfer": 1,
+            "Modified_run_date": [],
+            "Production_Hub": ["vic"]  # Ensure Production_Hub is always present
         }
 
     # 3) Determine grain direction
@@ -94,6 +102,10 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         start_date = current_time.date()
         cutoff_status = "Before Cutoff"
 
+    # Adjust start_date to next valid start day
+    allowed_start_days = product_obj["Start_days"]
+    start_date = get_next_valid_start_day(start_date, allowed_start_days)
+
     # 6) Calculate finishing days
     finishing_days = calculate_finishing_days(req)
     base_prod_days = int(product_obj["Days_to_produce"])
@@ -114,9 +126,22 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # Find the actual cmykHubID for that chosen hub
     chosen_hub_id = find_cmyk_hub_id(chosen_hub, cmyk_hubs)
     
-     # 8) add business days for final dispatch
+    # 8) add business days for final dispatch
     closed_dates = get_closed_dates_for_state(chosen_hub, cmyk_hubs)
     adjusted_start_date, dispatch_date = add_business_days(start_date, total_prod_days, closed_dates)
+
+    # 9) Check for modified run dates
+    modified_start = check_modified_run_dates(
+        adjusted_start_date,
+        product_obj,
+        req.misDeliversToState
+    )
+    
+    if modified_start:
+        logger.debug(f"Using modified start date: {modified_start}")
+        adjusted_start_date = modified_start
+        # Recalculate dispatch date from modified start
+        _, dispatch_date = add_business_days(adjusted_start_date, total_prod_days, closed_dates)
 
     # Build a debug log
     debug_log = (
@@ -127,20 +152,72 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     )
     logger.debug("SCHEDULE LOG: " + debug_log)
 
-    # Return final
+    # Return comprehensive response
     return ScheduleResponse(
+        # Core Product Info
+        productId=found_product_id,
         productGroup=product_obj["Product_Group"],
+        productCategory=product_obj["Product_Category"],
+        productionHubs=product_obj["Production_Hub"],
+        
+        # Production Details
+        cutoffStatus=cutoff_status,
+        productStartDays=product_obj["Start_days"],
+        productCutoff=str(product_obj["Cutoff"]),
+        daysToProduceBase=base_prod_days,
+        finishingDays=finishing_days,
+        totalProductionDays=total_prod_days,
+        
+        # Location Info
+        orderPostcode=req.misDeliversToPostcode,
+        chosenProductionHub=chosen_hub,
+        hubTransferTo=chosen_hub_id,
+        
+        # Dates
+        startDate=str(start_date),
+        adjustedStartDate=str(adjusted_start_date),
         dispatchDate=str(dispatch_date),
-        setGrainDirection=grain_id,
-        hubTransferTo=chosen_hub_id,  # <-- now using the real ID, not hardcoded
-        dispatchDateLog=debug_log,
-        setGrainDirectionString=grain_str,
-        developmentLogging="Development logs: " + debug_log
+        
+        # Processing Info
+        grainDirection=grain_str,
+        orderQuantity=req.misOrderQTY,
+        orderKinds=req.kinds,
+        totalQuantity=req.misOrderQTY * req.kinds,
+        
+        # Configuration
+        synergyPreflight=product_obj.get("SynergyPreflight"),
+        synergyImpose=product_obj.get("SynergyImpose"),
+        enableAutoHubTransfer=product_obj.get("EnableAutoHubTransfer")
     )
 
 # --------------------------------------------------------------------
 # Postcode-based override (Step 1)
 # --------------------------------------------------------------------
+def is_postcode_in_range(postcode: str, range_string: str) -> bool:
+    """
+    Check if postcode is within the given range string.
+    Range string can be comma-separated values or dash ranges like "4737-4895".
+    """
+    postcode_segments = range_string.split(",")
+    for segment in postcode_segments:
+        segment = segment.strip()
+        if "-" in segment:
+            # Handle range like "4737-4895"
+            start, end = segment.split("-")
+            try:
+                p = int(postcode)
+                s = int(start)
+                e = int(end)
+                if s <= p <= e:
+                    return True
+            except ValueError:
+                continue
+        else:
+            # Handle exact match
+            if postcode == segment:
+                return True
+    return False
+
 def lookup_hub_by_postcode(postcode: str, hub_data: list[dict]) -> Optional[dict]:
     """
     Mirrors your JS logic to check if 'postcode' is in the comma-separated or dash range
@@ -151,7 +228,62 @@ def lookup_hub_by_postcode(postcode: str, hub_data: list[dict]) -> Optional[dict
             return {"hubName": entry["hubName"], "hubId": entry["hubId"]}
     return None
 
-def is_postcode_in_range(postcode: str, range_string: str) -> bool:
+def get_next_valid_start_day(date, allowed_start_days):
+    """
+    Find the next allowed start day from the given date.
+    
+    Args:
+        date: datetime.date object
+        allowed_start_days: list of allowed days (e.g., ["Monday", "Wednesday"])
+    
+    Returns:
+        datetime.date: The next valid start date
+    """
+    # Map weekday numbers to day names
+    day_map = {
+        0: "Monday", 1: "Tuesday", 2: "Wednesday",
+        3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"
+    }
+    
+    current_date = date
+    while True:
+        current_day_name = day_map[current_date.weekday()]
+        if current_day_name in allowed_start_days:
+            return current_date
+        current_date += timedelta(days=1)
+
+def check_modified_run_dates(adjusted_start_date: datetime.date, product_obj: dict, state: str) -> datetime.date:
+    """
+    Check if there's a modified run date that applies to this order.
+    Only returns the new print date if a modification applies.
+    
+    Args:
+        adjusted_start_date: The calculated start date after weekday adjustments
+        product_obj: The product object containing Modified_run_date array
+        state: The delivery state (e.g., 'vic', 'nsw')
+    
+    Returns:
+        datetime.date: New start date if modified, None if no modification applies
+    """
+    modified_dates = product_obj.get("Modified_run_date", [])
+    
+    for modified_date in modified_dates:
+        if len(modified_date) < 5:  # Ensure array has all required elements
+            continue
+            
+        scheduled_print_date = datetime.strptime(modified_date[0], "%Y-%m-%d").date()
+        new_print_date = datetime.strptime(modified_date[1], "%Y-%m-%d").date()
+        affected_states = [s.lower() for s in modified_date[3]]
+        
+        # If this modification applies to our state and date
+        if (state.lower() in affected_states and
+            adjusted_start_date == scheduled_print_date):
+            logger.debug(f"Found modified start date: {new_print_date}")
+            return new_print_date
+            
+    return None
+
+def add_business_days(start_date, total_prod_days, closed_dates):
     """
     Split the range by commas, handle possible dash range (e.g. '4737-4895').
     If 'postcode' is found or in range, return True.

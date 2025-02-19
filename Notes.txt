@@ -55,3 +55,19 @@ Make sure this functinoality is up front
 Need to step back and review the entire sequencing of the process order function, 
 right now post code based transfers are not right
 also feel like some of process order needs reviewing to make sure we allocate to hub, then check closed dates etc and set schedule 
+
+
+
+Start Date vs Adjusted Start Date
+1. **Start Date**: The initial calculated date based on:
+   - Current time
+   - Cutoff hour check
+   - If after cutoff, moves to next day
+   - If before cutoff, uses current day
+
+2. **Adjusted Start Date**: The actual production start date after:
+   - Checking for weekends (Sat/Sun)
+   - Checking for closed dates (holidays etc.)
+   - Moving forward until a valid business day is found
+
+Here's a detailed explanation from the code:
