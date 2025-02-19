@@ -76,25 +76,7 @@
       "Wednesday"
     ],
     "Days_to_produce": "3",
-    "Modified_run_date": [
-      [
-        "2025-02-26",
-        "2025-02-27",
-        "2025-02-27",
-        [
-          "nsw",
-          "vic",
-          "wa",
-          "qld",
-          "nqld"
-        ],
-        [
-          "1",
-          "2",
-          "4"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "5": {
     "Product_Category": "Offset 450+ NV Branding Cards",
