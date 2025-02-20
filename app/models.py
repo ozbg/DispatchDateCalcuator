@@ -92,6 +92,50 @@ class FinishingRules(BaseModel):
     keywordRules: List[FinishingRule]
     centerRules: List[CenterRule]
 
+class HubSizeConstraint(BaseModel):
+    """Size constraints for hub production capabilities"""
+    maxWidth: float
+    maxHeight: float
+    maxQuantity: Optional[int] = None
+
+class HubEquipmentRule(BaseModel):
+    """Equipment/process availability at a hub"""
+    hubId: str
+    equipment: List[str]
+    processes: List[str]
+    enabled: bool = True
+
+class HubSelectionRule(BaseModel):
+    """Rules for selecting production hubs"""
+    id: str
+    description: str
+    hubId: str
+    priority: int = 0
+    enabled: bool = True
+    
+    # Conditions
+    keywords: Optional[List[str]] = None
+    excludeKeywords: Optional[List[str]] = None
+    productIds: Optional[List[int]] = None
+    excludeProductIds: Optional[List[int]] = None
+    productGroups: Optional[List[str]] = None
+    excludeProductGroups: Optional[List[str]] = None
+    
+    # Size constraints
+    sizeConstraints: Optional[HubSizeConstraint] = None
+    
+    # State/region restrictions
+    allowedStates: Optional[List[str]] = None
+    excludedStates: Optional[List[str]] = None
+    
+    # Temporary exclusions
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
+    
+    # Equipment requirements
+    requiredEquipment: Optional[List[str]] = None
+    requiredProcesses: Optional[List[str]] = None
+
 class ScheduleResponse(BaseModel):
     # Core Product Info
     productId: int

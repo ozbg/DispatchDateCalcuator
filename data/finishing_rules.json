@@ -191,21 +191,10 @@
       "matchType": "any"
     },
     {
-      "id": "BT",
-      "description": "BenTest",
-      "addDays": 5,
-      "enabled": true,
-      "keywords": [
-        "Benny"
-      ],
-      "excludeKeywords": [],
-      "matchType": "all"
-    },
-    {
       "id": "presentation_large",
       "description": "Presentation Folder Large Quantity",
       "addDays": 2,
-      "enabled": true,
+      "enabled": false,
       "keywords": [],
       "excludeKeywords": [],
       "matchType": "any"
@@ -214,7 +203,7 @@
       "id": "strut_large",
       "description": "Mounted Strut Large Quantity",
       "addDays": 1,
-      "enabled": true,
+      "enabled": false,
       "keywords": [],
       "excludeKeywords": [],
       "matchType": "any"
@@ -223,13 +212,29 @@
       "id": "SST",
       "description": "SaddleTest",
       "addDays": 55,
-      "enabled": true,
+      "enabled": false,
       "keywords": [],
       "excludeKeywords": [],
       "matchType": "any",
       "conditions": {
         "quantityGreaterThan": 10,
         "quantityLessThan": 20
+      }
+    },
+    {
+      "id": "Laser_Test",
+      "description": "LaserTest",
+      "addDays": 55,
+      "enabled": true,
+      "keywords": [
+        "Laser"
+      ],
+      "excludeKeywords": [],
+      "matchType": "any",
+      "conditions": {
+        "productIdEqual": 24,
+        "quantityGreaterThan": 800,
+        "quantityLessThan": 1200
       }
     }
   ],

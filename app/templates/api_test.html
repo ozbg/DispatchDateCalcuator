@@ -155,7 +155,63 @@
     </div>
 </div>
 
+<!-- Debug Panel -->
+<div class="debug-panel">
+    <h3>Debug Messages</h3>
+    <div id="debugOutput" class="debug-content">
+        <p class="placeholder-text">Debug messages will appear here after running the API test...</p>
+    </div>
+</div>
+
 <style>
+.debug-panel {
+    margin-top: 40px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 7px;
+    width: 100%;
+}
+
+.debug-content {
+    font-family: monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 500px;
+    overflow-y: auto;
+    font-size: 1.2em;
+    line-height: 1.4;
+}
+
+.debug-content .timestamp {
+    color: #666;
+    margin-right: 10px;
+}
+
+.debug-content .level-debug {
+    color: #0066cc;
+}
+
+.debug-content .level-info {
+    color: #28a745;
+}
+
+.debug-content .level-warning {
+    color: #ffc107;
+}
+
+.debug-content .level-error {
+    color: #dc3545;
+}
+
+.debug-content .placeholder-text {
+    color: #666;
+    font-style: italic;
+    margin: 10px 0;
+}
 .api-test-container {
     padding: 20px;
     max-width: 95%;
@@ -196,19 +252,20 @@ textarea {
     border: 2px solid #ccc;
     border-radius: 7px;
     font-size: 1.4em;
-    min-height: 300px;
+    min-height: 600px;
 }
 
 pre {
     width: 100%;
-    background: #f8f9fa;
-    padding: 26px;
+    background: #fff;
+    padding: 17px;
+    border: 2px solid #ccc;
     border-radius: 7px;
     white-space: pre-wrap;
     word-wrap: break-word;
     font-family: monospace;
     font-size: 1.4em;
-    min-height: 300px;
+    min-height: 600px;
 }
 
 .formatted-response {
@@ -277,6 +334,33 @@ h3 {
 </style>
 
 <script>
+async function fetchDebugLogs() {
+    try {
+        const response = await fetch('/debug-logs');
+        const logs = await response.json();
+        const debugOutput = document.getElementById('debugOutput');
+        
+        if (logs.length === 0) {
+            debugOutput.innerHTML = '<p class="placeholder-text">No debug messages available...</p>';
+            return;
+        }
+
+        debugOutput.innerHTML = logs.map(log => {
+            const timestamp = `<span class="timestamp">${log.timestamp}</span>`;
+            const level = `<span class="level-${log.level.toLowerCase()}">${log.level}</span>`;
+            const message = `<span class="message">${log.message}</span>`;
+            return `<div>${timestamp} ${level}: ${message}</div>`;
+        }).join('\n');
+        
+        // Auto-scroll to bottom of debug panel
+        debugOutput.scrollTop = debugOutput.scrollHeight;
+    } catch (error) {
+        console.error('Error fetching debug logs:', error);
+        document.getElementById('debugOutput').innerHTML =
+            '<p class="level-error">Error fetching debug logs: ' + error.message + '</p>';
+    }
+}
+
 async function runTest() {
     try {
         const payload = JSON.parse(document.getElementById('requestPayload').value);
@@ -337,6 +421,9 @@ async function runTest() {
         setContent('synergyPreflight', result.synergyPreflight);
         setContent('synergyImpose', result.synergyImpose);
         setContent('enableAutoHubTransfer', result.enableAutoHubTransfer);
+
+        // Fetch and display debug logs after API call completes
+        await fetchDebugLogs();
     } catch (error) {
         document.getElementById('responseOutput').textContent = 'Error: ' + error.message;
         document.getElementById('formattedResponse').style.display = 'none';

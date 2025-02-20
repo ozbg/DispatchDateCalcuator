@@ -1,18 +1,18 @@
 #main.py
 #main.py is the main application file that defines the FastAPI application and the routes.
+import logging
 from fastapi import FastAPI, Request
-from fastapi import FastAPI, Request
+from datetime import datetime
+from collections import deque
+import threading
 from fastapi import HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
-import json
 from pathlib import Path
 from typing import List
-import json
 import pytz
-import logging
 
 from app.data_manager import (
     get_product_info_data, save_product_info_data,
@@ -23,11 +23,38 @@ from app.data_manager import (
 from app.models import ScheduleRequest, ScheduleResponse
 from app.schedule_logic import process_order
 
-app = FastAPI(title="Scheduler API", version="1.0.0")
-
-# Set up logging
+# 1) Set up the basic logging configuration
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("scheduler")
+
+# 2) Initialize FastAPI
+app = FastAPI(title="Scheduler API", version="1.0.0")
+
+# 3) Create thread-safe containers for debug logs
+debug_messages = deque(maxlen=1000)
+debug_lock = threading.Lock()
+
+# 4) Define the DebugHandler
+class DebugHandler(logging.Handler):
+    def emit(self, record):
+        log_entry = {
+            'timestamp': datetime.fromtimestamp(record.created).strftime('%Y-%m-%d %H:%M:%S'),
+            'level': record.levelname,
+            'message': record.getMessage()
+        }
+        with debug_lock:
+            debug_messages.append(log_entry)
+
+# 5) Now add the handler to our logger
+logger.addHandler(DebugHandler())
+
+@app.get("/debug-logs")
+async def get_debug_logs():
+    """Return the latest debug messages"""
+    with debug_lock:
+        return list(debug_messages)
+
+
 
 # Mount static folder for CSS, images, etc.
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -140,6 +167,179 @@ async def save_keywords(request: Request):
             {"success": False, "message": f"Error saving keywords: {str(e)}"},
             status_code=500
         )
+
+@app.get("/hub-rules", response_class=HTMLResponse)
+async def hub_rules(request: Request):
+    try:
+        rules_path = Path("data/hub_rules.json")
+        if rules_path.exists():
+            with open(rules_path, "r") as f:
+                data = json.load(f)
+                rules = data.get("rules", [])
+                equipment = data.get("equipment", {})
+        else:
+            rules = []
+            equipment = {}
+            
+        logger.debug(f"Loaded {len(rules)} rules and equipment data for {len(equipment)} hubs")
+        return templates.TemplateResponse(
+            "hub_rules.html",
+            {
+                "request": request,
+                "rules": rules,
+                "equipment": equipment
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error loading hub rules: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/hub-rules/save")
+async def save_hub_rule(request: Request):
+    try:
+        # Parse and validate incoming data
+        try:
+            rule_data = await request.json()
+            logger.debug(f"Received rule data: {rule_data}")
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON received: {e}")
+            return JSONResponse({
+                "success": False,
+                "message": "Invalid JSON data received"
+            }, status_code=400)
+
+        # Validate required fields
+        required_fields = ["id", "description", "hubId"]
+        missing_fields = [field for field in required_fields if not rule_data.get(field)]
+        if missing_fields:
+            error_msg = f"Missing required fields: {', '.join(missing_fields)}"
+            logger.error(error_msg)
+            return JSONResponse({
+                "success": False,
+                "message": error_msg
+            }, status_code=400)
+
+        rules_path = Path("data/hub_rules.json")
+        
+        # Load existing data
+        data = {"rules": [], "equipment": {}}
+        if rules_path.exists():
+            try:
+                with open(rules_path, "r", encoding='utf-8') as f:
+                    data = json.load(f)
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON in hub_rules.json: {e}")
+                return JSONResponse({
+                    "success": False,
+                    "message": "Error reading rules file"
+                }, status_code=500)
+
+        rules = data.get("rules", [])
+        
+        # Update or add rule
+        rule_index = next((i for i, r in enumerate(rules)
+                          if r["id"] == rule_data["id"]), None)
+                          
+        if rule_index is not None:
+            logger.info(f"Updating existing rule at index {rule_index}")
+            rules[rule_index] = rule_data
+        else:
+            logger.info(f"Adding new rule with ID: {rule_data['id']}")
+            rules.append(rule_data)
+            
+        # Sort rules by priority
+        rules.sort(key=lambda x: x.get("priority", 0), reverse=True)
+        
+        # Save rules
+        try:
+            data["rules"] = rules
+            with open(rules_path, "w", encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"Successfully saved rule with ID: {rule_data['id']}")
+            return JSONResponse({
+                "success": True,
+                "message": "Rule saved successfully",
+                "rule": rule_data
+            })
+        except Exception as e:
+            logger.error(f"Failed to save rules file: {e}")
+            return JSONResponse({
+                "success": False,
+                "message": f"Failed to save rules file: {str(e)}"
+            }, status_code=500)
+            
+    except Exception as e:
+        logger.error(f"Unexpected error saving hub rule: {str(e)}")
+        return JSONResponse({
+            "success": False,
+            "message": f"Unexpected error: {str(e)}"
+        }, status_code=500)
+    except ValueError as ve:
+        logger.error(f"Validation error saving hub rule: {str(ve)}")
+        return JSONResponse(
+            {"success": False, "message": str(ve)},
+            status_code=400
+        )
+    except Exception as e:
+        logger.error(f"Error saving hub rule: {str(e)}")
+        return JSONResponse(
+            {"success": False, "message": f"Error saving rule: {str(e)}"},
+            status_code=500
+        )
+
+@app.post("/hub-rules/delete/{rule_id}")
+async def delete_hub_rule(rule_id: str):
+    try:
+        rules_path = Path("data/hub_rules.json")
+        if not rules_path.exists():
+            return JSONResponse({
+                "success": False,
+                "message": "Rules file not found"
+            }, status_code=404)
+            
+        try:
+            with open(rules_path, "r", encoding='utf-8') as f:
+                data = json.load(f)
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in hub_rules.json: {e}")
+            return JSONResponse({
+                "success": False,
+                "message": "Error reading rules file"
+            }, status_code=500)
+            
+        # Check if rule exists
+        original_length = len(data.get("rules", []))
+        data["rules"] = [r for r in data["rules"] if r["id"] != rule_id]
+        
+        if len(data["rules"]) == original_length:
+            return JSONResponse({
+                "success": False,
+                "message": f"Rule with ID {rule_id} not found"
+            }, status_code=404)
+            
+        try:
+            with open(rules_path, "w", encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+            
+            logger.info(f"Successfully deleted rule with ID: {rule_id}")
+            return JSONResponse({
+                "success": True,
+                "message": "Rule deleted successfully"
+            })
+        except Exception as e:
+            logger.error(f"Failed to save rules file after deletion: {e}")
+            return JSONResponse({
+                "success": False,
+                "message": f"Failed to save rules file: {str(e)}"
+            }, status_code=500)
+            
+    except Exception as e:
+        logger.error(f"Error deleting hub rule: {str(e)}")
+        return JSONResponse({
+            "success": False,
+            "message": f"Unexpected error: {str(e)}"
+        }, status_code=500)
 
 @app.get("/")
 async def read_root(request: Request):
