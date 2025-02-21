@@ -8,7 +8,6 @@ from app.models import HubSelectionRule, HubSizeConstraint, OrderMatchingCriteri
 
 logger = logging.getLogger(__name__)
 
-
 # ------------------------------------------------------------------------
 # 1) LOAD AND HELPER FUNCTIONS
 # ------------------------------------------------------------------------
@@ -87,7 +86,6 @@ def check_size_constraints(width: float, height: float, constraints: HubSizeCons
     if not constraints or not constraints.maxWidth or not constraints.maxHeight:
         return True
 
-    # Try both orientations
     dim1, dim2 = width, height
     max1, max2 = constraints.maxWidth, constraints.maxHeight
 
@@ -221,8 +219,8 @@ def validate_hub_rules(
     Validates hub rules (one hub at a time) and returns the appropriate hub.
     1) We check size constraints first (independent).
     2) Then check the orderCriteria as a group (AND logic):
-       - If all specified criteria match (e.g. quantity > maxQuantity, productID is in the list, 
-         keywords are present in description), then we exclude the hub.
+       - If all specified criteria match (e.g. quantity >= maxQuantity, productID in the list,
+         any listed keyword found in description), then we exclude the hub.
     3) If no rule excludes the hub, we keep it.
     """
     logger.debug(f"Validating hub rules for initial hub: {initial_hub}")
@@ -262,14 +260,13 @@ def validate_hub_rules(
         #    If all specified sub-criteria match, exclude the hub
         # --------------------------
         if rule.orderCriteria:
-            # We'll check if the rule actually has some criteria set
             criteria_defined = False
             all_conditions_met = True
 
-            # maxQuantity => exclude if quantity > max
+            # maxQuantity => exclude if quantity >= maxQuantity
             if rule.orderCriteria.maxQuantity is not None:
                 criteria_defined = True
-                qty_match = (quantity > rule.orderCriteria.maxQuantity)
+                qty_match = (quantity >= rule.orderCriteria.maxQuantity)
                 all_conditions_met &= qty_match
 
             # productIds => exclude if product_id is in the list
@@ -278,19 +275,18 @@ def validate_hub_rules(
                 pid_match = (product_id in rule.orderCriteria.productIds)
                 all_conditions_met &= pid_match
 
-            # keywords => exclude if all are found in description
+            # keywords => exclude if any of them appear in the description
             if rule.orderCriteria.keywords:
                 criteria_defined = True
-                kw_match = all(kw.lower() in description.lower() for kw in rule.orderCriteria.keywords)
+                kw_match = any(kw.lower() in description.lower() for kw in rule.orderCriteria.keywords)
                 all_conditions_met &= kw_match
 
             # If we actually had criteria and all matched => exclude
             if criteria_defined and all_conditions_met:
-                logger.debug(f"Hub {initial_hub} excluded by rule {rule.id}: "
-                             f"matched all order criteria.")
+                logger.debug(f"Hub {initial_hub} excluded by rule {rule.id}: matched all order criteria.")
                 return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
 
-        # If we get here for this rule, it means no exclusion happened.
+        # If we get here, this rule did not exclude the hub
         logger.debug(f"Hub {initial_hub} not excluded by rule {rule.id}")
 
     # If no rule triggered an exclusion, return the initial hub
@@ -343,7 +339,8 @@ def choose_production_hub(
             if not check_size_constraints(width, height, rule.sizeConstraints):
                 should_remove = True
 
-        # (Additional checks for states, product groups, etc. could go here)
+        # (You could add more checks here for quantity, productID, etc., 
+        #  if you need to filter out hubs entirely rather than do a "redirect".)
 
         if should_remove:
             valid_hubs.discard(rule.hubId)

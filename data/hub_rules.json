@@ -1,17 +1,19 @@
 {
   "rules": [
     {
-      "id": "rule_1740138691857",
-      "description": "ds",
+      "id": "rule_1740144177417",
+      "description": "DDD",
       "hubId": "nqld",
       "priority": 0,
       "enabled": true,
-      "sizeConstraints": {
-        "maxWidth": 300,
-        "maxHeight": 300
-      },
       "orderCriteria": {
-        "maxQuantity": 100
+        "maxQuantity": 55,
+        "keywords": [
+          "card"
+        ],
+        "productIds": [
+          20
+        ]
       }
     }
   ]
