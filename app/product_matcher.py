@@ -2,7 +2,8 @@
 #This module contains the logic for matching product IDs based on description and determining the grain direction based on orientation, width, height, and description.
 import logging
 
-logger = logging.getLogger("scheduler")
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 def match_product_id(description: str, product_keywords: list) -> int:
     logger.debug(f"Matching product ID for description: {description}")

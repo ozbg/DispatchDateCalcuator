@@ -23,9 +23,10 @@ from app.data_manager import (
 from app.models import ScheduleRequest, ScheduleResponse
 from app.schedule_logic import process_order
 
-# 1) Set up the basic logging configuration
+
+## 1) Set up the basic logging configuration using the root logger.
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger("scheduler")
+logger = logging.getLogger()  # Use the root logger so all logs propagate
 
 # 2) Initialize FastAPI
 app = FastAPI(title="Scheduler API", version="1.0.0")
@@ -45,8 +46,10 @@ class DebugHandler(logging.Handler):
         with debug_lock:
             debug_messages.append(log_entry)
 
-# 5) Now add the handler to our logger
+# 5) Attach the DebugHandler to the root logger
 logger.addHandler(DebugHandler())
+
+
 
 @app.get("/debug-logs")
 async def get_debug_logs():

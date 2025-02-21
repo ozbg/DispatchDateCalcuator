@@ -27,7 +27,7 @@ from app.product_matcher import match_product_id, determine_grain_direction
 from app.config import TIME_ADJUST, WA_TIME_ADJUST
 from app.hub_selection import validate_hub_rules, choose_production_hub
 
-logger = logging.getLogger("scheduler")
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:

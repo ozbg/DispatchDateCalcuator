@@ -7,6 +7,7 @@ import logging
 from app.models import HubSelectionRule, HubSizeConstraint, OrderMatchingCriteria
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 # ------------------------------------------------------------------------
 # 1) LOAD AND HELPER FUNCTIONS
@@ -40,13 +41,18 @@ def load_hub_rules() -> List[HubSelectionRule]:
     }
     """
     rules_path = Path("data/hub_rules.json")
+    logger.debug(f"Attempting to load hub rules from file: {rules_path}")
     if not rules_path.exists():
+        logger.debug("Hub rules file does not exist; returning empty list")
         return []
 
     with open(rules_path, "r") as f:
         data = json.load(f)
         rule_list = []
-        for r in data.get("rules", []):
+        rules_data = data.get("rules", [])
+        logger.debug(f"Found {len(rules_data)} rule(s) in the file")
+        for r in rules_data:
+            logger.debug(f"Processing rule with id: {r.get('id')}")
             # Build the sub-objects carefully
             size_c = None
             if "sizeConstraints" in r and r["sizeConstraints"]:
@@ -54,6 +60,7 @@ def load_hub_rules() -> List[HubSelectionRule]:
                     maxWidth=r["sizeConstraints"].get("maxWidth"),
                     maxHeight=r["sizeConstraints"].get("maxHeight")
                 )
+                logger.debug(f"Rule {r.get('id')} - sizeConstraints set to: {r['sizeConstraints']}")
 
             order_c = None
             if "orderCriteria" in r and r["orderCriteria"]:
@@ -62,6 +69,7 @@ def load_hub_rules() -> List[HubSelectionRule]:
                     productIds=r["orderCriteria"].get("productIds"),
                     keywords=r["orderCriteria"].get("keywords")
                 )
+                logger.debug(f"Rule {r.get('id')} - orderCriteria set to: {r['orderCriteria']}")
 
             rule_obj = HubSelectionRule(
                 id=r["id"],
@@ -74,7 +82,9 @@ def load_hub_rules() -> List[HubSelectionRule]:
                 startDate=r.get("startDate"),
                 endDate=r.get("endDate")
             )
+            logger.debug(f"Created HubSelectionRule object for rule id: {rule_obj.id}")
             rule_list.append(rule_obj)
+        logger.debug(f"Total loaded hub rules: {len(rule_list)}")
         return rule_list
 
 
@@ -83,7 +93,9 @@ def check_size_constraints(width: float, height: float, constraints: HubSizeCons
     Check if dimensions fit within constraints in either orientation.
     Returns True if dimensions are acceptable, False if they exceed constraints.
     """
+    logger.debug(f"Checking size constraints for dimensions {width}x{height} with constraints {constraints}")
     if not constraints or not constraints.maxWidth or not constraints.maxHeight:
+        logger.debug("No constraints provided; automatically acceptable")
         return True
 
     dim1, dim2 = width, height
@@ -102,21 +114,27 @@ def check_size_constraints(width: float, height: float, constraints: HubSizeCons
 
 def check_dates(rule: HubSelectionRule) -> bool:
     """Check if a rule is valid for the current date (if start/end are provided)."""
+    logger.debug(f"Checking date validity for rule {rule.id} with startDate: {rule.startDate} and endDate: {rule.endDate}")
     if not rule.startDate and not rule.endDate:
+        logger.debug("No start or end dates provided; rule is automatically valid")
         return True
 
     current_date = datetime.now().date()
+    logger.debug(f"Current date is: {current_date}")
 
     if rule.startDate:
         start = datetime.strptime(rule.startDate, "%Y-%m-%d").date()
         if current_date < start:
+            logger.debug(f"Current date {current_date} is before start date {start} for rule {rule.id}")
             return False
 
     if rule.endDate:
         end = datetime.strptime(rule.endDate, "%Y-%m-%d").date()
         if current_date > end:
+            logger.debug(f"Current date {current_date} is after end date {end} for rule {rule.id}")
             return False
 
+    logger.debug(f"Rule {rule.id} is valid for the current date")
     return True
 
 
@@ -126,11 +144,15 @@ def get_equipment_data() -> Dict:
     (assuming structure has an "equipment" section).
     """
     rules_path = Path("data/hub_rules.json")
+    logger.debug(f"Loading equipment data from file: {rules_path}")
     if not rules_path.exists():
+        logger.debug("Equipment data file does not exist; returning empty dict")
         return {}
     with open(rules_path, "r") as f:
         data = json.load(f)
-        return data.get("equipment", {})
+        equipment = data.get("equipment", {})
+        logger.debug(f"Equipment data loaded: {equipment}")
+        return equipment
 
 
 def check_equipment_requirements(hub_id: str, required_equipment: List[str],
@@ -138,19 +160,24 @@ def check_equipment_requirements(hub_id: str, required_equipment: List[str],
     """
     Check if a hub has required equipment and processes based on "equipment" data.
     """
+    logger.debug(f"Checking equipment requirements for hub {hub_id}. Required equipment: {required_equipment}, Required processes: {required_processes}")
     equipment_data = get_equipment_data()
     hub_equipment = equipment_data.get(hub_id, {})
+    logger.debug(f"Hub {hub_id} equipment data: {hub_equipment}")
 
     if required_equipment:
         available_equipment = hub_equipment.get("equipment", [])
         if not all(eq in available_equipment for eq in required_equipment):
+            logger.debug(f"Hub {hub_id} does not have all required equipment: {required_equipment}")
             return False
 
     if required_processes:
         available_processes = hub_equipment.get("processes", [])
         if not all(proc in available_processes for proc in required_processes):
+            logger.debug(f"Hub {hub_id} does not have all required processes: {required_processes}")
             return False
 
+    logger.debug(f"Hub {hub_id} meets all equipment requirements")
     return True
 
 
@@ -179,14 +206,17 @@ def find_next_best_hub(
         ]
     If none is found, fallback to the first in available_hubs.
     """
+    logger.debug(f"Finding next best hub for current hub: {current_hub}, available hubs: {available_hubs}, state: {delivers_to_state}")
     # Find the hub entry for current state
     for hub in cmyk_hubs:
         if hub["State"].lower() == delivers_to_state.lower():
+            logger.debug(f"State match found in CMYK hubs for state: {hub['State']}")
             # Check each next best option
             for next_hub in hub["Next_Best"]:
                 if next_hub.lower() in [h.lower() for h in available_hubs]:
-                    logger.debug(f"Found next best hub: {next_hub}")
+                    logger.debug(f"Found next best hub: {next_hub} for state: {delivers_to_state}")
                     return next_hub.lower()
+            logger.debug(f"No next best hubs in the list matched available hubs for state: {delivers_to_state}")
 
     # Fallback to first available hub if no next best found
     if available_hubs:
@@ -223,22 +253,26 @@ def validate_hub_rules(
          any listed keyword found in description), then we exclude the hub.
     3) If no rule excludes the hub, we keep it.
     """
-    logger.debug(f"Validating hub rules for initial hub: {initial_hub}")
-
+    logger.debug(f"Starting validation of hub rules for initial hub: {initial_hub}")
     rules = load_hub_rules()
+    logger.debug(f"Sorting {len(rules)} loaded rule(s) by priority (highest first)")
     # Highest priority first
     rules.sort(key=lambda x: x.priority, reverse=True)
 
     for rule in rules:
+        logger.debug(f"Evaluating rule {rule.id} for hub {initial_hub}")
         if not rule.enabled:
+            logger.debug(f"Skipping rule {rule.id} because it is not enabled")
             continue
 
         # Must match the same hubId in the rule
         if rule.hubId.lower() != initial_hub.lower():
+            logger.debug(f"Skipping rule {rule.id} because rule hubId ({rule.hubId}) does not match initial hub ({initial_hub})")
             continue
 
         # Check date validity
         if not check_dates(rule):
+            logger.debug(f"Skipping rule {rule.id} because it is not valid for the current date")
             continue
 
         logger.debug(f"Checking rule: {rule.id} - {rule.description}")
@@ -251,7 +285,9 @@ def validate_hub_rules(
                 logger.debug(f"Hub {initial_hub} excluded by rule {rule.id}: "
                              f"size {width}x{height} fails constraints "
                              f"{rule.sizeConstraints.maxWidth}x{rule.sizeConstraints.maxHeight}")
-                return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+                selected_hub = find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+                logger.debug(f"Switching hub from {initial_hub} to {selected_hub} based on size constraints")
+                return selected_hub
             else:
                 logger.debug(f"Hub {initial_hub} passed size check for rule {rule.id}")
 
@@ -267,30 +303,33 @@ def validate_hub_rules(
             if rule.orderCriteria.maxQuantity is not None:
                 criteria_defined = True
                 qty_match = (quantity >= rule.orderCriteria.maxQuantity)
+                logger.debug(f"Rule {rule.id} - Checking quantity: order quantity {quantity} vs maxQuantity {rule.orderCriteria.maxQuantity} => match: {qty_match}")
                 all_conditions_met &= qty_match
 
             # productIds => exclude if product_id is in the list
             if rule.orderCriteria.productIds:
                 criteria_defined = True
                 pid_match = (product_id in rule.orderCriteria.productIds)
+                logger.debug(f"Rule {rule.id} - Checking product_id: {product_id} in {rule.orderCriteria.productIds} => match: {pid_match}")
                 all_conditions_met &= pid_match
 
             # keywords => exclude if any of them appear in the description
             if rule.orderCriteria.keywords:
                 criteria_defined = True
                 kw_match = any(kw.lower() in description.lower() for kw in rule.orderCriteria.keywords)
+                logger.debug(f"Rule {rule.id} - Checking keywords in description: '{description}' against {rule.orderCriteria.keywords} => match: {kw_match}")
                 all_conditions_met &= kw_match
 
             # If we actually had criteria and all matched => exclude
             if criteria_defined and all_conditions_met:
                 logger.debug(f"Hub {initial_hub} excluded by rule {rule.id}: matched all order criteria.")
-                return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+                selected_hub = find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+                logger.debug(f"Switching hub from {initial_hub} to {selected_hub} based on order criteria")
+                return selected_hub
 
-        # If we get here, this rule did not exclude the hub
         logger.debug(f"Hub {initial_hub} not excluded by rule {rule.id}")
 
-    # If no rule triggered an exclusion, return the initial hub
-    logger.debug(f"Hub {initial_hub} passed all rules")
+    logger.debug(f"Hub {initial_hub} passed all rules; final selection is {initial_hub}")
     return initial_hub
 
 
@@ -314,22 +353,26 @@ def choose_production_hub(
     This code will attempt to remove hubs that fail certain constraints 
     and then pick among the remaining. (Optional usage, can be tailored further.)
     """
-    logger.debug(f"Starting hub selection with available hubs: {available_hubs}")
-
+    logger.debug(f"Starting production hub selection with available hubs: {available_hubs}, current hub: {current_hub}")
     # Create set of valid hubs from available hubs
     valid_hubs = set(available_hubs)
+    logger.debug(f"Initial valid hubs set: {valid_hubs}")
 
     # Load and sort rules by priority (highest first)
     rules = load_hub_rules()
+    logger.debug(f"Applying {len(rules)} rule(s) for production hub selection")
     rules.sort(key=lambda x: x.priority, reverse=True)
 
     for rule in rules:
+        logger.debug(f"Evaluating production rule {rule.id} for hub {rule.hubId}")
         # Only apply enabled rules that match a hub in our valid set
         if not rule.enabled or rule.hubId not in valid_hubs:
+            logger.debug(f"Skipping rule {rule.id}: either not enabled or hub {rule.hubId} not in valid hubs")
             continue
 
         # Also skip if rule is not valid for current date
         if not check_dates(rule):
+            logger.debug(f"Skipping rule {rule.id} because it is not valid for the current date")
             continue
 
         should_remove = False
@@ -338,25 +381,26 @@ def choose_production_hub(
         if rule.sizeConstraints:
             if not check_size_constraints(width, height, rule.sizeConstraints):
                 should_remove = True
+                logger.debug(f"Rule {rule.id} indicates removal of hub {rule.hubId} due to size constraints")
 
         # (You could add more checks here for quantity, productID, etc., 
         #  if you need to filter out hubs entirely rather than do a "redirect".)
 
         if should_remove:
             valid_hubs.discard(rule.hubId)
-            logger.debug(f"Removed hub {rule.hubId} due to rule {rule.id}")
+            logger.debug(f"Removed hub {rule.hubId} from valid hubs based on rule {rule.id}")
 
-    logger.debug(f"Remaining valid hubs after applying rules: {valid_hubs}")
+    logger.debug(f"Remaining valid hubs after applying production rules: {valid_hubs}")
 
     # If the current hub is still valid, keep it
     if current_hub in valid_hubs:
-        logger.debug(f"Current hub {current_hub} remains valid")
+        logger.debug(f"Current hub {current_hub} remains valid after rule filtering")
         return current_hub
 
     # Otherwise, pick any valid hub or fallback
     if valid_hubs:
         chosen = next(iter(valid_hubs))
-        logger.debug(f"Chose first valid hub: {chosen}")
+        logger.debug(f"Chose production hub {chosen} from remaining valid hubs")
         return chosen
 
     # If no valid hubs remain, fallback
