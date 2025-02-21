@@ -2,6 +2,7 @@
 #These models are used to validate the data and ensure that it conforms to the expected structure.
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Union
+from datetime import date
 
 class RuleConditions(BaseModel):
     """Conditions that can be applied to finishing rules"""
@@ -94,8 +95,8 @@ class FinishingRules(BaseModel):
 
 class HubSizeConstraint(BaseModel):
     """Size constraints for hub production capabilities"""
-    maxWidth: float
-    maxHeight: float
+    maxWidth: Optional[float] = None
+    maxHeight: Optional[float] = None
     maxQuantity: Optional[int] = None
 
 class HubEquipmentRule(BaseModel):

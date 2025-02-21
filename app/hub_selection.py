@@ -27,17 +27,24 @@ def check_size_constraints(width: float, height: float, quantity: int,
 
 def check_keywords(description: str, keywords: List[str],
                   exclude_keywords: List[str]) -> bool:
-    """Check if description matches keyword rules"""
+    """
+    Check if description matches keyword rules.
+    For required keywords: ALL keywords must be present (AND logic)
+    For excluded keywords: ANY keyword match excludes (OR logic)
+    """
     description = description.lower()
     
-    # Check excluded keywords first
+    # Check excluded keywords first (OR logic - any match excludes)
     if exclude_keywords:
         if any(kw.lower() in description for kw in exclude_keywords):
+            logger.debug(f"Description excluded due to keyword: matches one of {exclude_keywords}")
             return False
             
-    # Check required keywords
+    # Check required keywords (AND logic - all must match)
     if keywords:
-        if not any(kw.lower() in description for kw in keywords):
+        missing_keywords = [kw for kw in keywords if kw.lower() not in description]
+        if missing_keywords:
+            logger.debug(f"Description missing required keywords: {missing_keywords}")
             return False
             
     return True
@@ -87,6 +94,123 @@ def check_equipment_requirements(hub_id: str, required_equipment: List[str],
             return False
             
     return True
+
+def load_hub_rules() -> List[HubSelectionRule]:
+    """Load hub selection rules from JSON file"""
+    rules_path = Path("data/hub_rules.json")
+    if not rules_path.exists():
+        return []
+    with open(rules_path, "r") as f:
+        rules_data = json.load(f)
+        return [HubSelectionRule(**rule) for rule in rules_data["rules"]]
+
+def validate_hub_rules(
+    initial_hub: str,
+    available_hubs: List[str],
+    delivers_to_state: str,
+    current_hub: str,
+    description: str,
+    width: float,
+    height: float,
+    quantity: int,
+    product_id: int,
+    product_group: str,
+    cmyk_hubs: List[dict]
+) -> str:
+    """
+    Validates a chosen hub against hub rules and returns either:
+    - The same hub if it passes rules
+    - Or the next best hub if the initial one fails rules
+    """
+    logger.debug(f"Validating hub rules for initial hub: {initial_hub}")
+    
+    rules = load_hub_rules()
+    rules.sort(key=lambda x: x.priority, reverse=True)
+    
+    # Check if any rules invalidate the initial hub
+    for rule in rules:
+        if not rule.enabled:
+            continue
+            
+        if rule.hubId.lower() != initial_hub.lower():
+            continue
+            
+        logger.debug(f"Checking rule: {rule.id} - {rule.description}")
+        
+        # Check size constraints
+        if rule.sizeConstraints:
+            # Check width constraint if specified
+            if (rule.sizeConstraints.maxWidth is not None and
+                width > rule.sizeConstraints.maxWidth):
+                logger.debug(f"Hub {initial_hub} failed width constraint: {width} > {rule.sizeConstraints.maxWidth}")
+                return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+                
+            # Check height constraint if specified
+            if (rule.sizeConstraints.maxHeight is not None and
+                height > rule.sizeConstraints.maxHeight):
+                logger.debug(f"Hub {initial_hub} failed height constraint: {height} > {rule.sizeConstraints.maxHeight}")
+                return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+                
+            # Check quantity constraint if specified
+            if (rule.sizeConstraints.maxQuantity is not None and
+                quantity > rule.sizeConstraints.maxQuantity):
+                logger.debug(f"Hub {initial_hub} failed quantity constraint: {quantity} > {rule.sizeConstraints.maxQuantity}")
+                return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+                
+        # Check state restrictions
+        if rule.allowedStates and delivers_to_state not in [s.lower() for s in rule.allowedStates]:
+            logger.debug(f"Hub {initial_hub} state not in allowed states")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+        if rule.excludedStates and delivers_to_state in [s.lower() for s in rule.excludedStates]:
+            logger.debug(f"Hub {initial_hub} state in excluded states")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+        # Check product restrictions
+        if rule.productIds and product_id not in rule.productIds:
+            logger.debug(f"Hub {initial_hub} product ID not allowed")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+        if rule.excludeProductIds and product_id in rule.excludeProductIds:
+            logger.debug(f"Hub {initial_hub} product ID explicitly excluded")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+        # Check product groups
+        if rule.productGroups and not any(pg.lower() in product_group.lower() for pg in rule.productGroups):
+            logger.debug(f"Hub {initial_hub} product group not allowed")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+        if rule.excludeProductGroups and any(pg.lower() in product_group.lower() for pg in rule.excludeProductGroups):
+            logger.debug(f"Hub {initial_hub} product group explicitly excluded")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+        # Check keywords
+        if rule.keywords and not any(kw.lower() in description.lower() for kw in rule.keywords):
+            logger.debug(f"Hub {initial_hub} required keywords not found")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+        if rule.excludeKeywords and any(kw.lower() in description.lower() for kw in rule.excludeKeywords):
+            logger.debug(f"Hub {initial_hub} excluded keywords found")
+            return find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+            
+    # If we get here, the hub passed all rules
+    logger.debug(f"Hub {initial_hub} passed all rules")
+    return initial_hub
+
+def find_next_best_hub(current_hub: str, available_hubs: List[str], delivers_to_state: str, cmyk_hubs: List[dict]) -> str:
+    """Find the next best hub when current hub fails rules"""
+    # Find the hub entry for current state
+    for hub in cmyk_hubs:
+        if hub["State"].lower() == delivers_to_state:
+            # Check each next best option
+            for next_hub in hub["Next_Best"]:
+                if next_hub.lower() in [h.lower() for h in available_hubs]:
+                    logger.debug(f"Found next best hub: {next_hub}")
+                    return next_hub.lower()
+                    
+    # Fallback to first available hub if no next best found
+    logger.debug(f"No valid next best hub found, using first available: {available_hubs[0]}")
+    return available_hubs[0].lower()
 
 def choose_production_hub(
     available_hubs: List[str],

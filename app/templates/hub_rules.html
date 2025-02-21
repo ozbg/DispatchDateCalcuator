@@ -2,304 +2,444 @@
 {% block content %}
 <h2>Hub Selection Rules Management</h2>
 <p><a href="/" class="btn">Back to Admin</a></p>
-<p><a href="/" class="btn">Back to Admin</a></p>
 
 <div class="help-section">
-    <h3>Understanding Hub Selection Rules</h3>
-    <div class="rule-explanation">
-        <div class="rule-box">
-            <h4>Rule Application</h4>
-            <p>Rules only remove hubs from the available list when constraints are not met</p>
-            <p class="example">Example: If a hub exceeds size limits, it's removed as an option</p>
-        </div>
-        <div class="rule-box">
-            <h4>Hub Selection</h4>
-            <p>After applying rules, system tries to:</p>
-            <ol>
-                <li>Use current hub if still valid</li>
-                <li>Fall back to remaining valid hubs</li>
-            </ol>
-        </div>
-        <div class="rule-box">
-            <h4>Constraints</h4>
-            <ul>
-                <li>Size and quantity limits</li>
-                <li>Equipment availability</li>
-                <li>Temporary restrictions</li>
-                <li>Product requirements</li>
-            </ul>
-        </div>
+  <h3>Understanding Hub Selection Rules</h3>
+  <div class="rule-explanation">
+    <div class="rule-box">
+      <h4>Rule Application</h4>
+      <p>Rules only remove hubs from the available list when constraints are not met</p>
+      <p class="example">Example: If a hub exceeds size limits, it's removed as an option</p>
     </div>
+    <div class="rule-box">
+      <h4>Hub Selection</h4>
+      <p>After applying rules, system tries to:</p>
+      <ol>
+        <li>Use current hub if still valid</li>
+        <li>Fall back to remaining valid hubs</li>
+      </ol>
+    </div>
+    <div class="rule-box">
+      <h4>Constraints</h4>
+      <ul>
+        <li>Size and quantity limits</li>
+        <li>Equipment availability</li>
+        <li>Temporary restrictions</li>
+        <li>Product requirements</li>
+      </ul>
+    </div>
+  </div>
 </div>
 
 <button onclick="showAddForm()" class="add-btn">Add New Rule</button>
 
 <div id="rulesContainer" class="rules-container">
-    <table class="rules-table">
-        <thead>
-            <tr>
-                <th>Priority</th>
-                <th>Hub</th>
-                <th>Description</th>
-                <th>Constraints</th>
-                <th>Status</th>
-                <th>Valid Until</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="hubRulesBody">
-            {% if rules %}
-                {% for rule in rules %}
-                <tr>
-                    <td>{{ rule.priority }}</td>
-                    <td>{{ rule.hubId }}</td>
-                    <td>{{ rule.description }}</td>
-                    <td>
-                        <ul class="constraints-list">
-                            {% if rule.sizeConstraints %}
-                            <li>Max size: {{ rule.sizeConstraints.maxWidth }}x{{ rule.sizeConstraints.maxHeight }}
-                                {% if rule.sizeConstraints.maxQuantity %}
-                                    (Max Qty: {{ rule.sizeConstraints.maxQuantity }})
-                                {% endif %}
-                            </li>
-                            {% endif %}
-                            
-                            {% if rule.keywords %}
-                            <li>Required Keywords: {{ rule.keywords|join(", ") }}</li>
-                            {% endif %}
-                            
-                            {% if rule.excludeKeywords %}
-                            <li>Excluded Keywords: {{ rule.excludeKeywords|join(", ") }}</li>
-                            {% endif %}
-                            
-                            {% if rule.productIds %}
-                            <li>Product IDs: {{ rule.productIds|join(", ") }}</li>
-                            {% endif %}
-                            
-                            {% if rule.productGroups %}
-                            <li>Product Groups: {{ rule.productGroups|join(", ") }}</li>
-                            {% endif %}
-                            
-                            {% if rule.requiredEquipment %}
-                            <li>Required Equipment: {{ rule.requiredEquipment|join(", ") }}</li>
-                            {% endif %}
-                            
-                            {% if rule.requiredProcesses %}
-                            <li>Required Processes: {{ rule.requiredProcesses|join(", ") }}</li>
-                            {% endif %}
-                        </ul>
-                    </td>
-                    <td>{{ "Active" if rule.enabled else "Disabled" }}</td>
-                    <td>{{ rule.endDate if rule.endDate else "Permanent" }}</td>
-                    <td>
-                        <button onclick="editRule('{{ rule.id }}')" class="edit-btn">Edit</button>
-                        <button onclick="deleteRule('{{ rule.id }}')" class="delete-btn">Delete</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="7">No rules found. Click 'Add New Rule' to create one.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
+  <table class="rules-table">
+    <thead>
+      <tr>
+        <th>Priority</th>
+        <th>Hub</th>
+        <th>Description</th>
+        <th>Constraints</th>
+        <th>Status</th>
+        <th>Valid Until</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="hubRulesBody">
+      {% if rules %}
+        {% for rule in rules %}
+        <tr>
+          <td>{{ rule.priority }}</td>
+          <td>{{ rule.hubId }}</td>
+          <td>{{ rule.description }}</td>
+          <td>
+            <ul class="constraints-list">
+              {% if rule.sizeConstraints %}
+              <li>
+                Max size: {{ rule.sizeConstraints.maxWidth }}x{{ rule.sizeConstraints.maxHeight }}
+                {% if rule.sizeConstraints.maxQuantity %}
+                  (Max Qty: {{ rule.sizeConstraints.maxQuantity }})
+                {% endif %}
+              </li>
+              {% endif %}
+              {% if rule.keywords %}
+              <li>Required Keywords: {{ rule.keywords|join(", ") }}</li>
+              {% endif %}
+              {% if rule.excludeKeywords %}
+              <li>Excluded Keywords: {{ rule.excludeKeywords|join(", ") }}</li>
+              {% endif %}
+              {% if rule.productIds %}
+              <li>Product IDs: {{ rule.productIds|join(", ") }}</li>
+              {% endif %}
+              {% if rule.productGroups %}
+              <li>Product Groups: {{ rule.productGroups|join(", ") }}</li>
+              {% endif %}
+              {% if rule.requiredEquipment %}
+              <li>Required Equipment: {{ rule.requiredEquipment|join(", ") }}</li>
+              {% endif %}
+              {% if rule.requiredProcesses %}
+              <li>Required Processes: {{ rule.requiredProcesses|join(", ") }}</li>
+              {% endif %}
+            </ul>
+          </td>
+          <td>{{ "Active" if rule.enabled else "Disabled" }}</td>
+          <td>{{ rule.endDate if rule.endDate else "Permanent" }}</td>
+          <td>
+            <button class="edit-btn" data-rule-id="{{ rule.id }}" data-rule-data='{{ rule|tojson|safe }}'>Edit</button>
+            <button class="delete-btn" data-rule-id="{{ rule.id }}">Delete</button>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="7">No rules found. Click 'Add New Rule' to create one.</td>
+        </tr>
+      {% endif %}
+    </tbody>
+  </table>
 </div>
 
 <!-- Rule Editor Modal -->
 <div id="ruleEditor" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle">Edit Hub Rule</h3>
-        
-        <div class="form-group">
-            <label for="ruleId">Rule ID:</label>
-            <input type="text" id="ruleId" required>
-        </div>
-
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <input type="text" id="description" required>
-        </div>
-
-        <div class="form-group">
-            <label for="hubId">Production Hub:</label>
-            <select id="hubId" required>
-                <option value="vic">Victoria</option>
-                <option value="qld">Queensland</option>
-                <option value="nsw">New South Wales</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="priority">Priority:</label>
-            <input type="number" id="priority" value="0">
-        </div>
-
-        <div class="form-group">
-            <h4>Size Constraints</h4>
-            <div class="size-constraints">
-                <label>Max Width (mm):
-                    <input type="number" id="maxWidth" step="0.1">
-                </label>
-                <label>Max Height (mm):
-                    <input type="number" id="maxHeight" step="0.1">
-                </label>
-                <label>Max Quantity:
-                    <input type="number" id="maxQuantity">
-                </label>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <h4>Keywords</h4>
-            <div class="keywords-section">
-                <div>
-                    <label>Required Keywords:</label>
-                    <div class="tag-input-container">
-                        <input type="text" id="keywordInput" placeholder="Type and press Enter">
-                        <div id="keywordTags" class="tag-container"></div>
-                    </div>
-                </div>
-                <div>
-                    <label>Excluded Keywords:</label>
-                    <div class="tag-input-container">
-                        <input type="text" id="excludeKeywordInput" placeholder="Type and press Enter">
-                        <div id="excludeKeywordTags" class="tag-container"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <h4>Product Restrictions</h4>
-            <div class="product-restrictions">
-                <div>
-                    <label>Product IDs:</label>
-                    <div class="tag-input-container">
-                        <input type="text" id="productIdInput" placeholder="Enter product ID">
-                        <div id="productIdTags" class="tag-container"></div>
-                    </div>
-                </div>
-                <div>
-                    <label>Product Groups:</label>
-                    <div class="tag-input-container">
-                        <input type="text" id="productGroupInput" placeholder="Enter product group">
-                        <div id="productGroupTags" class="tag-container"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <h4>Time Restrictions</h4>
-            <div class="time-restrictions">
-                <label>Start Date:
-                    <input type="date" id="startDate">
-                </label>
-                <label>End Date:
-                    <input type="date" id="endDate">
-                </label>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>
-                <input type="checkbox" id="enabled" checked>
-                Rule Enabled
-            </label>
-        </div>
-
-        <div class="button-group">
-            <button onclick="saveRule()" class="save-btn">Save Rule</button>
-            <button onclick="closeEditor()" class="cancel-btn">Cancel</button>
-        </div>
+  <div class="modal-content">
+    <h3 id="modalTitle">Edit Hub Rule</h3>
+    <input type="hidden" id="ruleId">
+    
+    <div class="form-group">
+      <label for="keywords">Keywords and Product Matching</label>
+      <div class="instruction-box">
+        <h4>Matching Rules:</h4>
+        <ul>
+          <li><strong>Required Keywords (AND Logic):</strong>
+            <br>ALL keywords must be present in the description.
+            <br>Example: "A4, Book, Jam" requires ALL three terms.</li>
+          <li><strong>Excluded Keywords (OR Logic):</strong>
+            <br>ANY matching keyword will exclude the description.
+            <br>Example: If "spiral, wire" are excluded, a match to either will exclude.</li>
+          <li><strong>Product IDs (OR Logic):</strong>
+            <br>ANY matching ID will include the product.
+            <br>Example: IDs "1,2,3" means the product must match ANY of these IDs.</li>
+        </ul>
+      </div>
     </div>
+
+    <div class="form-group">
+      <label for="description">Description:</label>
+      <input type="text" id="description" required>
+    </div>
+
+    <div class="form-group">
+      <label for="hubId">Production Hub:</label>
+      <select id="hubId" required class="form-control">
+        <option value="vic">Victoria (VIC)</option>
+        <option value="nsw">New South Wales (NSW)</option>
+        <option value="qld">Queensland (QLD)</option>
+        <option value="nqld">North Queensland (NQLD)</option>
+        <option value="wa">Western Australia (WA)</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="priority">Priority:</label>
+      <input type="number" id="priority" value="0">
+    </div>
+
+    <div class="form-group">
+      <h4>Size Constraints</h4>
+      <div class="size-constraints">
+        <label>Max Width (mm):
+          <input type="number" id="maxWidth" step="0.1">
+        </label>
+        <label>Max Height (mm):
+          <input type="number" id="maxHeight" step="0.1">
+        </label>
+        <label>Max Quantity:
+          <input type="number" id="maxQuantity">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <h4>Keywords</h4>
+      <div class="keywords-section">
+        <div>
+          <label>Required Keywords:</label>
+          <div class="tag-input-container">
+            <input type="text" id="keywordInput" placeholder="Type and press Enter">
+            <div id="keywordTags" class="tag-container"></div>
+          </div>
+        </div>
+        <div>
+          <label>Excluded Keywords:</label>
+          <div class="tag-input-container">
+            <input type="text" id="excludeKeywordInput" placeholder="Type and press Enter">
+            <div id="excludeKeywordTags" class="tag-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <h4>Product Restrictions</h4>
+      <div class="product-restrictions">
+        <div>
+          <label>Product IDs:</label>
+          <div class="tag-input-container">
+            <input type="text" id="productIdInput" placeholder="Enter product ID">
+            <div id="productIdTags" class="tag-container"></div>
+          </div>
+        </div>
+        <div>
+          <label>Product Groups:</label>
+          <div class="tag-input-container">
+            <input type="text" id="productGroupInput" placeholder="Enter product group">
+            <div id="productGroupTags" class="tag-container"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <h4>Time Restrictions</h4>
+      <div class="time-restrictions">
+        <label>Start Date:
+          <input type="date" id="startDate">
+        </label>
+        <label>End Date:
+          <input type="date" id="endDate">
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input type="checkbox" id="enabled" checked>
+        Rule Enabled
+      </label>
+    </div>
+
+    <div class="button-group">
+      <button onclick="saveRule()" class="save-btn">Save Rule</button>
+      <button onclick="closeEditor()" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
 </div>
 
+<!-- CSS (you may keep your existing CSS or include these styles as needed) -->
 <style>
-/* Existing styles from finishing_rules.html */
-.tag-input-container {
-    margin-top: 0.5rem;
-}
-
-.tag {
-    display: inline-block;
-    background: #e9ecef;
-    border-radius: 4px;
-    padding: 2px 8px;
-    margin: 2px 4px;
-    font-size: 0.9em;
-}
-
-.tag .remove {
-    margin-left: 6px;
-    cursor: pointer;
-    color: #666;
-}
-
-.tag .remove:hover {
-    color: #dc3545;
-}
-
-.tag-container {
-    min-height: 32px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    padding: 4px;
-    margin-top: 4px;
-}
+/* General Layout */
 .rules-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* Add hub-specific styles */
-.size-constraints,
-.time-restrictions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-top: 0.5rem;
+/* Table Styles */
+.rules-table {
+  width: 100%;
+  margin-top: 25px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-
-.keywords-section,
-.product-restrictions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 0.5rem;
+.rules-table th {
+  background: #f8f9fa;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #dee2e6;
 }
-
+.rules-table td {
+  padding: 15px;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: top;
+}
+.rules-table tr:hover {
+  background-color: #f8f9fa;
+}
 .constraints-list {
-    margin: 0;
-    padding-left: 20px;
-    font-size: 0.9em;
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.9em;
 }
 
-/* Include all other styles from finishing_rules.html */
+/* Help Section */
+.help-section {
+  background: #f8f9fa;
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 8px;
+}
+.rule-explanation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 15px;
+}
+.rule-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+.rule-box h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+.example {
+  font-style: italic;
+  color: #666;
+  font-size: 0.9em;
+}
+
+/* Modal Styling */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  margin: 5% auto;
+  padding: 20px;
+  width: 80%;
+  max-width: 800px;
+  border-radius: 8px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 25px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+.form-group h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 10px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.select,
+.tag-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+.form-group small {
+  display: block;
+  color: #666;
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+/* Tag Containers */
+.tag-input-container {
+  margin-top: 10px;
+}
+.tag-container {
+  min-height: 44px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 8px;
+  background: white;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background: #e9ecef;
+  border-radius: 4px;
+  padding: 6px 12px;
+  margin: 4px;
+  font-size: 14px;
+}
+.tag .remove {
+  margin-left: 8px;
+  cursor: pointer;
+  color: #666;
+  font-size: 18px;
+}
+.tag .remove:hover {
+  color: #dc3545;
+}
+
+/* Button Styles */
+.add-btn,
+.edit-btn,
+.delete-btn,
+.save-btn,
+.cancel-btn {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+  color: #fff;
+}
+.add-btn { background: #28a745; }
+.edit-btn { background: #007bff; }
+.delete-btn { background: #dc3545; }
+.save-btn { background: #28a745; }
+.cancel-btn { background: #6c757d; }
+.add-btn:hover { background: #218838; }
+.edit-btn:hover { background: #0056b3; }
+.delete-btn:hover { background: #c82333; }
+.save-btn:hover { background: #218838; }
+.cancel-btn:hover { background: #5a6268; }
 </style>
 
+<!-- Single consolidated script block -->
 <script>
-// Store rules in a JS variable
-let currentRules = {{ rules|tojson }};
-
-function showAddForm() {
-    document.getElementById('modalTitle').textContent = 'Add New Hub Rule';
+  // Function to show the modal in "Add" mode
+  function showAddForm() {
     resetForm();
+    document.getElementById('modalTitle').textContent = 'Add New Hub Rule';
     document.getElementById('ruleEditor').style.display = 'block';
-}
+  }
 
-function closeEditor() {
+  // Function to hide the modal and reset fields
+  function closeEditor() {
     document.getElementById('ruleEditor').style.display = 'none';
     resetForm();
-}
+  }
 
-function resetForm() {
+  // Reset all form fields in the modal
+  function resetForm() {
     document.getElementById('ruleId').value = '';
     document.getElementById('description').value = '';
     document.getElementById('hubId').value = 'vic';
-    document.getElementById('priority').value = '0';
+    document.getElementById('priority').value = 0;
+    document.getElementById('enabled').checked = true;
     document.getElementById('maxWidth').value = '';
     document.getElementById('maxHeight').value = '';
     document.getElementById('maxQuantity').value = '';
@@ -309,427 +449,223 @@ function resetForm() {
     document.getElementById('productGroupTags').innerHTML = '';
     document.getElementById('startDate').value = '';
     document.getElementById('endDate').value = '';
-    document.getElementById('enabled').checked = true;
-}
+  }
 
-function editRule(ruleId) {
-    const rule = currentRules.find(r => r.id === ruleId);
-    if (!rule) return;
-
-    document.getElementById('modalTitle').textContent = 'Edit Hub Rule';
+  // Function to populate the modal with a rule object for editing
+  function editHubRule(rule) {
+    if (!rule || !rule.id) {
+      alert('Invalid rule data');
+      return;
+    }
     document.getElementById('ruleId').value = rule.id;
-    document.getElementById('description').value = rule.description;
-    document.getElementById('hubId').value = rule.hubId;
-    document.getElementById('priority').value = rule.priority;
-    document.getElementById('enabled').checked = rule.enabled;
-
-    // Load size constraints
-    if (rule.sizeConstraints) {
-        document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth;
-        document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight;
-        document.getElementById('maxQuantity').value = rule.sizeConstraints.maxQuantity || '';
-    }
-
-    // Load keywords
-    if (rule.keywords) {
-        rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
-    }
-    if (rule.excludeKeywords) {
-        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
-    }
-
-    // Load product restrictions
-    if (rule.productIds) {
-        rule.productIds.forEach(id => addTag(id.toString(), 'productIdTags'));
-    }
-    if (rule.productGroups) {
-        rule.productGroups.forEach(group => addTag(group, 'productGroupTags'));
-    }
-
-    // Load dates
-    document.getElementById('startDate').value = rule.startDate || '';
-    document.getElementById('endDate').value = rule.endDate || '';
-
-    document.getElementById('ruleEditor').style.display = 'block';
-}
-
-async function saveRule() {
-    try {
-        // Generate a unique ID if not editing
-        const ruleId = document.getElementById('ruleId').value || 'rule_' + Date.now();
-
-        // Validate required fields
-        const description = document.getElementById('description').value;
-        const hubId = document.getElementById('hubId').value;
-        
-        async function saveRule() {
-    try {
-        // Validate required fields
-        const description = document.getElementById('description').value;
-        const hubId = document.getElementById('hubId').value;
-        
-        if (!description || !hubId) {
-            alert('Description and Production Hub are required');
-            return;
-        }
-
-        // Generate a unique ID if not editing
-        const ruleId = document.getElementById('ruleId').value || 'rule_' + Date.now();
-
-        // Build the rule object
-        const rule = {
-            id: ruleId,
-            description: description,
-            hubId: hubId,
-            priority: parseInt(document.getElementById('priority').value || '0'),
-            enabled: document.getElementById('enabled').checked
-        };
-
-        // Add size constraints if any values exist
-        const maxWidth = document.getElementById('maxWidth').value;
-        const maxHeight = document.getElementById('maxHeight').value;
-        const maxQuantity = document.getElementById('maxQuantity').value;
-        
-        if (maxWidth || maxHeight || maxQuantity) {
-            rule.sizeConstraints = {
-                maxWidth: maxWidth ? parseFloat(maxWidth) : null,
-                maxHeight: maxHeight ? parseFloat(maxHeight) : null,
-                maxQuantity: maxQuantity ? parseInt(maxQuantity) : null
-            };
-        }
-
-        // Add keywords if they exist
-        const keywords = Array.from(document.getElementById('keywordTags').children)
-            .map(tag => tag.firstChild.textContent.trim())
-            .filter(kw => kw);
-        if (keywords.length > 0) {
-            rule.keywords = keywords;
-        }
-
-        const excludeKeywords = Array.from(document.getElementById('excludeKeywordTags').children)
-            .map(tag => tag.firstChild.textContent.trim())
-            .filter(kw => kw);
-        if (excludeKeywords.length > 0) {
-            rule.excludeKeywords = excludeKeywords;
-        }
-
-        // Add product restrictions if they exist
-        const productIds = Array.from(document.getElementById('productIdTags').children)
-            .map(tag => parseInt(tag.firstChild.textContent.trim()))
-            .filter(id => !isNaN(id));
-        if (productIds.length > 0) {
-            rule.productIds = productIds;
-        }
-
-        const productGroups = Array.from(document.getElementById('productGroupTags').children)
-            .map(tag => tag.firstChild.textContent.trim())
-            .filter(group => group);
-        if (productGroups.length > 0) {
-            rule.productGroups = productGroups;
-        }
-
-        // Add dates if they exist
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        
-        if (startDate) rule.startDate = startDate;
-        if (endDate) rule.endDate = endDate;
-
-        console.log('Saving rule:', rule);
-
-        const response = await fetch('/hub-rules/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(rule)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success) {
-            window.location.reload();
-        } else {
-            throw new Error(result.message || 'Failed to save rule');
-        }
-    } catch (error) {
-        console.error('Save error:', error);
-        alert('Error saving rule: ' + error.message);
-    }
-}
-
-async function deleteRule(ruleId) {
-    if (!confirm('Are you sure you want to delete this rule?')) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`/hub-rules/delete/${ruleId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-        
-        if (result.success) {
-            window.location.reload();
-        } else {
-            throw new Error(result.message || 'Failed to delete rule');
-        }
-    } catch (error) {
-        console.error('Delete error:', error);
-        alert('Error deleting rule: ' + error.message);
-    }
-}
-
-function editRule(ruleId) {
-    const rule = currentRules.find(r => r.id === ruleId);
-    if (!rule) {
-        console.error('Rule not found:', ruleId);
-        return;
-    }
-
-    document.getElementById('modalTitle').textContent = 'Edit Hub Rule';
-    
-    // Reset form first
-    resetForm();
-    
-    // Fill in basic fields
-    document.getElementById('ruleId').value = rule.id;
-    document.getElementById('description').value = rule.description;
-    document.getElementById('hubId').value = rule.hubId;
+    document.getElementById('description').value = rule.description || '';
+    document.getElementById('hubId').value = rule.hubId || 'vic';
     document.getElementById('priority').value = rule.priority || 0;
-    document.getElementById('enabled').checked = rule.enabled !== false;
-
-    // Fill in size constraints
+    document.getElementById('enabled').checked = (rule.enabled !== false);
     if (rule.sizeConstraints) {
-        document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth || '';
-        document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight || '';
-        document.getElementById('maxQuantity').value = rule.sizeConstraints.maxQuantity || '';
+      document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth || '';
+      document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight || '';
+      document.getElementById('maxQuantity').value = rule.sizeConstraints.maxQuantity || '';
+    } else {
+      document.getElementById('maxWidth').value = '';
+      document.getElementById('maxHeight').value = '';
+      document.getElementById('maxQuantity').value = '';
     }
-
-    // Fill in keywords
+    // Clear and populate tag containers
+    document.getElementById('keywordTags').innerHTML = '';
+    document.getElementById('excludeKeywordTags').innerHTML = '';
+    document.getElementById('productIdTags').innerHTML = '';
+    document.getElementById('productGroupTags').innerHTML = '';
     if (rule.keywords && Array.isArray(rule.keywords)) {
-        rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
+      rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
     }
     if (rule.excludeKeywords && Array.isArray(rule.excludeKeywords)) {
-        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
+      rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
     }
-
-    // Fill in product IDs and groups
     if (rule.productIds && Array.isArray(rule.productIds)) {
-        rule.productIds.forEach(id => addTag(id.toString(), 'productIdTags'));
+      rule.productIds.forEach(id => addTag(id.toString(), 'productIdTags'));
     }
     if (rule.productGroups && Array.isArray(rule.productGroups)) {
-        rule.productGroups.forEach(group => addTag(group, 'productGroupTags'));
+      rule.productGroups.forEach(pg => addTag(pg, 'productGroupTags'));
     }
-
-    // Fill in dates
-    if (rule.startDate) document.getElementById('startDate').value = rule.startDate;
-    if (rule.endDate) document.getElementById('endDate').value = rule.endDate;
-
+    if (rule.startDate) {
+      document.getElementById('startDate').value = rule.startDate;
+    }
+    if (rule.endDate) {
+      document.getElementById('endDate').value = rule.endDate;
+    }
+    document.getElementById('modalTitle').textContent = 'Edit Hub Rule';
     document.getElementById('ruleEditor').style.display = 'block';
-}
+  }
 
-    // Add size constraints if values exist
+  // Function to save the rule (for both add and edit)
+  async function saveRule() {
+    const description = document.getElementById('description').value.trim();
+    const hubId = document.getElementById('hubId').value.trim();
+    if (!description || !hubId) {
+      alert('Description and Production Hub are required.');
+      return;
+    }
+    const ruleIdField = document.getElementById('ruleId').value.trim();
+    const ruleId = ruleIdField || ('rule_' + Date.now());
+    const rule = {
+      id: ruleId,
+      description: description,
+      hubId: hubId,
+      priority: parseInt(document.getElementById('priority').value || '0'),
+      enabled: document.getElementById('enabled').checked
+    };
     const maxWidth = document.getElementById('maxWidth').value;
     const maxHeight = document.getElementById('maxHeight').value;
     const maxQuantity = document.getElementById('maxQuantity').value;
-    
     if (maxWidth || maxHeight || maxQuantity) {
-        rule.sizeConstraints = {
-            maxWidth: maxWidth ? parseFloat(maxWidth) : null,
-            maxHeight: maxHeight ? parseFloat(maxHeight) : null,
-            maxQuantity: maxQuantity ? parseInt(maxQuantity) : null
-        };
+      rule.sizeConstraints = {
+        maxWidth: maxWidth ? parseFloat(maxWidth) : null,
+        maxHeight: maxHeight ? parseFloat(maxHeight) : null,
+        maxQuantity: maxQuantity ? parseInt(maxQuantity) : null
+      };
     }
-
-    // Add keywords if they exist
-    const keywords = Array.from(document.getElementById('keywordTags').children)
+    // Helper to get tag texts from a container
+    const getTags = (containerId) => {
+      return Array.from(document.getElementById(containerId).children)
         .map(tag => tag.firstChild.textContent.trim());
+    };
+    const keywords = getTags('keywordTags');
     if (keywords.length > 0) {
-        rule.keywords = keywords;
+      rule.keywords = keywords;
     }
-
-    const excludeKeywords = Array.from(document.getElementById('excludeKeywordTags').children)
-        .map(tag => tag.firstChild.textContent.trim());
+    const excludeKeywords = getTags('excludeKeywordTags');
     if (excludeKeywords.length > 0) {
-        rule.excludeKeywords = excludeKeywords;
+      rule.excludeKeywords = excludeKeywords;
     }
-
-    // Add product restrictions if they exist
-    const productIds = Array.from(document.getElementById('productIdTags').children)
-        .map(tag => parseInt(tag.firstChild.textContent.trim()))
-        .filter(id => !isNaN(id));
+    const productIds = getTags('productIdTags').map(s => parseInt(s)).filter(n => !isNaN(n));
     if (productIds.length > 0) {
-        rule.productIds = productIds;
+      rule.productIds = productIds;
     }
-
-    const productGroups = Array.from(document.getElementById('productGroupTags').children)
-        .map(tag => tag.firstChild.textContent.trim());
+    const productGroups = getTags('productGroupTags');
     if (productGroups.length > 0) {
-        rule.productGroups = productGroups;
+      rule.productGroups = productGroups;
     }
-
-    // Add dates if they exist
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-    
     if (startDate) {
-        rule.startDate = startDate;
+      rule.startDate = startDate;
     }
     if (endDate) {
-        rule.endDate = endDate;
+      rule.endDate = endDate;
     }
-
-    console.log('Saving rule:', rule);
-
-    try {
-        const response = await fetch('/hub-rules/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(rule)
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const result = await response.json();
-
-        if (result.success) {
-            window.location.reload();
-        } else {
-            alert('Error saving rule: ' + result.message);
-        }
-    } catch (error) {
-        console.error('Error saving rule:', error);
-        alert('Error saving rule: ' + error.message);
-    }
-}
-}
-
-async function deleteRule(ruleId) {
-    if (!ruleId || !confirm('Are you sure you want to delete this rule?')) {
-        return;
-    }
-
-    try {
-        const response = await fetch(`/hub-rules/delete/${ruleId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            window.location.reload();
-        } else {
-            alert('Error deleting rule: ' + result.message);
-        }
-    } catch (error) {
-        console.error('Delete error:', error);
-        alert('Error deleting rule: ' + error.message);
-    }
-}
-
-function editRule(ruleId) {
-    const rule = currentRules.find(r => r.id === ruleId);
-    if (!rule) {
-        console.error('Rule not found:', ruleId);
-        return;
-    }
-
-    document.getElementById('modalTitle').textContent = 'Edit Hub Rule';
     
-    // Reset form first
-    resetForm();
-    
-    // Fill in basic fields
-    document.getElementById('ruleId').value = rule.id;
-    document.getElementById('description').value = rule.description;
-    document.getElementById('hubId').value = rule.hubId;
-    document.getElementById('priority').value = rule.priority || 0;
-    document.getElementById('enabled').checked = rule.enabled !== false;
-
-    // Fill in size constraints
-    if (rule.sizeConstraints) {
-        document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth || '';
-        document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight || '';
-        document.getElementById('maxQuantity').value = rule.sizeConstraints.maxQuantity || '';
+    try {
+      const response = await fetch('/hub-rules/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(rule)
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+      const result = await response.json();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        alert('Error saving rule: ' + (result.message || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error('Error in saveRule:', err);
+      alert('Error saving rule: ' + err.message);
     }
+  }
 
-    // Fill in keywords
-    if (rule.keywords && Array.isArray(rule.keywords)) {
-        rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
+  // Function to delete a rule by its ID
+  async function deleteRule(ruleId) {
+    ruleId = ruleId.replace(/['"]+/g, '');
+    if (!confirm('Are you sure you want to delete this rule?')) return;
+    try {
+      const response = await fetch(`/hub-rules/delete/${ruleId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+      const result = await response.json();
+      if (result.success) {
+        window.location.reload();
+      } else {
+        throw new Error(result.message || 'Unknown error');
+      }
+    } catch (err) {
+      console.error('Error deleting rule:', err);
+      alert('Error deleting rule: ' + err.message);
     }
-    if (rule.excludeKeywords && Array.isArray(rule.excludeKeywords)) {
-        rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
-    }
+  }
 
-    // Fill in product IDs and groups
-    if (rule.productIds && Array.isArray(rule.productIds)) {
-        rule.productIds.forEach(id => addTag(id.toString(), 'productIdTags'));
-    }
-    if (rule.productGroups && Array.isArray(rule.productGroups)) {
-        rule.productGroups.forEach(group => addTag(group, 'productGroupTags'));
-    }
-
-    // Fill in dates
-    if (rule.startDate) document.getElementById('startDate').value = rule.startDate;
-    if (rule.endDate) document.getElementById('endDate').value = rule.endDate;
-
-    document.getElementById('ruleEditor').style.display = 'block';
-}
-// Tag input functionality
-function addTag(value, containerId) {
+  // Helper function to add a tag to a container
+  function addTag(value, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-
     const tag = document.createElement('span');
     tag.className = 'tag';
-    
-    const cleanValue = value.trim();
-    const textNode = document.createTextNode(cleanValue);
-    tag.appendChild(textNode);
-
+    tag.textContent = value;
     const removeBtn = document.createElement('span');
     removeBtn.className = 'remove';
     removeBtn.innerHTML = '&times;';
-    removeBtn.onclick = function() {
-        tag.remove();
-    };
-
+    removeBtn.onclick = () => tag.remove();
     tag.appendChild(removeBtn);
     container.appendChild(tag);
-}
+  }
 
-// Handle tag input events
-['keywordInput', 'excludeKeywordInput', 'productIdInput', 'productGroupInput'].forEach(inputId => {
-    document.getElementById(inputId).addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && this.value.trim()) {
-            const containerMap = {
-                'keywordInput': 'keywordTags',
-                'excludeKeywordInput': 'excludeKeywordTags',
-                'productIdInput': 'productIdTags',
-                'productGroupInput': 'productGroupTags'
-            };
-            
-            addTag(this.value.trim(), containerMap[this.id]);
-            this.value = '';
-            e.preventDefault();
-        }
+  // Attach Enter key event listeners for tag input fields
+  ['keywordInput', 'excludeKeywordInput', 'productIdInput', 'productGroupInput'].forEach(inputId => {
+    const inputElem = document.getElementById(inputId);
+    inputElem.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && this.value.trim()) {
+        const containerMap = {
+          'keywordInput': 'keywordTags',
+          'excludeKeywordInput': 'excludeKeywordTags',
+          'productIdInput': 'productIdTags',
+          'productGroupInput': 'productGroupTags'
+        };
+        addTag(this.value.trim(), containerMap[this.id]);
+        this.value = '';
+        e.preventDefault();
+      }
     });
-});
+  });
+
+  // Bind click events for Edit and Delete buttons once DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        try {
+          const ruleDataStr = this.getAttribute('data-rule-data');
+          console.log("Raw rule data string:", ruleDataStr); // Debug log
+
+          if (!ruleDataStr) {
+            console.error('No rule data found for rule:', this.getAttribute('data-rule-id'));
+            return;
+          }
+          const ruleData = JSON.parse(ruleDataStr);
+          editHubRule(ruleData);
+        } catch (err) {
+          console.error('Error in edit button click:', err);
+          alert('Error editing rule. Please check console.');
+        }
+      });
+    });
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const ruleId = this.getAttribute('data-rule-id');
+        if (!ruleId) {
+          console.error('No rule ID found for deletion.');
+          return;
+        }
+        if (confirm('Are you sure you want to delete this rule?')) {
+          deleteRule(ruleId);
+        }
+      });
+    });
+  });
 </script>
 {% endblock %}

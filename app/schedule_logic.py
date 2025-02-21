@@ -25,6 +25,7 @@ from app.data_manager import (
 )
 from app.product_matcher import match_product_id, determine_grain_direction
 from app.config import TIME_ADJUST, WA_TIME_ADJUST
+from app.hub_selection import validate_hub_rules, choose_production_hub
 
 logger = logging.getLogger("scheduler")
 logger.setLevel(logging.DEBUG)
@@ -123,17 +124,35 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     base_prod_days = int(product_obj["Days_to_produce"])
     total_prod_days = base_prod_days + finishing_days
 
-    # 7) Choose final production hub (like your JS snippet)
+    # 7) Choose final production hub with hub rules validation
     product_hubs = product_obj.get("Production_Hub", [])
     cmyk_hubs = get_cmyk_hubs_data()
 
-    chosen_hub = choose_production_hub(
+    # First get optimal hub based on standard rules
+    initial_hub = choose_production_hub(
         product_hubs,
         req.misDeliversToState.lower(),
         req.misCurrentHub.lower(),
         found_product_id,
         cmyk_hubs
     )
+    
+    # Then validate against hub rules and get final hub
+    chosen_hub = validate_hub_rules(
+        initial_hub=initial_hub,
+        available_hubs=product_hubs,
+        delivers_to_state=req.misDeliversToState.lower(),
+        current_hub=req.misCurrentHub.lower(),
+        description=req.description,
+        width=req.preflightedWidth,
+        height=req.preflightedHeight,
+        quantity=req.misOrderQTY,
+        product_id=found_product_id,
+        product_group=product_obj["Product_Group"],
+        cmyk_hubs=cmyk_hubs
+    )
+    
+    logger.debug(f"Initial hub selection: {initial_hub}, Final hub after rules: {chosen_hub}")
 
     # Find the actual cmykHubID for that chosen hub
     chosen_hub_id = find_cmyk_hub_id(chosen_hub, cmyk_hubs)

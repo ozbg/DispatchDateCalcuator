@@ -1,116 +1,14 @@
 {
   "rules": [
     {
-      "id": "vic_size_limit",
-      "description": "Victoria Hub Size Constraints",
-      "hubId": "vic",
-      "priority": 100,
+      "id": "rule_1740122322967",
+      "description": "fdfdfafds",
+      "hubId": "nqld",
+      "priority": 0,
       "enabled": true,
-      "sizeConstraints": {
-        "maxWidth": 750,
-        "maxHeight": 520,
-        "maxQuantity": 50000
-      }
-    },
-    {
-      "id": "qld_size_limit",
-      "description": "Queensland Hub Size Constraints",
-      "hubId": "qld",
-      "priority": 100,
-      "enabled": true,
-      "sizeConstraints": {
-        "maxWidth": 650,
-        "maxHeight": 450,
-        "maxQuantity": 30000
-      }
-    },
-    {
-      "id": "nsw_foiling",
-      "description": "NSW Foiling Equipment Maintenance",
-      "hubId": "nsw",
-      "priority": 200,
-      "enabled": true,
-      "startDate": "2024-03-01",
-      "endDate": "2024-03-15",
-      "keywords": ["foil", "foiling"],
-      "excludeKeywords": ["no foil"],
-      "requiredEquipment": ["foiling_machine"]
-    },
-    {
-      "id": "vic_presentation",
-      "description": "Victoria Presentation Folder Production",
-      "hubId": "vic",
-      "priority": 150,
-      "enabled": true,
-      "productIds": [29, 30],
-      "productGroups": ["presentation"],
-      "requiredProcesses": ["diecut", "glue"]
-    },
-    {
-      "id": "wa_state_restriction",
-      "description": "WA Deliveries to VIC Production",
-      "hubId": "vic",
-      "priority": 300,
-      "enabled": true,
-      "allowedStates": ["WA"],
-      "excludedStates": ["QLD", "NSW"],
-      "sizeConstraints": {
-        "maxWidth": 500,
-        "maxHeight": 350,
-        "maxQuantity": 10000
-      }
-    },
-    {
-      "id": "qld_cards",
-      "description": "Queensland Business Card Production",
-      "hubId": "qld",
-      "priority": 250,
-      "enabled": true,
-      "productIds": [6, 7, 8, 9],
-      "excludeKeywords": ["foil", "scodix", "spot uv"],
-      "allowedStates": ["QLD", "NT"]
-    },
-    {
-      "id": "vic_large_format",
-      "description": "Victoria Large Format Production",
-      "hubId": "vic",
-      "priority": 175,
-      "enabled": true,
-      "sizeConstraints": {
-        "maxWidth": 1200,
-        "maxHeight": 700,
-        "maxQuantity": 5000
-      },
-      "requiredEquipment": ["large_format_printer"],
-      "productGroups": ["large_format", "posters"]
-    },
-    {
-      "id": "nsw_digital",
-      "description": "NSW Digital Press Production",
-      "hubId": "nsw",
-      "priority": 125,
-      "enabled": true,
-      "sizeConstraints": {
-        "maxWidth": 330,
-        "maxHeight": 488,
-        "maxQuantity": 1000
-      },
-      "requiredEquipment": ["hp_indigo"],
-      "excludeProductGroups": ["offset", "large_format"]
+      "keywords": [
+        "Gloss"
+      ]
     }
-  ],
-  "equipment": {
-    "vic": {
-      "equipment": ["hp_indigo", "large_format_printer", "foiling_machine", "diecut_press"],
-      "processes": ["diecut", "foil", "glue", "laminate"]
-    },
-    "nsw": {
-      "equipment": ["hp_indigo", "foiling_machine"],
-      "processes": ["foil", "laminate"]
-    },
-    "qld": {
-      "equipment": ["hp_indigo", "diecut_press"],
-      "processes": ["diecut", "laminate"]
-    }
-  }
+  ]
 }

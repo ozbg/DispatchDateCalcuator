@@ -65,55 +65,373 @@
 </div>
 
 <div id="editForm" class="modal" style="display: none;">
-    <div class="modal-content">
+    <div class="modal-content wide-modal">
         <h3 id="formTitle">Edit Hub</h3>
         
-        <div class="form-group">
-            <label for="hubName">Hub Name:</label>
-            <input type="text" id="hubName" required>
-            <small>Short name for the hub (e.g., vic, nsw, qld)</small>
-        </div>
-
-        <div class="form-group">
-            <label for="state">State:</label>
-            <input type="text" id="state" required>
-            <small>Full state name or identifier</small>
-        </div>
-
-        <div class="form-group">
-            <label for="hubId">CMYK Hub ID:</label>
-            <input type="number" id="hubId" required>
-            <small>Unique identifier for system reference</small>
-        </div>
-
-        <div class="form-group">
-            <label>Next Best Options:</label>
-            <div id="nextBestContainer">
-                <div class="next-best-list">
-                    <!-- Dynamic list items will be added here -->
+        <div class="two-column-grid">
+            <div class="form-section">
+                <h4>Basic Information</h4>
+                <div class="form-group">
+                    <label for="hubName">Hub Name:</label>
+                    <input type="text" id="hubName" required class="form-control">
+                    <small>Short name for the hub (e.g., vic, nsw, qld)</small>
                 </div>
-                <button type="button" onclick="addNextBestInput()" class="add-option-btn">Add Option</button>
+
+                <div class="form-group">
+                    <label for="state">State:</label>
+                    <input type="text" id="state" required class="form-control">
+                    <small>Full state name or identifier</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="hubId">CMYK Hub ID:</label>
+                    <input type="number" id="hubId" required class="form-control">
+                    <small>Unique identifier for system reference</small>
+                </div>
             </div>
-            <small>Order matters - list from most preferred to least preferred alternative</small>
+
+            <div class="form-section">
+                <h4>Production Options</h4>
+                <div class="form-group">
+                    <label>Next Best Options:</label>
+                    <div id="nextBestContainer" class="dynamic-container">
+                        <table class="next-best-table">
+                            <thead>
+                                <tr>
+                                    <th width="80">Priority</th>
+                                    <th>Hub</th>
+                                    <th width="100">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="next-best-list">
+                                <!-- Dynamic rows will be added here -->
+                            </tbody>
+                        </table>
+                        <button type="button" onclick="addNextBestInput()" class="action-btn add-btn">
+                            <i class="fas fa-plus"></i> Add Production Option
+                        </button>
+                    </div>
+                    <small class="emphasis-note">Priority order determines which hub is tried first</small>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label>Closed Dates:</label>
-            <div id="closedDatesContainer">
-                <div class="closed-dates-list">
-                    <!-- Dynamic date inputs will be added here -->
+        <div class="form-section full-width">
+            <h4>Schedule Management</h4>
+            <div class="form-group">
+                <div class="label-button-group">
+                    <label>Closed Dates:</label>
+                    <button type="button" onclick="addClosedDateInput()" class="action-btn add-btn compact-btn">
+                        <i class="fas fa-plus"></i> Add Closed Date
+                    </button>
                 </div>
-                <button type="button" onclick="addClosedDateInput()" class="add-date-btn">Add Date</button>
+                <div id="closedDatesContainer" class="dynamic-container dates-grid">
+                    <div class="closed-dates-list date-container">
+                        <!-- Dynamic date inputs will be added here -->
+                    </div>
+                </div>
+                <small>Select dates when the hub will be closed</small>
             </div>
-            <small>Select dates when the hub will be closed</small>
         </div>
 
         <div class="button-group">
-            <button onclick="saveHub()" class="save-btn">Save Hub</button>
-            <button onclick="closeForm()" class="cancel-btn">Cancel</button>
+            <button onclick="saveHub()" class="primary-btn save-btn">Save Changes</button>
+            <button onclick="closeForm()" class="secondary-btn cancel-btn">Cancel</button>
         </div>
     </div>
 </div>
+
+<style>
+/* Modal Styling */
+.modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 30px;
+    width: 95%;
+    max-width: 8000px;
+    margin: 30px auto;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.wide-modal {
+    max-width: 2000px;
+}
+
+.two-column-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.dates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.label-button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.compact-btn {
+    padding: 8px 16px;
+    font-size: 0.9em;
+    height: fit-content;
+    width: auto;
+    min-width: 120px;
+}
+
+.dates-grid .action-btn {
+    width: auto;
+    min-width: 150px;
+}
+
+.emphasis-note {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.next-best-table {
+    width: 100%;
+    margin-bottom: 15px;
+    border-collapse: collapse;
+}
+
+.next-best-table th,
+.next-best-table td {
+    padding: 15px;
+    border: 1px solid #dee2e6;
+}
+
+.next-best-table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.next-best-table select {
+    width: 100%;
+    min-width: 200px;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1.1em;
+}
+
+.priority-number {
+    font-weight: bold;
+    color: #007bff;
+    text-align: center;
+}
+
+.button-group {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 20px 0;
+    margin-top: 20px;
+    border-top: 2px solid #e9ecef;
+    z-index: 1000;
+    width: 100%;
+}
+
+.form-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.form-section h4 {
+    color: #2c3e50;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-size: 1.1em;
+}
+
+.form-group small {
+    display: block;
+    color: #6c757d;
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1.1em;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+/* Dynamic Containers */
+.dynamic-container {
+    background: #ffffff;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.tag-container, .date-container {
+    min-height: 100px;
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Buttons */
+.action-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background: #5a6268;
+}
+
+.add-btn {
+    background: #28a745;
+}
+
+.add-btn:hover {
+    background: #218838;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #e9ecef;
+}
+
+.primary-btn, .secondary-btn {
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-size: 1.1em;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.primary-btn {
+    background: #007bff;
+    color: white;
+}
+
+.primary-btn:hover {
+    background: #0056b3;
+}
+
+.secondary-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.secondary-btn:hover {
+    background: #5a6268;
+}
+
+/* Tags and Date Items */
+.next-best-item, .closed-date-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.next-best-item input, .closed-date-item input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.remove-btn:hover {
+    background: #c82333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+        margin: 20px auto;
+    }
+
+    .form-section {
+        padding: 15px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .primary-btn, .secondary-btn {
+        width: 100%;
+    }
+}
+</style>
 
 <style>
 .help-section {
@@ -316,13 +634,38 @@ function resetForm() {
 
 function addNextBestOption(value = '') {
     const container = document.querySelector('.next-best-list');
-    const div = document.createElement('div');
-    div.className = 'next-best-item';
-    div.innerHTML = `
-        <input type="text" value="${value}" placeholder="Hub name">
-        <button type="button" onclick="this.parentElement.remove()" class="remove-btn">Remove</button>
+    const row = document.createElement('tr');
+    const priority = container.children.length + 1;
+    row.innerHTML = `
+        <td class="priority-number">#${priority}</td>
+        <td>
+            <select class="hub-select">
+                <option value="">Select Hub</option>
+                <option value="vic" ${value === 'vic' ? 'selected' : ''}>VIC</option>
+                <option value="nsw" ${value === 'nsw' ? 'selected' : ''}>NSW</option>
+                <option value="qld" ${value === 'qld' ? 'selected' : ''}>QLD</option>
+                <option value="nqld" ${value === 'nqld' ? 'selected' : ''}>NQLD</option>
+                <option value="wa" ${value === 'wa' ? 'selected' : ''}>WA</option>
+            </select>
+        </td>
+        <td>
+            <button type="button" onclick="removeNextBestOption(this)" class="remove-btn">Remove</button>
+        </td>
     `;
-    container.appendChild(div);
+    container.appendChild(row);
+    updateNextBestIndices();
+}
+
+function removeNextBestOption(button) {
+    button.closest('tr').remove();
+    updateNextBestIndices();
+}
+
+function updateNextBestIndices() {
+    const rows = document.querySelectorAll('.next-best-list tr');
+    rows.forEach((row, index) => {
+        row.querySelector('.priority-number').textContent = `#${index + 1}`;
+    });
 }
 
 function addClosedDate(value = '') {
@@ -349,7 +692,7 @@ async function saveHub() {
         Hub: document.getElementById('hubName').value,
         State: document.getElementById('state').value,
         CMHKhubID: parseInt(document.getElementById('hubId').value),
-        Next_Best: Array.from(document.querySelectorAll('.next-best-item input')).map(input => input.value),
+        Next_Best: Array.from(document.querySelectorAll('.hub-select')).map(select => select.value).filter(value => value),
         Closed_Dates: Array.from(document.querySelectorAll('.closed-date-item input')).map(input => input.value)
     };
     

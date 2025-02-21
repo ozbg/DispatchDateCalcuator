@@ -180,14 +180,18 @@ async def hub_rules(request: Request):
         else:
             rules = []
             equipment = {}
-            
-        logger.debug(f"Loaded {len(rules)} rules and equipment data for {len(equipment)} hubs")
+        
+        # Load hubs data from cmyk_hubs.json
+        hubs = get_cmyk_hubs_data()
+        
+        logger.debug(f"Loaded {len(rules)} rules and equipment data for {len(hubs)} hubs")
         return templates.TemplateResponse(
             "hub_rules.html",
             {
                 "request": request,
                 "rules": rules,
-                "equipment": equipment
+                "equipment": equipment,
+                "hubs": hubs   # Pass hubs data here
             }
         )
     except Exception as e:
