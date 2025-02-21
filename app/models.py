@@ -93,18 +93,28 @@ class FinishingRules(BaseModel):
     keywordRules: List[FinishingRule]
     centerRules: List[CenterRule]
 
+class OrderMatchingCriteria(BaseModel):
+    """Criteria for matching orders based on quantity, keywords, and product details"""
+    maxQuantity: Optional[int] = None
+    minQuantity: Optional[int] = None
+    keywords: Optional[List[str]] = None
+    excludeKeywords: Optional[List[str]] = None
+    productIds: Optional[List[int]] = None
+    excludeProductIds: Optional[List[int]] = None
+    productGroups: Optional[List[str]] = None
+    excludeProductGroups: Optional[List[str]] = None
+
 class HubSizeConstraint(BaseModel):
     """Size constraints for hub production capabilities"""
     maxWidth: Optional[float] = None
     maxHeight: Optional[float] = None
-    maxQuantity: Optional[int] = None
 
 class HubEquipmentRule(BaseModel):
     """Equipment/process availability at a hub"""
-    hubId: str
-    equipment: List[str]
-    processes: List[str]
-    enabled: bool = True
+class HubSizeConstraint(BaseModel):
+    """Size constraints for hub production capabilities"""
+    maxWidth: Optional[float] = None
+    maxHeight: Optional[float] = None
 
 class HubSelectionRule(BaseModel):
     """Rules for selecting production hubs"""
@@ -113,14 +123,17 @@ class HubSelectionRule(BaseModel):
     hubId: str
     priority: int = 0
     enabled: bool = True
+    sizeConstraints: Optional[HubSizeConstraint] = None
+    orderCriteria: Optional[OrderMatchingCriteria] = None
+    startDate: Optional[str] = None
+    endDate: Optional[str] = None
     
     # Conditions
     keywords: Optional[List[str]] = None
     excludeKeywords: Optional[List[str]] = None
     productIds: Optional[List[int]] = None
-    excludeProductIds: Optional[List[int]] = None
-    productGroups: Optional[List[str]] = None
-    excludeProductGroups: Optional[List[str]] = None
+    maxQuantity: Optional[int] = None
+    maxQuantity: Optional[int] = None
     
     # Size constraints
     sizeConstraints: Optional[HubSizeConstraint] = None
@@ -132,10 +145,7 @@ class HubSelectionRule(BaseModel):
     # Temporary exclusions
     startDate: Optional[str] = None
     endDate: Optional[str] = None
-    
-    # Equipment requirements
-    requiredEquipment: Optional[List[str]] = None
-    requiredProcesses: Optional[List[str]] = None
+    endDate: Optional[str] = None
 
 class ScheduleResponse(BaseModel):
     # Core Product Info

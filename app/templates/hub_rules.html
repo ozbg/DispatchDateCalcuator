@@ -56,37 +56,35 @@
           <td>
             <ul class="constraints-list">
               {% if rule.sizeConstraints %}
-              <li>
-                Max size: {{ rule.sizeConstraints.maxWidth }}x{{ rule.sizeConstraints.maxHeight }}
-                {% if rule.sizeConstraints.maxQuantity %}
-                  (Max Qty: {{ rule.sizeConstraints.maxQuantity }})
+                <li>
+                  Max size: 
+                  {{ rule.sizeConstraints.maxWidth if rule.sizeConstraints.maxWidth else "∞" }}
+                  x
+                  {{ rule.sizeConstraints.maxHeight if rule.sizeConstraints.maxHeight else "∞" }}
+                </li>
+              {% endif %}
+              {% if rule.orderCriteria %}
+                {% if rule.orderCriteria.maxQuantity %}
+                  <li>Max Quantity: {{ rule.orderCriteria.maxQuantity }}</li>
                 {% endif %}
-              </li>
-              {% endif %}
-              {% if rule.keywords %}
-              <li>Required Keywords: {{ rule.keywords|join(", ") }}</li>
-              {% endif %}
-              {% if rule.excludeKeywords %}
-              <li>Excluded Keywords: {{ rule.excludeKeywords|join(", ") }}</li>
-              {% endif %}
-              {% if rule.productIds %}
-              <li>Product IDs: {{ rule.productIds|join(", ") }}</li>
-              {% endif %}
-              {% if rule.productGroups %}
-              <li>Product Groups: {{ rule.productGroups|join(", ") }}</li>
-              {% endif %}
-              {% if rule.requiredEquipment %}
-              <li>Required Equipment: {{ rule.requiredEquipment|join(", ") }}</li>
-              {% endif %}
-              {% if rule.requiredProcesses %}
-              <li>Required Processes: {{ rule.requiredProcesses|join(", ") }}</li>
+                {% if rule.orderCriteria.keywords %}
+                  <li>Required Keywords: {{ rule.orderCriteria.keywords|join(", ") }}</li>
+                {% endif %}
+                {% if rule.orderCriteria.excludeKeywords %}
+                  <li>Excluded Keywords: {{ rule.orderCriteria.excludeKeywords|join(", ") }}</li>
+                {% endif %}
+                {% if rule.orderCriteria.productIds %}
+                  <li>Product IDs: {{ rule.orderCriteria.productIds|join(", ") }}</li>
+                {% endif %}
               {% endif %}
             </ul>
           </td>
           <td>{{ "Active" if rule.enabled else "Disabled" }}</td>
           <td>{{ rule.endDate if rule.endDate else "Permanent" }}</td>
           <td>
-            <button class="edit-btn" data-rule-id="{{ rule.id }}" data-rule-data='{{ rule|tojson|safe }}'>Edit</button>
+            <button class="edit-btn" 
+                    data-rule-id="{{ rule.id }}" 
+                    data-rule-data='{{ rule|tojson|safe }}'>Edit</button>
             <button class="delete-btn" data-rule-id="{{ rule.id }}">Delete</button>
           </td>
         </tr>
@@ -103,130 +101,126 @@
 <!-- Rule Editor Modal -->
 <div id="ruleEditor" class="modal">
   <div class="modal-content">
-    <h3 id="modalTitle">Edit Hub Rule</h3>
-    <input type="hidden" id="ruleId">
-    
-    <div class="form-group">
-      <label for="keywords">Keywords and Product Matching</label>
-      <div class="instruction-box">
-        <h4>Matching Rules:</h4>
-        <ul>
-          <li><strong>Required Keywords (AND Logic):</strong>
-            <br>ALL keywords must be present in the description.
-            <br>Example: "A4, Book, Jam" requires ALL three terms.</li>
-          <li><strong>Excluded Keywords (OR Logic):</strong>
-            <br>ANY matching keyword will exclude the description.
-            <br>Example: If "spiral, wire" are excluded, a match to either will exclude.</li>
-          <li><strong>Product IDs (OR Logic):</strong>
-            <br>ANY matching ID will include the product.
-            <br>Example: IDs "1,2,3" means the product must match ANY of these IDs.</li>
-        </ul>
+      <h3 id="modalTitle">Edit Hub Rule</h3>
+      <input type="hidden" id="ruleId">
+
+      <!-- Basic Info -->
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <input type="text" id="description" required>
       </div>
-    </div>
 
-    <div class="form-group">
-      <label for="description">Description:</label>
-      <input type="text" id="description" required>
-    </div>
+      <div class="form-group">
+        <label for="hubId">Production Hub:</label>
+        <select id="hubId" required class="form-control">
+          <option value="vic">Victoria (VIC)</option>
+          <option value="nsw">New South Wales (NSW)</option>
+          <option value="qld">Queensland (QLD)</option>
+          <option value="nqld">North Queensland (NQLD)</option>
+          <option value="wa">Western Australia (WA)</option>
+        </select>
+      </div>
 
-    <div class="form-group">
-      <label for="hubId">Production Hub:</label>
-      <select id="hubId" required class="form-control">
-        <option value="vic">Victoria (VIC)</option>
-        <option value="nsw">New South Wales (NSW)</option>
-        <option value="qld">Queensland (QLD)</option>
-        <option value="nqld">North Queensland (NQLD)</option>
-        <option value="wa">Western Australia (WA)</option>
-      </select>
-    </div>
+      <div class="form-group">
+        <label for="priority">Priority:</label>
+        <input type="number" id="priority" value="0">
+      </div>
 
-    <div class="form-group">
-      <label for="priority">Priority:</label>
-      <input type="number" id="priority" value="0">
-    </div>
-
-    <div class="form-group">
-      <h4>Size Constraints</h4>
-      <div class="size-constraints">
-        <label>Max Width (mm):
-          <input type="number" id="maxWidth" step="0.1">
-        </label>
-        <label>Max Height (mm):
-          <input type="number" id="maxHeight" step="0.1">
-        </label>
-        <label>Max Quantity:
-          <input type="number" id="maxQuantity">
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="enabled" checked>
+          Rule Enabled
         </label>
       </div>
-    </div>
 
-    <div class="form-group">
-      <h4>Keywords</h4>
-      <div class="keywords-section">
-        <div>
-          <label>Required Keywords:</label>
-          <div class="tag-input-container">
-            <input type="text" id="keywordInput" placeholder="Type and press Enter">
-            <div id="keywordTags" class="tag-container"></div>
-          </div>
-        </div>
-        <div>
-          <label>Excluded Keywords:</label>
-          <div class="tag-input-container">
-            <input type="text" id="excludeKeywordInput" placeholder="Type and press Enter">
-            <div id="excludeKeywordTags" class="tag-container"></div>
-          </div>
+      <!-- Time Restrictions -->
+      <div class="form-group">
+        <h4>Time Restrictions</h4>
+        <div class="time-restrictions">
+          <label>Start Date:
+            <input type="date" id="startDate">
+          </label>
+          <label>End Date:
+            <input type="date" id="endDate">
+          </label>
         </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <h4>Product Restrictions</h4>
-      <div class="product-restrictions">
-        <div>
-          <label>Product IDs:</label>
-          <div class="tag-input-container">
-            <input type="text" id="productIdInput" placeholder="Enter product ID">
-            <div id="productIdTags" class="tag-container"></div>
-          </div>
+      <!-- Size Constraints Panel -->
+      <div class="form-group">
+        <h4>Size Constraints</h4>
+        <div class="instruction-box">
+          <p class="info-text">Maximum dimensions allowed for this hub. 
+          Order dimensions can be in either orientation.</p>
+          <p><em>Example: For max size 650x450mm:</em></p>
+          <ul>
+            <li>600x400mm is acceptable (fits directly)</li>
+            <li>400x600mm is acceptable (fits when rotated)</li>
+            <li>300x655mm is not acceptable (exceeds both max dimensions)</li>
+            <li>600x455mm is not acceptable (exceeds max height in both orientations)</li>
+          </ul>
         </div>
-        <div>
-          <label>Product Groups:</label>
-          <div class="tag-input-container">
-            <input type="text" id="productGroupInput" placeholder="Enter product group">
-            <div id="productGroupTags" class="tag-container"></div>
+        <div class="size-constraints">
+          <label>Max Width (mm):
+            <input type="number" id="maxWidth" step="0.1">
+          </label>
+          <label>Max Height (mm):
+            <input type="number" id="maxHeight" step="0.1">
+          </label>
+        </div>
+      </div>
+
+      <!-- Order Matching Requirements Panel -->
+      <div class="form-group">
+        <h4>Order Matching Requirements</h4>
+        <div class="instruction-box">
+          <p class="info-text">For a rule to apply, ALL these conditions in this block must be met (AND logic):</p>
+          <ul>
+            <li><strong>Max Quantity:</strong> The order quantity must be **greater** than this number to match (if you want to exclude large orders).  
+                Or **not exceed** this number, depending on your code logic. Usually “order quantity > maxQuantity means exclude.”</li>
+            <li><strong>Required Keywords:</strong> ALL typed keywords must be present in the description</li>
+            <li><strong>Excluded Keywords:</strong> ALL typed keywords must be absent from the description</li>
+            <li><strong>Product IDs:</strong> The order's product ID must be in the list</li>
+          </ul>
+        </div>
+        
+        <div class="matching-inputs">
+          <div>
+            <label>Max Quantity:</label>
+            <input type="number" id="maxQuantity" placeholder="Maximum order quantity">
+          </div>
+          <div>
+            <label>Required Keywords:</label>
+            <div class="tag-input-container">
+              <input type="text" id="keywordInput" placeholder="Type and press Enter">
+              <div id="keywordTags" class="tag-container"></div>
+            </div>
+          </div>
+          <div>
+            <label>Excluded Keywords:</label>
+            <div class="tag-input-container">
+              <input type="text" id="excludeKeywordInput" placeholder="Type and press Enter">
+              <div id="excludeKeywordTags" class="tag-container"></div>
+            </div>
+          </div>
+          <div>
+            <label>Product IDs:</label>
+            <div class="tag-input-container">
+              <input type="text" id="productIdInput" placeholder="Enter product ID and press Enter">
+              <div id="productIdTags" class="tag-container"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="form-group">
-      <h4>Time Restrictions</h4>
-      <div class="time-restrictions">
-        <label>Start Date:
-          <input type="date" id="startDate">
-        </label>
-        <label>End Date:
-          <input type="date" id="endDate">
-        </label>
+      <div class="button-group">
+        <button onclick="saveRule()" class="save-btn">Save Rule</button>
+        <button onclick="closeEditor()" class="cancel-btn">Cancel</button>
       </div>
-    </div>
-
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="enabled" checked>
-        Rule Enabled
-      </label>
-    </div>
-
-    <div class="button-group">
-      <button onclick="saveRule()" class="save-btn">Save Rule</button>
-      <button onclick="closeEditor()" class="cancel-btn">Cancel</button>
-    </div>
   </div>
 </div>
 
-<!-- CSS (you may keep your existing CSS or include these styles as needed) -->
+<!-- CSS (Keep or adapt as needed) -->
 <style>
 /* General Layout */
 .rules-container {
@@ -234,8 +228,6 @@
   margin: 0 auto;
   padding: 20px;
 }
-
-/* Table Styles */
 .rules-table {
   width: 100%;
   margin-top: 25px;
@@ -357,6 +349,10 @@
   margin-top: 5px;
   font-size: 0.9em;
 }
+.size-constraints label {
+  display: inline-block;
+  margin-right: 20px;
+}
 
 /* Tag Containers */
 .tag-input-container {
@@ -418,16 +414,16 @@
 .cancel-btn:hover { background: #5a6268; }
 </style>
 
-<!-- Single consolidated script block -->
 <script>
-  // Function to show the modal in "Add" mode
+  // Show the modal in "Add" mode
   function showAddForm() {
     resetForm();
     document.getElementById('modalTitle').textContent = 'Add New Hub Rule';
     document.getElementById('ruleEditor').style.display = 'block';
+    initializeTagInputs();
   }
 
-  // Function to hide the modal and reset fields
+  // Hide the modal and reset fields
   function closeEditor() {
     document.getElementById('ruleEditor').style.display = 'none';
     resetForm();
@@ -446,59 +442,56 @@
     document.getElementById('keywordTags').innerHTML = '';
     document.getElementById('excludeKeywordTags').innerHTML = '';
     document.getElementById('productIdTags').innerHTML = '';
-    document.getElementById('productGroupTags').innerHTML = '';
     document.getElementById('startDate').value = '';
     document.getElementById('endDate').value = '';
   }
 
-  // Function to populate the modal with a rule object for editing
+  // Populate the modal with a rule object for editing
   function editHubRule(rule) {
     if (!rule || !rule.id) {
       alert('Invalid rule data');
       return;
     }
+    resetForm(); // Start fresh
+
     document.getElementById('ruleId').value = rule.id;
     document.getElementById('description').value = rule.description || '';
     document.getElementById('hubId').value = rule.hubId || 'vic';
     document.getElementById('priority').value = rule.priority || 0;
     document.getElementById('enabled').checked = (rule.enabled !== false);
+
+    // Time restrictions
+    if (rule.startDate) document.getElementById('startDate').value = rule.startDate;
+    if (rule.endDate) document.getElementById('endDate').value = rule.endDate;
+
+    // Size constraints
     if (rule.sizeConstraints) {
       document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth || '';
       document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight || '';
-      document.getElementById('maxQuantity').value = rule.sizeConstraints.maxQuantity || '';
-    } else {
-      document.getElementById('maxWidth').value = '';
-      document.getElementById('maxHeight').value = '';
-      document.getElementById('maxQuantity').value = '';
     }
-    // Clear and populate tag containers
-    document.getElementById('keywordTags').innerHTML = '';
-    document.getElementById('excludeKeywordTags').innerHTML = '';
-    document.getElementById('productIdTags').innerHTML = '';
-    document.getElementById('productGroupTags').innerHTML = '';
-    if (rule.keywords && Array.isArray(rule.keywords)) {
-      rule.keywords.forEach(kw => addTag(kw, 'keywordTags'));
+
+    // Order Criteria
+    if (rule.orderCriteria) {
+      if (rule.orderCriteria.maxQuantity) {
+        document.getElementById('maxQuantity').value = rule.orderCriteria.maxQuantity;
+      }
+      if (rule.orderCriteria.keywords && Array.isArray(rule.orderCriteria.keywords)) {
+        rule.orderCriteria.keywords.forEach(kw => addTag(kw, 'keywordTags'));
+      }
+      if (rule.orderCriteria.excludeKeywords && Array.isArray(rule.orderCriteria.excludeKeywords)) {
+        rule.orderCriteria.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
+      }
+      if (rule.orderCriteria.productIds && Array.isArray(rule.orderCriteria.productIds)) {
+        rule.orderCriteria.productIds.forEach(id => addTag(String(id), 'productIdTags'));
+      }
     }
-    if (rule.excludeKeywords && Array.isArray(rule.excludeKeywords)) {
-      rule.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
-    }
-    if (rule.productIds && Array.isArray(rule.productIds)) {
-      rule.productIds.forEach(id => addTag(id.toString(), 'productIdTags'));
-    }
-    if (rule.productGroups && Array.isArray(rule.productGroups)) {
-      rule.productGroups.forEach(pg => addTag(pg, 'productGroupTags'));
-    }
-    if (rule.startDate) {
-      document.getElementById('startDate').value = rule.startDate;
-    }
-    if (rule.endDate) {
-      document.getElementById('endDate').value = rule.endDate;
-    }
+
     document.getElementById('modalTitle').textContent = 'Edit Hub Rule';
     document.getElementById('ruleEditor').style.display = 'block';
+    initializeTagInputs();
   }
 
-  // Function to save the rule (for both add and edit)
+  // Save the rule (Add or Edit)
   async function saveRule() {
     const description = document.getElementById('description').value.trim();
     const hubId = document.getElementById('hubId').value.trim();
@@ -506,8 +499,11 @@
       alert('Description and Production Hub are required.');
       return;
     }
+
     const ruleIdField = document.getElementById('ruleId').value.trim();
     const ruleId = ruleIdField || ('rule_' + Date.now());
+
+    // Build our core rule object
     const rule = {
       id: ruleId,
       description: description,
@@ -515,46 +511,67 @@
       priority: parseInt(document.getElementById('priority').value || '0'),
       enabled: document.getElementById('enabled').checked
     };
-    const maxWidth = document.getElementById('maxWidth').value;
-    const maxHeight = document.getElementById('maxHeight').value;
-    const maxQuantity = document.getElementById('maxQuantity').value;
-    if (maxWidth || maxHeight || maxQuantity) {
-      rule.sizeConstraints = {
-        maxWidth: maxWidth ? parseFloat(maxWidth) : null,
-        maxHeight: maxHeight ? parseFloat(maxHeight) : null,
-        maxQuantity: maxQuantity ? parseInt(maxQuantity) : null
-      };
-    }
-    // Helper to get tag texts from a container
-    const getTags = (containerId) => {
-      return Array.from(document.getElementById(containerId).children)
-        .map(tag => tag.firstChild.textContent.trim());
-    };
-    const keywords = getTags('keywordTags');
-    if (keywords.length > 0) {
-      rule.keywords = keywords;
-    }
-    const excludeKeywords = getTags('excludeKeywordTags');
-    if (excludeKeywords.length > 0) {
-      rule.excludeKeywords = excludeKeywords;
-    }
-    const productIds = getTags('productIdTags').map(s => parseInt(s)).filter(n => !isNaN(n));
-    if (productIds.length > 0) {
-      rule.productIds = productIds;
-    }
-    const productGroups = getTags('productGroupTags');
-    if (productGroups.length > 0) {
-      rule.productGroups = productGroups;
-    }
+
+    // Time restrictions
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-    if (startDate) {
-      rule.startDate = startDate;
+    if (startDate) rule.startDate = startDate;
+    if (endDate) rule.endDate = endDate;
+
+    // Build sizeConstraints
+    const maxWidth = document.getElementById('maxWidth').value;
+    const maxHeight = document.getElementById('maxHeight').value;
+    let sizeConstraints = null;
+    if (maxWidth || maxHeight) {
+      sizeConstraints = {
+        maxWidth: maxWidth ? parseFloat(maxWidth) : null,
+        maxHeight: maxHeight ? parseFloat(maxHeight) : null
+      };
     }
-    if (endDate) {
-      rule.endDate = endDate;
+    if (sizeConstraints) {
+      rule.sizeConstraints = sizeConstraints;
     }
-    
+
+    // Build orderCriteria
+    let orderCriteria = null;
+    const maxQuantity = document.getElementById('maxQuantity').value;
+
+    // Gather tag arrays
+    const getTags = (containerId) => {
+      const container = document.getElementById(containerId);
+      if (!container) return [];
+      return Array.from(container.children)
+        .map(tag => {
+          const textContent = tag.firstChild ? tag.firstChild.textContent : null;
+          return textContent ? textContent.trim() : null;
+        })
+        .filter(text => text !== null);
+    };
+    const keywords = getTags('keywordTags');
+    const excludeKeywords = getTags('excludeKeywordTags');
+    const productIds = getTags('productIdTags')
+      .map(s => parseInt(s))
+      .filter(n => !isNaN(n));
+
+    if (maxQuantity || keywords.length > 0 || excludeKeywords.length > 0 || productIds.length > 0) {
+      orderCriteria = {};
+      if (maxQuantity) {
+        orderCriteria.maxQuantity = parseInt(maxQuantity);
+      }
+      if (keywords.length > 0) {
+        orderCriteria.keywords = keywords;
+      }
+      if (excludeKeywords.length > 0) {
+        orderCriteria.excludeKeywords = excludeKeywords;
+      }
+      if (productIds.length > 0) {
+        orderCriteria.productIds = productIds;
+      }
+    }
+    if (orderCriteria) {
+      rule.orderCriteria = orderCriteria;
+    }
+
     try {
       const response = await fetch('/hub-rules/save', {
         method: 'POST',
@@ -576,7 +593,7 @@
     }
   }
 
-  // Function to delete a rule by its ID
+  // Delete a rule by its ID
   async function deleteRule(ruleId) {
     ruleId = ruleId.replace(/['"]+/g, '');
     if (!confirm('Are you sure you want to delete this rule?')) return;
@@ -600,7 +617,7 @@
     }
   }
 
-  // Helper function to add a tag to a container
+  // Helper: add a tag to a container
   function addTag(value, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -615,32 +632,39 @@
     container.appendChild(tag);
   }
 
-  // Attach Enter key event listeners for tag input fields
-  ['keywordInput', 'excludeKeywordInput', 'productIdInput', 'productGroupInput'].forEach(inputId => {
-    const inputElem = document.getElementById(inputId);
-    inputElem.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter' && this.value.trim()) {
-        const containerMap = {
-          'keywordInput': 'keywordTags',
-          'excludeKeywordInput': 'excludeKeywordTags',
-          'productIdInput': 'productIdTags',
-          'productGroupInput': 'productGroupTags'
-        };
-        addTag(this.value.trim(), containerMap[this.id]);
-        this.value = '';
-        e.preventDefault();
+  // Handle tag input "Enter" key
+  function handleTagInputKeypress(e, inputId) {
+    if (e.key === 'Enter' && e.target.value.trim()) {
+      const containerMap = {
+        'keywordInput': 'keywordTags',
+        'excludeKeywordInput': 'excludeKeywordTags',
+        'productIdInput': 'productIdTags'
+      };
+      addTag(e.target.value.trim(), containerMap[inputId]);
+      e.target.value = '';
+      e.preventDefault();
+    }
+  }
+
+  // Initialize tag input event listeners
+  function initializeTagInputs() {
+    ['keywordInput', 'excludeKeywordInput', 'productIdInput'].forEach(inputId => {
+      const inputElem = document.getElementById(inputId);
+      if (inputElem) {
+        // Remove any existing listener to avoid duplication
+        inputElem.onkeypress = null;
+        // Add new listener
+        inputElem.addEventListener('keypress', (e) => handleTagInputKeypress(e, inputId));
       }
     });
-  });
+  }
 
-  // Bind click events for Edit and Delete buttons once DOM is loaded
+  // Bind click events for existing Edit/Delete buttons
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.edit-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         try {
           const ruleDataStr = this.getAttribute('data-rule-data');
-          console.log("Raw rule data string:", ruleDataStr); // Debug log
-
           if (!ruleDataStr) {
             console.error('No rule data found for rule:', this.getAttribute('data-rule-id'));
             return;
@@ -661,9 +685,7 @@
           console.error('No rule ID found for deletion.');
           return;
         }
-        if (confirm('Are you sure you want to delete this rule?')) {
-          deleteRule(ruleId);
-        }
+        deleteRule(ruleId);
       });
     });
   });

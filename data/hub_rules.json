@@ -1,22 +1,19 @@
 {
   "rules": [
     {
-      "id": "rule_1740122322967",
-      "description": "QLDN Size Limit",
+      "id": "rule_1740138691857",
+      "description": "ds",
       "hubId": "nqld",
-      "priority": 100,
+      "priority": 0,
       "enabled": true,
-      "sizeConstraints": {
-        "maxWidth": 650,
-        "maxHeight": 455,
-        "maxQuantity": null
-      },
-      "excludeKeywords": [
-        "A4"
-      ],
-      "productIds": [
-        21
-      ]
+      "orderCriteria": {
+        "keywords": [
+          "xx"
+        ],
+        "productIds": [
+          20
+        ]
+      }
     }
   ]
 }
