@@ -6,13 +6,12 @@
       "hubId": "nqld",
       "priority": 0,
       "enabled": true,
+      "sizeConstraints": {
+        "maxWidth": 300,
+        "maxHeight": 300
+      },
       "orderCriteria": {
-        "keywords": [
-          "xx"
-        ],
-        "productIds": [
-          20
-        ]
+        "maxQuantity": 100
       }
     }
   ]

@@ -111,10 +111,7 @@ class HubSizeConstraint(BaseModel):
 
 class HubEquipmentRule(BaseModel):
     """Equipment/process availability at a hub"""
-class HubSizeConstraint(BaseModel):
-    """Size constraints for hub production capabilities"""
-    maxWidth: Optional[float] = None
-    maxHeight: Optional[float] = None
+
 
 class HubSelectionRule(BaseModel):
     """Rules for selecting production hubs"""
@@ -132,9 +129,7 @@ class HubSelectionRule(BaseModel):
     keywords: Optional[List[str]] = None
     excludeKeywords: Optional[List[str]] = None
     productIds: Optional[List[int]] = None
-    maxQuantity: Optional[int] = None
-    maxQuantity: Optional[int] = None
-    
+    maxQuantity: Optional[int] = None    
     # Size constraints
     sizeConstraints: Optional[HubSizeConstraint] = None
     
@@ -144,7 +139,6 @@ class HubSelectionRule(BaseModel):
     
     # Temporary exclusions
     startDate: Optional[str] = None
-    endDate: Optional[str] = None
     endDate: Optional[str] = None
 
 class ScheduleResponse(BaseModel):

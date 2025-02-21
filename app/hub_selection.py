@@ -4,6 +4,8 @@ from pathlib import Path
 import json
 import logging
 
+from app.models import HubSelectionRule, HubSizeConstraint, OrderMatchingCriteria
+
 logger = logging.getLogger(__name__)
 
 
@@ -56,7 +58,7 @@ def load_hub_rules() -> List[HubSelectionRule]:
 
             order_c = None
             if "orderCriteria" in r and r["orderCriteria"]:
-                order_c = OrderCriteria(
+                order_c = OrderMatchingCriteria(
                     maxQuantity=r["orderCriteria"].get("maxQuantity"),
                     productIds=r["orderCriteria"].get("productIds"),
                     keywords=r["orderCriteria"].get("keywords")
