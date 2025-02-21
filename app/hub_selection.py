@@ -31,22 +31,38 @@ def check_keywords(description: str, keywords: List[str],
     Check if description matches keyword rules.
     For required keywords: ALL keywords must be present (AND logic)
     For excluded keywords: ANY keyword match excludes (OR logic)
+    
+    Args:
+        description: The order description to check
+        keywords: List of required keywords (ALL must match)
+        exclude_keywords: List of excluded keywords (ANY matches exclude)
+    
+    Returns:
+        bool: True if description matches keyword rules, False otherwise
     """
+    if not description:
+        return not keywords  # Empty description only valid if no required keywords
+        
     description = description.lower()
     
     # Check excluded keywords first (OR logic - any match excludes)
     if exclude_keywords:
-        if any(kw.lower() in description for kw in exclude_keywords):
-            logger.debug(f"Description excluded due to keyword: matches one of {exclude_keywords}")
-            return False
-            
+        for kw in exclude_keywords:
+            if not kw:  # Skip empty keywords
+                continue
+            if kw.lower() in description:
+                logger.debug(f"Description excluded due to keyword: '{kw}'")
+                return False
+                
     # Check required keywords (AND logic - all must match)
     if keywords:
-        missing_keywords = [kw for kw in keywords if kw.lower() not in description]
-        if missing_keywords:
-            logger.debug(f"Description missing required keywords: {missing_keywords}")
-            return False
-            
+        for kw in keywords:
+            if not kw:  # Skip empty keywords
+                continue
+            if kw.lower() not in description:
+                logger.debug(f"Description missing required keyword: '{kw}'")
+                return False
+                
     return True
 
 def check_dates(rule: HubSelectionRule) -> bool:
