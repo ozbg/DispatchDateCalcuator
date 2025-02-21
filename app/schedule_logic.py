@@ -37,6 +37,11 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
       2) Postcode -> Hub override (if any).
       3) Product matching, finishing days, final production hub selection.
     """
+    
+    # Set default postcode if it's null or empty
+    if not req.misDeliversToPostcode:
+        req.misDeliversToPostcode = "0000"
+    
 
     # ----------------------------------------------------------------
     # Step 1a) State override for SA, TAS, ACT, and NQLD
