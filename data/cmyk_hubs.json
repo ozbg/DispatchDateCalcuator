@@ -1,16 +1,9 @@
 [
   {
     "CMHKhubID": 1,
-    "Closed_Dates": [
-      "2025-02-24",
-      "2025-02-25",
-      "2025-02-26",
-      "2025-02-27",
-      "2025-02-28"
-    ],
+    "Closed_Dates": [],
     "Hub": "vic",
     "Next_Best": [
-      "vic",
       "nsw",
       "qld",
       "nqld",
@@ -19,28 +12,16 @@
     "State": "sa"
   },
   {
-    "CMHKhubID": 1,
-    "Closed_Dates": [
-      "2024-12-23",
-      "2024-12-24",
-      "2024-12-25",
-      "2024-12-26",
-      "2024-12-27",
-      "2024-12-30",
-      "2024-12-31",
-      "2025-01-01",
-      "2025-01-02",
-      "2025-01-03"
-    ],
     "Hub": "vic",
+    "State": "tas",
+    "CMHKhubID": 1,
     "Next_Best": [
-      "vic",
       "nsw",
       "qld",
       "nqld",
       "wa"
     ],
-    "State": "tas"
+    "Closed_Dates": []
   },
   {
     "CMHKhubID": 2,
@@ -58,10 +39,11 @@
   },
   {
     "CMHKhubID": 2,
-    "Closed_Dates": [],
+    "Closed_Dates": [
+      "2025-02-13"
+    ],
     "Hub": "nsw",
     "Next_Best": [
-      "nsw",
       "vic",
       "qld",
       "nqld",
@@ -107,15 +89,7 @@
     "State": "nqld"
   },
   {
-    "Hub": "wa",
-    "State": "wa",
     "CMHKhubID": 3,
-    "Next_Best": [
-      "vic",
-      "nsw",
-      "qld",
-      "nqld"
-    ],
     "Closed_Dates": [
       "2024-12-23",
       "2024-12-24",
@@ -127,7 +101,15 @@
       "2025-01-01",
       "2025-01-02",
       "2025-01-03"
-    ]
+    ],
+    "Hub": "wa",
+    "Next_Best": [
+      "vic",
+      "nsw",
+      "qld",
+      "nqld"
+    ],
+    "State": "wa"
   },
   {
     "CMHKhubID": 3,
