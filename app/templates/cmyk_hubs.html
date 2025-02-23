@@ -127,13 +127,31 @@
                 <div class="form-group">
                     <div class="label-button-group">
                         <label>Closed Dates:</label>
-                        <button type="button" onclick="addClosedDateInput()" class="action-btn add-btn compact-btn">
-                            <i class="fas fa-plus"></i> Add Closed Date
-                        </button>
+                        <div class="date-actions">
+                            <button type="button" onclick="addClosedDateInput()" class="action-btn add-btn compact-btn">
+                                <i class="fas fa-plus"></i> Single Date
+                            </button>
+                            <button type="button" onclick="showDateRangeInput()" class="action-btn add-btn compact-btn">
+                                <i class="fas fa-calendar-week"></i> Date Range
+                            </button>
+                        </div>
                     </div>
-                    <div id="closedDatesContainer" class="dynamic-container dates-grid">
+                    <div id="closedDatesContainer" class="dynamic-container">
                         <div class="closed-dates-list date-container">
                             <!-- Dynamic date inputs will be added here -->
+                        </div>
+                    </div>
+                    <div id="dateRangeInput" style="display: none;" class="date-range-container">
+                        <div class="date-range-inputs">
+                            <div class="range-input">
+                                <label>From:</label>
+                                <input type="date" id="rangeStart">
+                            </div>
+                            <div class="range-input">
+                                <label>To:</label>
+                                <input type="date" id="rangeEnd">
+                            </div>
+                            <button onclick="addDateRange()" class="action-btn add-btn">Add Range</button>
                         </div>
                     </div>
                     <small>Select dates when the hub will be closed</small>
@@ -207,12 +225,41 @@
     grid-column: 1 / -1;
 }
 
-.dates-grid {
+.closed-dates-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-    max-height: 400px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    max-height: 300px;
     overflow-y: auto;
+    padding: 10px;
+}
+
+.date-range-container {
+    margin-top: 15px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+.date-range-inputs {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.range-input {
+    flex: 1;
+}
+
+.range-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.date-actions {
+    display: flex;
+    gap: 10px;
 }
 
 .label-button-group {
@@ -659,9 +706,30 @@
 .next-best-item,
 .closed-date-item {
     display: flex;
-    gap: 10px;
-    margin-bottom: 5px;
+    gap: 8px;
     align-items: center;
+    background: white;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+}
+
+.closed-date-item input[type="date"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.closed-date-item .remove-btn {
+    padding: 2px 6px;
+    font-size: 12px;
+    background: transparent;
+    color: #dc3545;
+    border: none;
+    cursor: pointer;
+}
+
+.closed-date-item .remove-btn:hover {
+    color: #c82333;
 }
 
 .remove-btn {
@@ -772,14 +840,16 @@ function validatePostcodes() {
     
     // Reset feedback
     feedback.className = 'postcode-validation-feedback';
-    feedback.style.display = 'block';
+    feedback.style.display = 'none';
+    countElement.textContent = '0 postcodes';
     
+    // Handle empty postcodes
     if (!postcodes) {
-        feedback.textContent = 'Please enter some postcodes';
-        feedback.classList.add('validation-error');
-        countElement.textContent = '0 postcodes';
-        return false;
+        countElement.textContent = 'No postcodes';
+        return true;
     }
+    
+    feedback.style.display = 'block';
     
     const parts = postcodes.split(',').filter(p => p.trim().length > 0);
     const errors = [];
@@ -934,9 +1004,41 @@ function addClosedDate(value = '') {
     div.className = 'closed-date-item';
     div.innerHTML = `
         <input type="date" value="${value}">
-        <button type="button" onclick="this.parentElement.remove()" class="remove-btn">Remove</button>
+        <button type="button" onclick="this.parentElement.remove()" class="remove-btn">×</button>
     `;
     container.appendChild(div);
+}
+
+function showDateRangeInput() {
+    document.getElementById('dateRangeInput').style.display = 'block';
+}
+
+function addDateRange() {
+    const startDate = new Date(document.getElementById('rangeStart').value);
+    const endDate = new Date(document.getElementById('rangeEnd').value);
+    
+    if (!startDate || !endDate || startDate > endDate) {
+        alert('Please select valid date range');
+        return;
+    }
+    
+    const dates = [];
+    let currentDate = new Date(startDate);
+    
+    while (currentDate <= endDate) {
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    dates.forEach(date => {
+        const formattedDate = date.toISOString().split('T')[0];
+        addClosedDate(formattedDate);
+    });
+    
+    // Reset and hide the range input
+    document.getElementById('rangeStart').value = '';
+    document.getElementById('rangeEnd').value = '';
+    document.getElementById('dateRangeInput').style.display = 'none';
 }
 
 function addNextBestInput() {
@@ -948,26 +1050,10 @@ function addClosedDateInput() {
 }
 
 async function saveHub() {
-    if (!validatePostcodes()) {
-        alert('Please fix the postcode validation errors before saving.');
-        return;
-    }
-    
     const hubName = document.getElementById('hubName').value;
     const postcodes = document.getElementById('postcodes').value;
     
-    // Update hub_data
-    const hubDataIndex = hubData.findIndex(h => h.hubName === hubName);
-    if (hubDataIndex !== -1) {
-        hubData[hubDataIndex].postcode = postcodes;
-    } else {
-        hubData.push({
-            hubName: hubName,
-            hubId: parseInt(document.getElementById('hubId').value),
-            postcode: postcodes
-        });
-    }
-    
+    // Create the hub data object
     const hub = {
         Hub: hubName,
         State: document.getElementById('state').value,
@@ -975,12 +1061,21 @@ async function saveHub() {
         Next_Best: Array.from(document.querySelectorAll('.hub-select')).map(select => select.value).filter(value => value),
         Closed_Dates: Array.from(document.querySelectorAll('.closed-date-item input')).map(input => input.value)
     };
-    
+
+    // Update or add hub to currentHubs
     if (editIndex >= 0) {
         currentHubs[editIndex] = hub;
     } else {
         currentHubs.push(hub);
     }
+
+    // Prepare the complete data object including both hubs and postcodes
+    const saveData = {
+        hubs: currentHubs,
+        postcodes: {
+            [hubName]: postcodes || '' // Map hub name to its postcodes
+        }
+    };
     
     try {
         const response = await fetch('/save-hubs', {
@@ -988,7 +1083,7 @@ async function saveHub() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(currentHubs)
+            body: JSON.stringify(saveData)
         });
         
         if (response.ok) {

@@ -97,12 +97,44 @@ async def cmyk_hubs(request: Request):
 @app.post("/save-hubs")
 async def save_hubs(request: Request):
     try:
-        hubs_data = await request.json()
+        # Get current data
+        data = await request.json()
+        hubs_data = data.get('hubs', [])
+        postcode_data = data.get('postcodes', {})
+        
+        # Save CMYK hubs data
         save_cmyk_hubs_data(hubs_data)
-        return JSONResponse({"success": True, "message": "Hubs saved successfully"})
+        
+        # Get existing hub data
+        current_hub_data = get_hub_data()
+        
+        # Update hub data with new postcodes
+        for hub_name, postcode in postcode_data.items():
+            # Find existing hub entry or create new one
+            hub_entry = next((h for h in current_hub_data if h["hubName"] == hub_name), None)
+            if hub_entry:
+                hub_entry["postcode"] = postcode
+            else:
+                # Get hub ID from hubs_data
+                hub_info = next((h for h in hubs_data if h["Hub"] == hub_name), None)
+                hub_id = hub_info["CMHKhubID"] if hub_info else None
+                current_hub_data.append({
+                    "hubName": hub_name,
+                    "hubId": hub_id,
+                    "postcode": postcode
+                })
+        
+        # Save updated hub data
+        save_hub_data(current_hub_data)
+        
+        return JSONResponse({
+            "success": True,
+            "message": "Hubs and postcodes saved successfully"
+        })
     except Exception as e:
+        logger.error(f"Error saving hubs and postcodes: {str(e)}")
         return JSONResponse(
-            {"success": False, "message": f"Error saving hubs: {str(e)}"},
+            {"success": False, "message": f"Error saving data: {str(e)}"},
             status_code=500
         )
 
