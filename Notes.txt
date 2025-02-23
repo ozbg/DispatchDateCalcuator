@@ -71,3 +71,22 @@ Start Date vs Adjusted Start Date
    - Moving forward until a valid business day is found
 
 Here's a detailed explanation from the code:
+
+
+
+
+
+
+
+make sure this is dealt with 
+
+
+///// SPECIAL OVERRIDE FOR QLD CARDS , SEND DEL 2 QLD DIGITAL CARDS TO VIC, UNLESS THE CURRENT HUB IS NQLD , LEAVE NQLD IN NQLD
+
+
+    if ( ((productId == 6)||(productId == 7)||(productId == 8)||(productId == 9)) && (misCurrentHub != "nqld") && (misDeliversToState == "qld")) {
+        actualProductionHub = "vic"
+        
+        myLog = myLog + (" ** QLD Card produce in: "+actualProductionHub + "** ")
+      
+    }

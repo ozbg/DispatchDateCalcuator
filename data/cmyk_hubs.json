@@ -1,18 +1,6 @@
 [
   {
     "CMHKhubID": 1,
-    "Closed_Dates": [],
-    "Hub": "vic",
-    "Next_Best": [
-      "nsw",
-      "qld",
-      "nqld",
-      "wa"
-    ],
-    "State": "vic"
-  },
-  {
-    "CMHKhubID": 1,
     "Closed_Dates": [
       "2024-12-23",
       "2024-12-24",
@@ -130,18 +118,18 @@
     "State": "qld"
   },
   {
-    "Hub": "nqld",
-    "State": "nqld",
     "CMHKhubID": 24,
+    "Closed_Dates": [
+      "2025-02-27"
+    ],
+    "Hub": "nqld",
     "Next_Best": [
       "qld",
       "nsw",
       "vic",
       "wa"
     ],
-    "Closed_Dates": [
-      "2025-02-27"
-    ]
+    "State": "nqld"
   },
   {
     "CMHKhubID": 3,

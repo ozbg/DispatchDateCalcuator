@@ -11,16 +11,19 @@
             <p>ALL these keywords must be present. Like AND logic.</p>
             <p class="example">Example: ["BC", "450+"] means both "BC" AND "450+" must appear</p>
         </div>
-        <div class="rule-box">
-            <h4>Exclude All</h4>
-            <p>NONE of these keywords can be present. Like NOT logic.</p>
-            <p class="example">Example: ["Digital", "UV"] means neither word can appear</p>
-        </div>
+       
         <div class="rule-box">
             <h4>Match Any Groups</h4>
             <p>For each group, AT LEAST ONE keyword must match. Like OR logic within each group.</p>
             <p class="example">Example: [["Branding","BC"]] means either "Branding" OR "BC" must appear</p>
         </div>
+
+        <div class="rule-box">
+            <h4>Exclude All</h4>
+            <p>NONE of these keywords can be present. Like NOT logic.</p>
+            <p class="example">Example: ["Digital", "UV"] means neither word can appear</p>
+        </div>
+         
     </div>
 </div>
 
@@ -32,9 +35,12 @@
             <tr>
                 <th>Product ID</th>
                 <th>Product Group</th>
+                <!-- Keep Match All as the third column -->
                 <th>Match All (Required)</th>
-                <th>Exclude All (Blocked)</th>
+                <!-- Move Match Any Groups (Options) to fourth column -->
                 <th>Match Any Groups (Options)</th>
+                <!-- Move Exclude All (Blocked) to fifth column -->
+                <th>Exclude All (Blocked)</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -43,14 +49,21 @@
             <tr>
                 <td>{{ rule.Product_ID }}</td>
                 <td>{{ product_info[rule.Product_ID|string].Product_Group if rule.Product_ID|string in product_info else "Unknown Group" }}</td>
+    
+                <!-- Match All (Required) -->
                 <td>{{ rule.Match_All|join(", ") }}</td>
-                <td>{{ rule.Exclude_All|join(", ") }}</td>
+    
+                <!-- Match Any Groups (Options) now in this new position -->
                 <td>
                     {% for group in rule.Match_Any %}
                         Group {{ loop.index }}: ({{ group|join(" OR ") }})
                         {% if not loop.last %}<br>{% endif %}
                     {% endfor %}
                 </td>
+    
+                <!-- Exclude All (Blocked) moved here -->
+                <td>{{ rule.Exclude_All|join(", ") }}</td>
+    
                 <td>
                     <button onclick="editRule({{ loop.index0 }})" class="edit-btn">Edit</button>
                     <button onclick="deleteRule({{ loop.index0 }})" class="delete-btn">Delete</button>

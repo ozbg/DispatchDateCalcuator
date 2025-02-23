@@ -110,43 +110,31 @@
     {
       "id": "presentation_glue",
       "description": "Presentation Folder with Glue",
+      "addDays": 1,
+      "enabled": true,
       "keywords": [
         "glue"
       ],
+      "excludeKeywords": [],
       "matchType": "any",
-      "caseSensitive": false,
-      "addDays": 1,
       "conditions": {
-        "productIdIn": [
-          29,
-          30
-        ],
-        "hubOverrides": {
-          "wa": 3
-        }
-      },
-      "enabled": true
+        "productIdEqual": 29
+      }
     },
     {
       "id": "presentation_new_forme",
       "description": "Presentation Folder New/Custom Forme",
+      "addDays": 1,
+      "enabled": true,
       "keywords": [
         "custom forme",
         "new forme"
       ],
+      "excludeKeywords": [],
       "matchType": "any",
-      "caseSensitive": false,
-      "addDays": 1,
       "conditions": {
-        "productIdIn": [
-          29,
-          30
-        ],
-        "hubOverrides": {
-          "wa": 2
-        }
-      },
-      "enabled": true
+        "productIdEqual": 29
+      }
     },
     {
       "id": "laminating",
