@@ -35,6 +35,7 @@
                 <th>CMYK Hub ID</th>
                 <th>Next Best Options</th>
                 <th>Closed Dates</th>
+                <th>Postcodes</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -53,6 +54,19 @@
                     {% for date in hub.Closed_Dates %}
                         {{ date }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
+                </td>
+                <td class="postcode-cell">
+                    <div class="postcode-preview">
+                        {% for hub_info in hub_data %}
+                            {% if hub_info.hubName == hub.Hub %}
+                                {% set postcodes = hub_info.postcode %}
+                                {{ postcodes|truncate(50) }}
+                                {% if postcodes|length > 50 %}
+                                    <span class="view-more" onclick="viewFullPostcodes('{{ postcodes }}')">View All</span>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </td>
                 <td>
                     <button onclick="editHub({{ loop.index0 }})" class="edit-btn">Edit</button>
@@ -91,6 +105,42 @@
             </div>
 
             <div class="form-section">
+                <h4>Postcode Management</h4>
+                <div class="form-group">
+                    <label for="postcodes">Postcodes:</label>
+                    <div class="postcode-input-container">
+                        <textarea id="postcodes" class="form-control postcode-textarea" rows="6"
+                                placeholder="Enter postcodes (comma-separated)&#10;Examples:&#10;Single: 2000&#10;Range: 2000-2999&#10;Multiple: 2000,2001,2002"></textarea>
+                        <div class="postcode-validation-feedback"></div>
+                    </div>
+                    <small>Enter postcodes as single values (2000), ranges (2000-2999), or comma-separated lists.</small>
+                    <div class="postcode-tools">
+                        <button type="button" onclick="formatPostcodes()" class="tool-btn">Format</button>
+                        <button type="button" onclick="validatePostcodes()" class="tool-btn">Validate</button>
+                        <span id="postcodeCount" class="count-badge">0 postcodes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h4>Schedule Management</h4>
+                <div class="form-group">
+                    <div class="label-button-group">
+                        <label>Closed Dates:</label>
+                        <button type="button" onclick="addClosedDateInput()" class="action-btn add-btn compact-btn">
+                            <i class="fas fa-plus"></i> Add Closed Date
+                        </button>
+                    </div>
+                    <div id="closedDatesContainer" class="dynamic-container dates-grid">
+                        <div class="closed-dates-list date-container">
+                            <!-- Dynamic date inputs will be added here -->
+                        </div>
+                    </div>
+                    <small>Select dates when the hub will be closed</small>
+                </div>
+            </div>
+
+            <div class="form-section">
                 <h4>Production Options</h4>
                 <div class="form-group">
                     <label>Next Best Options:</label>
@@ -116,24 +166,6 @@
             </div>
         </div>
 
-        <div class="form-section full-width">
-            <h4>Schedule Management</h4>
-            <div class="form-group">
-                <div class="label-button-group">
-                    <label>Closed Dates:</label>
-                    <button type="button" onclick="addClosedDateInput()" class="action-btn add-btn compact-btn">
-                        <i class="fas fa-plus"></i> Add Closed Date
-                    </button>
-                </div>
-                <div id="closedDatesContainer" class="dynamic-container dates-grid">
-                    <div class="closed-dates-list date-container">
-                        <!-- Dynamic date inputs will be added here -->
-                    </div>
-                </div>
-                <small>Select dates when the hub will be closed</small>
-            </div>
-        </div>
-
         <div class="button-group">
             <button onclick="saveHub()" class="primary-btn save-btn">Save Changes</button>
             <button onclick="closeForm()" class="secondary-btn cancel-btn">Cancel</button>
@@ -143,6 +175,10 @@
 
 <style>
 /* Modal Styling */
+.wide-modal {
+    max-width: 2400px;
+}
+
 .modal-content {
     background: #ffffff;
     border-radius: 12px;
@@ -411,6 +447,111 @@
     background: #c82333;
 }
 
+/* Postcode Management Styles */
+.postcode-cell {
+    max-width: 200px;
+}
+
+.postcode-preview {
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.view-more {
+    color: #007bff;
+    cursor: pointer;
+    margin-left: 5px;
+    font-size: 0.9em;
+}
+
+.postcode-input-container {
+    position: relative;
+}
+
+.postcode-textarea {
+    font-family: monospace;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.postcode-validation-feedback {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    display: none;
+}
+
+.validation-error {
+    background-color: #fff3f3;
+    border: 1px solid #dc3545;
+    color: #dc3545;
+}
+
+.validation-success {
+    background-color: #f3fff3;
+    border: 1px solid #28a745;
+    color: #28a745;
+}
+
+.postcode-tools {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    align-items: center;
+}
+
+.tool-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.tool-btn:hover {
+    background: #5a6268;
+}
+
+.count-badge {
+    background: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+    color: #495057;
+}
+
+/* Postcode Modal */
+.postcode-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-width: 80%;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1100;
+}
+
+.postcode-modal-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .modal-content {
@@ -480,8 +621,8 @@
     background: white;
     margin: 5% auto;
     padding: 20px;
-    width: 80%;
-    max-width: 800px;
+    width: 95%;
+    max-width: 2400px;
     border-radius: 8px;
 }
 
@@ -592,6 +733,120 @@ th {
 
 <script>
 let currentHubs = {{ hubs|tojson }};
+let hubData = {{ hub_data|tojson }};
+
+function getHubPostcodes(hubName) {
+    const hubInfo = hubData.find(h => h.hubName === hubName);
+    return hubInfo ? hubInfo.postcode : '';
+}
+
+function viewFullPostcodes(postcodes) {
+    const modal = document.createElement('div');
+    modal.className = 'postcode-modal';
+    modal.innerHTML = `
+        <h4>Full Postcode List</h4>
+        <pre style="white-space: pre-wrap;">${postcodes}</pre>
+        <button onclick="closePostcodeModal()" class="btn btn-secondary">Close</button>
+    `;
+    
+    const backdrop = document.createElement('div');
+    backdrop.className = 'postcode-modal-backdrop';
+    
+    document.body.appendChild(backdrop);
+    document.body.appendChild(modal);
+    
+    modal.style.display = 'block';
+    backdrop.style.display = 'block';
+}
+
+function closePostcodeModal() {
+    document.querySelector('.postcode-modal').remove();
+    document.querySelector('.postcode-modal-backdrop').remove();
+}
+
+function validatePostcodes() {
+    const textarea = document.getElementById('postcodes');
+    const feedback = document.querySelector('.postcode-validation-feedback');
+    const countElement = document.getElementById('postcodeCount');
+    const postcodes = textarea.value.trim();
+    
+    // Reset feedback
+    feedback.className = 'postcode-validation-feedback';
+    feedback.style.display = 'block';
+    
+    if (!postcodes) {
+        feedback.textContent = 'Please enter some postcodes';
+        feedback.classList.add('validation-error');
+        countElement.textContent = '0 postcodes';
+        return false;
+    }
+    
+    const parts = postcodes.split(',').filter(p => p.trim().length > 0);
+    const errors = [];
+    let count = 0;
+    
+    for (const part of parts) {
+        const trimmedPart = part.trim();
+        if (trimmedPart.includes('-')) {
+            // Range validation
+            const [start, end] = trimmedPart.split('-').map(p => parseInt(p.trim()));
+            if (isNaN(start) || isNaN(end) || start > end || start < 0 || end > 9999) {
+                errors.push(`Invalid range: ${trimmedPart}`);
+            } else {
+                count += end - start + 1;
+            }
+        } else {
+            // Single postcode validation
+            if (!/^\d{4}$/.test(trimmedPart)) {
+                errors.push(`Invalid postcode: ${trimmedPart}`);
+            } else {
+                count++;
+            }
+        }
+    }
+    
+    if (errors.length > 0) {
+        feedback.innerHTML = errors.join('<br>');
+        feedback.classList.add('validation-error');
+        countElement.textContent = '0 postcodes';
+        return false;
+    }
+    
+    feedback.textContent = `Valid! ${count} postcodes found.`;
+    feedback.classList.add('validation-success');
+    countElement.textContent = `${count} postcodes`;
+    return true;
+}
+
+function showValidationError(message) {
+    const feedback = document.querySelector('.postcode-validation-feedback');
+    feedback.innerHTML = message;
+    feedback.classList.add('validation-error');
+    feedback.style.display = 'block';
+}
+
+function formatPostcodes() {
+    const textarea = document.getElementById('postcodes');
+    let postcodes = textarea.value;
+    
+    // Remove spaces and split by commas
+    postcodes = postcodes.replace(/\s+/g, '').split(',');
+    
+    // Remove empty entries and duplicates
+    postcodes = [...new Set(postcodes.filter(p => p))];
+    
+    // Sort numerically
+    postcodes.sort((a, b) => {
+        const aStart = parseInt(a.split('-')[0]);
+        const bStart = parseInt(b.split('-')[0]);
+        return aStart - bStart;
+    });
+    
+    // Join back with commas
+    textarea.value = postcodes.join(',');
+    
+    validatePostcodes();
+}
 let editIndex = -1;
 
 function showAddForm() {
@@ -606,10 +861,15 @@ function editHub(index) {
     const hub = currentHubs[index];
     document.getElementById('formTitle').textContent = 'Edit Hub';
     
+    // Find corresponding postcode data
+    const hubInfo = hubData.find(h => h.hubName === hub.Hub);
+    const postcodes = hubInfo ? hubInfo.postcode : '';
+    
     // Populate form
     document.getElementById('hubName').value = hub.Hub;
     document.getElementById('state').value = hub.State;
     document.getElementById('hubId').value = hub.CMHKhubID;
+    document.getElementById('postcodes').value = postcodes;
     
     // Clear and repopulate Next Best options
     const nextBestList = document.querySelector('.next-best-list');
@@ -688,8 +948,28 @@ function addClosedDateInput() {
 }
 
 async function saveHub() {
+    if (!validatePostcodes()) {
+        alert('Please fix the postcode validation errors before saving.');
+        return;
+    }
+    
+    const hubName = document.getElementById('hubName').value;
+    const postcodes = document.getElementById('postcodes').value;
+    
+    // Update hub_data
+    const hubDataIndex = hubData.findIndex(h => h.hubName === hubName);
+    if (hubDataIndex !== -1) {
+        hubData[hubDataIndex].postcode = postcodes;
+    } else {
+        hubData.push({
+            hubName: hubName,
+            hubId: parseInt(document.getElementById('hubId').value),
+            postcode: postcodes
+        });
+    }
+    
     const hub = {
-        Hub: document.getElementById('hubName').value,
+        Hub: hubName,
         State: document.getElementById('state').value,
         CMHKhubID: parseInt(document.getElementById('hubId').value),
         Next_Best: Array.from(document.querySelectorAll('.hub-select')).map(select => select.value).filter(value => value),

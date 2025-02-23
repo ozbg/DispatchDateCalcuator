@@ -69,13 +69,27 @@ templates = Jinja2Templates(directory="app/templates")
 async def api_test(request: Request):
     return templates.TemplateResponse("api_test.html", {"request": request})
 
+def get_hub_postcodes(hub_name: str) -> str:
+    """Get postcodes for a specific hub from hub_data.json"""
+    hub_data = get_hub_data()
+    for hub in hub_data:
+        if hub["hubName"].lower() == hub_name.lower():
+            return hub["postcode"]
+    return ""
+
 @app.get("/cmyk-hubs", response_class=HTMLResponse)
 async def cmyk_hubs(request: Request):
     try:
         hubs_data = get_cmyk_hubs_data()
+        hub_data = get_hub_data()  # Load hub data for postcodes
         return templates.TemplateResponse(
             "cmyk_hubs.html",
-            {"request": request, "hubs": hubs_data}
+            {
+                "request": request,
+                "hubs": hubs_data,
+                "hub_data": hub_data,
+                "get_hub_postcodes": get_hub_postcodes
+            }
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

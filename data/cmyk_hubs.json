@@ -118,18 +118,18 @@
     "State": "qld"
   },
   {
-    "CMHKhubID": 24,
-    "Closed_Dates": [
-      "2025-02-27"
-    ],
     "Hub": "nqld",
+    "State": "nqld",
+    "CMHKhubID": 24,
     "Next_Best": [
       "qld",
       "nsw",
       "vic",
       "wa"
     ],
-    "State": "nqld"
+    "Closed_Dates": [
+      "2025-02-27"
+    ]
   },
   {
     "CMHKhubID": 3,
