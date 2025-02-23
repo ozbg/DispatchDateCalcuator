@@ -70,7 +70,6 @@
                 </td>
                 <td>
                     <button onclick="editHub({{ loop.index0 }})" class="edit-btn">Edit</button>
-                    <button onclick="deleteHub({{ loop.index0 }})" class="delete-btn">Delete</button>
                 </td>
             </tr>
             {% endfor %}
@@ -82,47 +81,16 @@
     <div class="modal-content wide-modal">
         <h3 id="formTitle">Edit Hub</h3>
         
+        <div class="form-actions">
+            <button type="button" onclick="toggleAdvancedOptions()" class="toggle-advanced-btn">
+                <span class="toggle-text">Show Advanced Options</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
         <div class="two-column-grid">
-            <div class="form-section">
-                <h4>Basic Information</h4>
-                <div class="form-group">
-                    <label for="hubName">Hub Name:</label>
-                    <input type="text" id="hubName" required class="form-control">
-                    <small>Short name for the hub (e.g., vic, nsw, qld)</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="state">State:</label>
-                    <input type="text" id="state" required class="form-control">
-                    <small>Full state name or identifier</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="hubId">CMYK Hub ID:</label>
-                    <input type="number" id="hubId" required class="form-control">
-                    <small>Unique identifier for system reference</small>
-                </div>
-            </div>
-
-            <div class="form-section">
-                <h4>Postcode Management</h4>
-                <div class="form-group">
-                    <label for="postcodes">Postcodes:</label>
-                    <div class="postcode-input-container">
-                        <textarea id="postcodes" class="form-control postcode-textarea" rows="6"
-                                placeholder="Enter postcodes (comma-separated)&#10;Examples:&#10;Single: 2000&#10;Range: 2000-2999&#10;Multiple: 2000,2001,2002"></textarea>
-                        <div class="postcode-validation-feedback"></div>
-                    </div>
-                    <small>Enter postcodes as single values (2000), ranges (2000-2999), or comma-separated lists.</small>
-                    <div class="postcode-tools">
-                        <button type="button" onclick="formatPostcodes()" class="tool-btn">Format</button>
-                        <button type="button" onclick="validatePostcodes()" class="tool-btn">Validate</button>
-                        <span id="postcodeCount" class="count-badge">0 postcodes</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-section">
+            <!-- Schedule Management Section - Always Visible -->
+            <div class="form-section schedule-section">
                 <h4>Schedule Management</h4>
                 <div class="form-group">
                     <div class="label-button-group">
@@ -158,30 +126,72 @@
                 </div>
             </div>
 
-            <div class="form-section">
-                <h4>Production Options</h4>
-                <div class="form-group">
-                    <label>Next Best Options:</label>
-                    <div id="nextBestContainer" class="dynamic-container">
-                        <table class="next-best-table">
-                            <thead>
-                                <tr>
-                                    <th width="80">Priority</th>
-                                    <th>Hub</th>
-                                    <th width="100">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="next-best-list">
-                                <!-- Dynamic rows will be added here -->
-                            </tbody>
-                        </table>
-                        <button type="button" onclick="addNextBestInput()" class="action-btn add-btn">
-                            <i class="fas fa-plus"></i> Add Production Option
-                        </button>
+            <!-- Advanced Options - Hidden by Default -->
+            <div class="advanced-options" style="display: none;">
+                <div class="form-section">
+                    <h4>Basic Information</h4>
+                    <div class="form-group">
+                        <label for="hubName">Hub Name:</label>
+                        <input type="text" id="hubName" required class="form-control">
+                        <small>Short name for the hub (e.g., vic, nsw, qld)</small>
                     </div>
-                    <small class="emphasis-note">Priority order determines which hub is tried first</small>
+
+                    <div class="form-group">
+                        <label for="state">State:</label>
+                        <input type="text" id="state" required class="form-control">
+                        <small>Full state name or identifier</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hubId">CMYK Hub ID:</label>
+                        <input type="number" id="hubId" required class="form-control">
+                        <small>Unique identifier for system reference</small>
+                    </div>
                 </div>
-            </div>
+
+                <div class="form-section">
+                    <h4>Postcode Management</h4>
+                    <div class="form-group">
+                        <label for="postcodes">Postcodes:</label>
+                        <div class="postcode-input-container">
+                            <textarea id="postcodes" class="form-control postcode-textarea" rows="6"
+                                    placeholder="Enter postcodes (comma-separated)&#10;Examples:&#10;Single: 2000&#10;Range: 2000-2999&#10;Multiple: 2000,2001,2002"></textarea>
+                            <div class="postcode-validation-feedback"></div>
+                        </div>
+                        <small>Enter postcodes as single values (2000), ranges (2000-2999), or comma-separated lists.</small>
+                        <div class="postcode-tools">
+                            <button type="button" onclick="formatPostcodes()" class="tool-btn">Format</button>
+                            <button type="button" onclick="validatePostcodes()" class="tool-btn">Validate</button>
+                            <span id="postcodeCount" class="count-badge">0 postcodes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4>Production Options</h4>
+                    <div class="form-group">
+                        <label>Next Best Options:</label>
+                        <div id="nextBestContainer" class="dynamic-container">
+                            <table class="next-best-table">
+                                <thead>
+                                    <tr>
+                                        <th width="80">Priority</th>
+                                        <th>Hub</th>
+                                        <th width="100">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="next-best-list">
+                                    <!-- Dynamic rows will be added here -->
+                                </tbody>
+                            </table>
+                            <button type="button" onclick="addNextBestInput()" class="action-btn add-btn">
+                                <i class="fas fa-plus"></i> Add Production Option
+                            </button>
+                        </div>
+                        <small class="emphasis-note">Priority order determines which hub is tried first</small>
+                    </div>
+                </div>
+            </div> <!-- Close advanced-options -->
         </div>
 
         <div class="button-group">
@@ -192,6 +202,48 @@
 </div>
 
 <style>
+/* Advanced Options Toggle */
+.form-actions {
+    margin-bottom: 20px;
+    text-align: right;
+}
+
+.toggle-advanced-btn {
+    background: #f8f9fa;
+    color: #b8b8b8;
+    border: 1px solid #dee2e6;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    transition: all 0.3s ease;
+}
+
+.toggle-advanced-btn:hover {
+    background: #e9ecef;
+}
+
+.toggle-advanced-btn i {
+    transition: transform 0.3s ease;
+}
+
+.toggle-advanced-btn.active i {
+    transform: rotate(180deg);
+}
+
+.advanced-options {
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.schedule-section {
+    grid-column: 1 / -1;
+    transition: all 0.3s ease;
+}
+
 /* Modal Styling */
 .wide-modal {
     max-width: 2400px;
@@ -801,6 +853,25 @@ th {
 
 <script>
 let currentHubs = {{ hubs|tojson }};
+let advancedOptionsVisible = false;
+
+function toggleAdvancedOptions() {
+    const advancedOptions = document.querySelector('.advanced-options');
+    const toggleBtn = document.querySelector('.toggle-advanced-btn');
+    const toggleText = toggleBtn.querySelector('.toggle-text');
+    
+    advancedOptionsVisible = !advancedOptionsVisible;
+    
+    if (advancedOptionsVisible) {
+        advancedOptions.style.display = 'block';
+        toggleText.textContent = 'Hide Advanced Options';
+        toggleBtn.classList.add('active');
+    } else {
+        advancedOptions.style.display = 'none';
+        toggleText.textContent = 'Show Advanced Options';
+        toggleBtn.classList.remove('active');
+    }
+}
 let hubData = {{ hub_data|tojson }};
 
 function getHubPostcodes(hubName) {
@@ -1053,20 +1124,35 @@ async function saveHub() {
     const hubName = document.getElementById('hubName').value;
     const postcodes = document.getElementById('postcodes').value;
     
+    // Get closed dates that will be applied to all entries of this hub
+    const closedDates = Array.from(document.querySelectorAll('.closed-date-item input')).map(input => input.value);
+    
     // Create the hub data object
     const hub = {
         Hub: hubName,
         State: document.getElementById('state').value,
         CMHKhubID: parseInt(document.getElementById('hubId').value),
         Next_Best: Array.from(document.querySelectorAll('.hub-select')).map(select => select.value).filter(value => value),
-        Closed_Dates: Array.from(document.querySelectorAll('.closed-date-item input')).map(input => input.value)
+        Closed_Dates: closedDates
     };
 
-    // Update or add hub to currentHubs
+    // Update or add hub to currentHubs and sync closed dates
     if (editIndex >= 0) {
         currentHubs[editIndex] = hub;
+        // Sync closed dates across all entries with the same Hub
+        currentHubs.forEach((h, index) => {
+            if (h.Hub === hubName && index !== editIndex) {
+                h.Closed_Dates = closedDates;
+            }
+        });
     } else {
         currentHubs.push(hub);
+        // Sync closed dates across all existing entries with the same Hub
+        currentHubs.forEach((h) => {
+            if (h.Hub === hubName) {
+                h.Closed_Dates = closedDates;
+            }
+        });
     }
 
     // Prepare the complete data object including both hubs and postcodes

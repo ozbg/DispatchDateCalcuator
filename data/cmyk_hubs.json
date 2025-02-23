@@ -9,14 +9,38 @@
       "nqld",
       "wa"
     ],
+    "State": "vic"
+  },
+  {
+    "CMHKhubID": 1,
+    "Closed_Dates": [],
+    "Hub": "vic",
+    "Next_Best": [
+      "nsw",
+      "qld",
+      "nqld",
+      "wa"
+    ],
     "State": "sa"
   },
   {
-    "Hub": "vic",
-    "State": "tas",
     "CMHKhubID": 1,
+    "Closed_Dates": [],
+    "Hub": "vic",
     "Next_Best": [
       "nsw",
+      "qld",
+      "nqld",
+      "wa"
+    ],
+    "State": "tas"
+  },
+  {
+    "Hub": "nsw",
+    "State": "nsw",
+    "CMHKhubID": 2,
+    "Next_Best": [
+      "vic",
       "qld",
       "nqld",
       "wa"
@@ -25,23 +49,7 @@
   },
   {
     "CMHKhubID": 2,
-    "Closed_Dates": [
-      "2025-02-26"
-    ],
-    "Hub": "nsw",
-    "Next_Best": [
-      "vic",
-      "qld",
-      "nqld",
-      "wa"
-    ],
-    "State": "nsw"
-  },
-  {
-    "CMHKhubID": 2,
-    "Closed_Dates": [
-      "2025-02-13"
-    ],
+    "Closed_Dates": [],
     "Hub": "nsw",
     "Next_Best": [
       "vic",

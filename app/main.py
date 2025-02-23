@@ -102,6 +102,19 @@ async def save_hubs(request: Request):
         hubs_data = data.get('hubs', [])
         postcode_data = data.get('postcodes', {})
         
+        # Ensure closed dates are synced across same hub entries
+        hub_closed_dates = {}
+        for hub in hubs_data:
+            hub_name = hub.get('Hub')
+            if hub_name not in hub_closed_dates:
+                hub_closed_dates[hub_name] = hub.get('Closed_Dates', [])
+        
+        # Apply synced closed dates
+        for hub in hubs_data:
+            hub_name = hub.get('Hub')
+            if hub_name in hub_closed_dates:
+                hub['Closed_Dates'] = hub_closed_dates[hub_name]
+        
         # Save CMYK hubs data
         save_cmyk_hubs_data(hubs_data)
         
