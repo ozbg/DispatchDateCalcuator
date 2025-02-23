@@ -208,22 +208,6 @@
         "quantityGreaterThan": 10,
         "quantityLessThan": 20
       }
-    },
-    {
-      "id": "Laser_Test",
-      "description": "LaserTest",
-      "addDays": 55,
-      "enabled": true,
-      "keywords": [
-        "Laser"
-      ],
-      "excludeKeywords": [],
-      "matchType": "any",
-      "conditions": {
-        "productIdEqual": 24,
-        "quantityGreaterThan": 800,
-        "quantityLessThan": 1200
-      }
     }
   ],
   "centerRules": [

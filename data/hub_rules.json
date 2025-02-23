@@ -9,9 +9,6 @@
       "sizeConstraints": {
         "maxWidth": 450,
         "maxHeight": 320
-      },
-      "orderCriteria": {
-        "maxQuantity": 5000
       }
     }
   ]

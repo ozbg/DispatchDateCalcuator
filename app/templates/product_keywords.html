@@ -43,6 +43,14 @@
                 <th>Exclude All (Blocked)</th>
                 <th>Actions</th>
             </tr>
+            <tr class="filter-row">
+                <td><input type="text" class="column-filter" data-column="0" placeholder="Filter Product ID..."></td>
+                <td><input type="text" class="column-filter" data-column="1" placeholder="Filter Product Group..."></td>
+                <td><input type="text" class="column-filter" data-column="2" placeholder="Filter Match All..."></td>
+                <td><input type="text" class="column-filter" data-column="3" placeholder="Filter Match Any..."></td>
+                <td><input type="text" class="column-filter" data-column="4" placeholder="Filter Exclude All..."></td>
+                <td></td>
+            </tr>
         </thead>
         <tbody>
             {% for rule in keywords %}
@@ -371,6 +379,8 @@
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.5);
+    overflow-y: auto;
+    z-index: 1000;
 }
 
 .modal-content {
@@ -380,6 +390,9 @@
     width: 80%;
     max-width: 800px;
     border-radius: 8px;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
 }
 
 .form-group {
@@ -480,11 +493,75 @@ th, td {
 th {
     background: #f8f9fa;
 }
+
+.filter-row input {
+    width: calc(100% - 16px); /* Account for padding */
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin: 0 8px;
+    box-sizing: border-box;
+}
+
+.filter-row input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+}
+
+.filter-row td {
+    padding: 8px;
+    background: #f8f9fa;
+}
 </style>
 
 <script>
 let currentKeywords = {{ keywords|tojson }};
 let editIndex = -1;
+
+// Table filtering
+document.addEventListener('DOMContentLoaded', function() {
+    const filterInputs = document.querySelectorAll('.column-filter');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            filterTable();
+        });
+    });
+});
+
+function filterTable() {
+    const tbody = document.querySelector('tbody');
+    const rows = tbody.getElementsByTagName('tr');
+    const filters = Array.from(document.querySelectorAll('.column-filter')).map(input => ({
+        column: parseInt(input.dataset.column),
+        value: input.value.toLowerCase()
+    }));
+
+    for (let row of rows) {
+        let showRow = true;
+        
+        filters.forEach(filter => {
+            if (filter.value) {
+                const cell = row.cells[filter.column];
+                const cellText = cell.textContent.toLowerCase();
+                if (!cellText.includes(filter.value)) {
+                    showRow = false;
+                }
+            }
+        });
+        
+        row.style.display = showRow ? '' : 'none';
+    }
+}
+
+// Add event listener for Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeForm();
+    }
+});
 
 function showAddForm() {
     editIndex = -1;

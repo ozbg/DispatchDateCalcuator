@@ -38,6 +38,16 @@
             <th>Start Days</th>
             <th>Actions</th>
         </tr>
+        <tr class="filter-row">
+            <th><input type="text" class="column-filter" data-column="0" placeholder="Filter ID..."></th>
+            <th><input type="text" class="column-filter" data-column="1" placeholder="Filter Category..."></th>
+            <th><input type="text" class="column-filter" data-column="2" placeholder="Filter Group..."></th>
+            <th><input type="text" class="column-filter" data-column="3" placeholder="Filter Hubs..."></th>
+            <th><input type="text" class="column-filter" data-column="4" placeholder="Filter Days..."></th>
+            <th><input type="text" class="column-filter" data-column="5" placeholder="Filter Cutoff..."></th>
+            <th><input type="text" class="column-filter" data-column="6" placeholder="Filter Start Days..."></th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
         {% for id, product in product_data.items() %}
@@ -120,6 +130,26 @@
 </div>
 
 <style>
+.filter-row input {
+    width: calc(100% - 16px);
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin: 4px 8px;
+    box-sizing: border-box;
+}
+
+.filter-row input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.filter-row th {
+    padding: 4px 12px;
+    background: #f1f3f5;
+}
 .help-section {
     background: #f8f9fa;
     padding: 20px;
@@ -300,6 +330,40 @@ th {
 </style>
 
 <script>
+// Add filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterInputs = document.querySelectorAll('.column-filter');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            filterTable();
+        });
+    });
+});
+
+function filterTable() {
+    const filters = Array.from(document.querySelectorAll('.column-filter')).map(input => ({
+        column: parseInt(input.dataset.column),
+        value: input.value.toLowerCase()
+    }));
+    
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        let showRow = true;
+        
+        filters.forEach(filter => {
+            if (!filter.value) return; // Skip empty filters
+            
+            const cellText = row.cells[filter.column].textContent.toLowerCase();
+            if (!cellText.includes(filter.value)) {
+                showRow = false;
+            }
+        });
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
 let currentProductId = null;
 let product_data = {{ product_data|tojson }};
 

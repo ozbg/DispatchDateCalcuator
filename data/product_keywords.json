@@ -19,6 +19,12 @@
     "Product_ID": 1
   },
   {
+    "Product_ID": 1,
+    "Match_All": [
+      "Velvet",
+      "Artboard",
+      "Laminat"
+    ],
     "Exclude_All": [
       "NVS",
       "NVU",
@@ -26,14 +32,12 @@
       "Holographic",
       "Digital"
     ],
-    "Match_All": [
-      "Velvet",
-      "BC",
-      "Artboard",
-      "Laminat"
-    ],
-    "Match_Any": [],
-    "Product_ID": 1
+    "Match_Any": [
+      [
+        "Branding",
+        "BC"
+      ]
+    ]
   },
   {
     "Exclude_All": [],
@@ -1596,9 +1600,9 @@
     "Product_ID": 62
   },
   {
-    "Product_ID": 1,
-    "Match_All": [],
     "Exclude_All": [],
-    "Match_Any": []
+    "Match_All": [],
+    "Match_Any": [],
+    "Product_ID": 1
   }
 ]

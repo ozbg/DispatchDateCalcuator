@@ -40,6 +40,16 @@
                 <th>Status</th>
                 <th>Actions</th>
             </tr>
+            <tr class="filter-row">
+                <th><input type="text" class="column-filter" data-column="0" placeholder="Filter ID..."></th>
+                <th><input type="text" class="column-filter" data-column="1" placeholder="Filter Description..."></th>
+                <th><input type="text" class="column-filter" data-column="2" placeholder="Filter Keywords..."></th>
+                <th><input type="text" class="column-filter" data-column="3" placeholder="Filter Exclude..."></th>
+                <th><input type="text" class="column-filter" data-column="4" placeholder="Filter Days..."></th>
+                <th><input type="text" class="column-filter" data-column="5" placeholder="Filter Conditions..."></th>
+                <th><input type="text" class="column-filter" data-column="6" placeholder="Filter Status..."></th>
+                <th></th>
+            </tr>
         </thead>
         <tbody id="keywordRulesBody">
             {% for rule in rules.keywordRules %}
@@ -87,6 +97,15 @@
                 <th>Days Added</th>
                 <th>Status</th>
                 <th>Actions</th>
+            </tr>
+            <tr class="filter-row">
+                <th><input type="text" class="column-filter" data-column="0" placeholder="Filter ID..."></th>
+                <th><input type="text" class="column-filter" data-column="1" placeholder="Filter Description..."></th>
+                <th><input type="text" class="column-filter" data-column="2" placeholder="Filter Center..."></th>
+                <th><input type="text" class="column-filter" data-column="3" placeholder="Filter Exclude..."></th>
+                <th><input type="text" class="column-filter" data-column="4" placeholder="Filter Days..."></th>
+                <th><input type="text" class="column-filter" data-column="5" placeholder="Filter Status..."></th>
+                <th></th>
             </tr>
         </thead>
         <tbody id="centerRulesBody">
@@ -194,11 +213,33 @@
 </div>
 
 <style>
-.rules-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-}
+    <style>
+    /* General Layout */
+    .rules-container {
+      max-width: 100%;
+      padding: 20px;
+    }
+    
+    .filter-row input {
+        width: calc(100% - 16px);
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.9em;
+        margin: 4px 8px;
+        box-sizing: border-box;
+    }
+    
+    .filter-row input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+    }
+    
+    .filter-row th {
+        padding: 4px 12px;
+        background: #f1f3f5;
+    }
 
 .section-title {
     color: #2c3e50;
@@ -431,6 +472,40 @@
 </style>
 
 <script>
+// Add filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterInputs = document.querySelectorAll('.column-filter');
+    
+    filterInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            filterTable();
+        });
+    });
+});
+
+function filterTable() {
+    const filters = Array.from(document.querySelectorAll('.column-filter')).map(input => ({
+        column: parseInt(input.dataset.column),
+        value: input.value.toLowerCase()
+    }));
+    
+    const rows = document.querySelectorAll('tbody tr');
+    
+    rows.forEach(row => {
+        let showRow = true;
+        
+        filters.forEach(filter => {
+            if (!filter.value) return; // Skip empty filters
+            
+            const cellText = row.cells[filter.column].textContent.toLowerCase();
+            if (!cellText.includes(filter.value)) {
+                showRow = false;
+            }
+        });
+        
+        row.style.display = showRow ? '' : 'none';
+    });
+}
 // Store rules in a JS variable
 let currentRules = {{ rules|tojson }};
 console.log('Initialized currentRules:', currentRules);
