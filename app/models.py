@@ -44,6 +44,7 @@ class FinishingRules(BaseModel):
     centerRules: List[CenterRule]
 
 class ScheduleRequest(BaseModel):
+    orderId: Optional[str] = None
     misDeliversToPostcode: str
     misOrderQTY: int
     orientation: str
@@ -144,6 +145,7 @@ class HubSelectionRule(BaseModel):
 
 class ScheduleResponse(BaseModel):
     # Core Product Info
+    orderId: Optional[str] = None
     productId: int
     productGroup: str
     productCategory: str

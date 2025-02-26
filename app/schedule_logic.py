@@ -212,6 +212,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # Return comprehensive response
     return ScheduleResponse(
         # Core Product Info
+        orderId=req.orderId,
         productId=found_product_id,
         productGroup=product_obj["Product_Group"],
         productCategory=product_obj["Product_Category"],

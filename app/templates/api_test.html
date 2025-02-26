@@ -9,6 +9,7 @@
             <div class="input-section">
                 <h3>Request Payload</h3>
                 <textarea id="requestPayload" rows="15">{
+    "orderId": "TEST123",
     "misDeliversToPostcode": "3000",
     "misOrderQTY": 1000,
     "orientation": "portrait",
@@ -42,6 +43,10 @@
                     </tr>
                     <!-- Product Info -->
                     <tr><td colspan="2" class="section-header">Product Information</td></tr>
+                    <tr>
+                        <td>Order ID</td>
+                        <td id="orderId"></td>
+                    </tr>
                     <tr>
                         <td>Product ID</td>
                         <td id="productId"></td>
@@ -472,6 +477,7 @@ async function runTest() {
         };
 
         // Product Info
+        setContent('orderId', result.orderId);
         setContent('productId', result.productId);
         setContent('productGroup', result.productGroup);
         setContent('productCategory', result.productCategory);
