@@ -1,0 +1,47 @@
+[
+  {
+    "Exclude_All": [],
+    "Match_All": [
+      "fold"
+    ],
+    "Match_Any": [],
+    "id": "fold",
+    "name": "Fold"
+  },
+  {
+    "id": "saddle_stitch",
+    "name": "Saddle Stitch",
+    "Match_All": [
+      "Saddle"
+    ],
+    "Exclude_All": [],
+    "Match_Any": []
+  },
+  {
+    "Exclude_All": [],
+    "Match_All": [
+      "nv laminate"
+    ],
+    "Match_Any": [],
+    "id": "nv_laminate",
+    "name": "NV Laminate"
+  },
+  {
+    "Exclude_All": [],
+    "Match_All": [
+      "gloss laminate"
+    ],
+    "Match_Any": [],
+    "id": "gloss_laminate",
+    "name": "Gloss Laminate"
+  },
+  {
+    "Exclude_All": [],
+    "Match_All": [
+      "padding"
+    ],
+    "Match_Any": [],
+    "id": "padding",
+    "name": "Padding"
+  }
+]

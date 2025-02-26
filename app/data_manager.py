@@ -53,3 +53,14 @@ def save_hub_data(data: list):
     filepath = DATA_DIR / "hub_data.json"
     with open(filepath, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
+
+# ---------- Production Groups ----------
+def get_production_groups_data() -> list:
+    filepath = DATA_DIR / "production_groups.json"
+    with open(filepath, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+def save_production_groups_data(data: list):
+    filepath = DATA_DIR / "production_groups.json"
+    with open(filepath, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)

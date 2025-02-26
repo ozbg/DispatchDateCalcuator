@@ -7,6 +7,8 @@ from typing import Optional
 import pytz
 from pathlib import Path
 from pathlib import Path
+from app.data_manager import get_production_groups_data
+from app.production_group_mapper import match_production_groups
 
 
 from app.models import (
@@ -73,7 +75,17 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # ----------------------------------------------------------------
     if req.misCurrentHub.lower() == "wa":
         logger.debug("Current hub is WA => appending #wa tag to description")
-        req.description = f"{req.description} #wa"
+        req.description = f"{req.description} #wa"    
+    
+    # ----------------------------------------------------------------
+    # Step 1d) Assign production groups based on order description
+    # ----------------------------------------------------------------
+    production_groups_data = get_production_groups_data()
+    assigned_groups = match_production_groups(req.description, production_groups_data)
+    logger.debug(f"Assigned production groups: {assigned_groups}")
+    
+    
+        
 
     # 2) Product matching
     product_keywords = get_product_keywords_data()
@@ -217,6 +229,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         productGroup=product_obj["Product_Group"],
         productCategory=product_obj["Product_Category"],
         productionHubs=product_obj["Production_Hub"],
+        productionGroups=assigned_groups,
         
         # Production Details
         cutoffStatus=cutoff_status,

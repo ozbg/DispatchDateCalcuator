@@ -1,3 +1,15 @@
 {
-  "rules": []
+  "rules": [
+    {
+      "id": "rule_1740551225757",
+      "description": "xx",
+      "hubId": "vic",
+      "priority": 0,
+      "enabled": true,
+      "sizeConstraints": {
+        "maxWidth": 400,
+        "maxHeight": 320
+      }
+    }
+  ]
 }

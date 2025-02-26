@@ -150,7 +150,8 @@ class ScheduleResponse(BaseModel):
     productGroup: str
     productCategory: str
     productionHubs: List[str]
-    
+    productionGroups: Optional[List[str]] = None
+        
     # Production Details
     cutoffStatus: str
     productStartDays: List[str]
@@ -179,3 +180,5 @@ class ScheduleResponse(BaseModel):
     synergyPreflight: Optional[int] = None
     synergyImpose: Optional[int] = None
     enableAutoHubTransfer: Optional[int] = None
+    
+    

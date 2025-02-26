@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 from typing import List
 import pytz
+from app.data_manager import get_production_groups_data, save_production_groups_data
 
 from app.data_manager import (
     get_product_info_data, save_product_info_data,
@@ -610,3 +611,26 @@ async def delete_product(product_id: str):
     else:
         logger.error(f"Product with ID {product_id} not found.")
         raise HTTPException(status_code=404, detail="Product not found.")
+    
+@app.get("/production-groups", response_class=HTMLResponse)
+async def production_groups(request: Request):
+    try:
+        groups = get_production_groups_data()
+        return templates.TemplateResponse(
+            "production_groups.html",
+            {"request": request, "groups": groups}
+        )
+    except Exception as e:
+        logger.error(f"Error loading production groups: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/save-production-groups")
+async def save_production_groups_endpoint(request: Request):
+    try:
+        groups = await request.json()
+        save_production_groups_data(groups)
+        logger.debug("Production groups saved successfully.")
+        return JSONResponse({"success": True, "message": "Production groups saved successfully"})
+    except Exception as e:
+        logger.error(f"Error saving production groups: {e}")
+        return JSONResponse({"success": False, "message": str(e)}, status_code=500)
