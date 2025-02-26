@@ -3,6 +3,7 @@
     "CMHKhubID": 1,
     "Closed_Dates": [],
     "Hub": "vic",
+    "Timezone": "Australia/Melbourne",
     "Next_Best": [
       "nsw",
       "qld",
@@ -15,6 +16,7 @@
     "CMHKhubID": 1,
     "Closed_Dates": [],
     "Hub": "vic",
+    "Timezone": "Australia/Melbourne",
     "Next_Best": [
       "nsw",
       "qld",
@@ -27,6 +29,7 @@
     "CMHKhubID": 1,
     "Closed_Dates": [],
     "Hub": "vic",
+    "Timezone": "Australia/Melbourne",
     "Next_Best": [
       "nsw",
       "qld",
@@ -37,6 +40,7 @@
   },
   {
     "Hub": "nsw",
+    "Timezone": "Australia/Sydney",
     "State": "nsw",
     "CMHKhubID": 2,
     "Next_Best": [
@@ -51,6 +55,7 @@
     "CMHKhubID": 2,
     "Closed_Dates": [],
     "Hub": "nsw",
+    "Timezone": "Australia/Sydney",
     "Next_Best": [
       "vic",
       "qld",
@@ -74,6 +79,7 @@
       "2025-01-13"
     ],
     "Hub": "qld",
+    "Timezone": "Australia/Brisbane",
     "Next_Best": [
       "nqld",
       "nsw",
@@ -88,6 +94,7 @@
       "2025-02-27"
     ],
     "Hub": "nqld",
+    "Timezone": "Australia/Brisbane",
     "Next_Best": [
       "qld",
       "nsw",
@@ -111,6 +118,7 @@
       "2025-01-03"
     ],
     "Hub": "wa",
+    "Timezone": "Australia/Perth",
     "Next_Best": [
       "vic",
       "nsw",
@@ -134,6 +142,7 @@
       "2025-01-03"
     ],
     "Hub": "wa",
+    "Timezone": "Australia/Perth",
     "Next_Best": [
       "vic",
       "nsw",

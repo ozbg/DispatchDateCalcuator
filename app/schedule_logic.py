@@ -24,7 +24,6 @@ from app.data_manager import (
     get_hub_data
 )
 from app.product_matcher import match_product_id, determine_grain_direction
-from app.config import TIME_ADJUST, WA_TIME_ADJUST
 from app.hub_selection import validate_hub_rules, choose_production_hub
 
 logger = logging.getLogger(__name__)
@@ -54,8 +53,8 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         logger.debug("MIS Delivers to: %s => treating as 'nsw'", req.misDeliversToState)
         req.misDeliversToState = "nsw"
 
-    if req.misCurrentHub.lower() == "nqld":
-        logger.debug("MIS Current hub is 'nqld' => setting misDeliversToState = 'nqld'")
+    if req.misCurrentHub.lower() == "nqld" and req.misDeliversToState.lower() == "qld":
+        logger.debug("MIS Current hub is 'nqld' and delivers to QLD => setting misDeliversToState = 'nqld'")
         req.misDeliversToState = "nqld"
 
     # ----------------------------------------------------------------
@@ -68,6 +67,13 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     else:
         logger.debug("No postcode override for postcode=%s => continuing with misDeliversToState=%s",
                      req.misDeliversToPostcode, req.misDeliversToState)
+
+    # ----------------------------------------------------------------
+    # Step 1c) Add #wa tag to WA orders for special product matching
+    # ----------------------------------------------------------------
+    if req.misCurrentHub.lower() == "wa":
+        logger.debug("Current hub is WA => appending #wa tag to description")
+        req.description = f"{req.description} #wa"
 
     # 2) Product matching
     product_keywords = get_product_keywords_data()
@@ -104,21 +110,36 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         description=req.description
     )
 
-    # 4) Current time (tz-aware)
-    current_time = datetime.now(timezone.utc)  # instead of datetime.utcnow() to avoid warnings
-    if req.misCurrentHub.lower() == "wa":
-        current_time += timedelta(hours=WA_TIME_ADJUST)
-    else:
-        current_time += timedelta(hours=TIME_ADJUST)
+    # 4) Get timezone from hub config
+    cmyk_hubs = get_cmyk_hubs_data()
+    hub_timezone = None
+    for hub in cmyk_hubs:
+        if hub["Hub"].lower() == req.misCurrentHub.lower():
+            hub_timezone = pytz.timezone(hub["Timezone"])
+            logger.debug(f"Found timezone {hub['Timezone']} for hub {req.misCurrentHub}")
+            break
+    
+    if not hub_timezone:
+        # Fallback to Melbourne time if hub not found
+        logger.warning(f"No timezone found for hub {req.misCurrentHub}, falling back to Melbourne time")
+        hub_timezone = pytz.timezone('Australia/Melbourne')
+    
+    # Get current time in hub's timezone
+    current_time = datetime.now(hub_timezone)
+    logger.debug(f"Current time in {hub_timezone}: {current_time}")
 
     # 5) Cutoff check
     cutoff_hour = int(product_obj["Cutoff"])
+    logger.debug(f"Checking cutoff: current hour={current_time.hour} ({hub_timezone}), cutoff hour={cutoff_hour}")
+    
     if current_time.hour >= cutoff_hour:
         start_date = (current_time + timedelta(days=1)).date()
         cutoff_status = "After Cutoff"
+        logger.debug(f"After cutoff: current_time={current_time} ({hub_timezone}), moving start date to next day={start_date}")
     else:
         start_date = current_time.date()
         cutoff_status = "Before Cutoff"
+        logger.debug(f"Before cutoff: current_time={current_time} ({hub_timezone}), keeping start date as today={start_date}")
 
     # Adjust start_date to next valid start day
     allowed_start_days = product_obj["Start_days"]

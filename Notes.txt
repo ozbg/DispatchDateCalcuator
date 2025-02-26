@@ -74,6 +74,33 @@ Here's a detailed explanation from the code:
 
 
 
+Confirmed in place; 
+if the delivers to is SA or Tas set deliversTo to VIC, to treat as vic.
+if the delivers to is ACT set deliversTo to NSW, to treat as nsw.
+if the current hub is NQLD,and the delivers to is QLD,  set deliversTo to NQLD, treat as nqld.
+Next is post code hub transfers - this overrides above - if post code is in the list - that will set hte deilvers to (preferred production hub)
+if the deliveres to after that is WA add #WA to the order so if it can be produced in WA , and that product type has unique WA sechdule - it will skip national schedule and match WA schedule. 
+
+BC Grain Direction
+
+1. Initial Orientation Setting:
+- If orientation from Preflight is "portrait":
+  - Default grain = "Vertical" (grain_id = 3)
+  - Long edge = height
+  - Short edge = width
+- If orientation is "landscape":
+  - Default grain = "Horizontal" (grain_id = 2) 
+  - Long edge = width
+  - Short edge = height
+
+- If EITHER:
+  - The dimensions are business card size (long_edge ≤ 100 AND short_edge ≤ 65)
+  - OR description contains "bc" 
+  THEN:
+  - Keep the initial orientation-based grain setting
+- ELSE:
+  - Set grain = "Either" (grain_id = 1)
+
 
 
 

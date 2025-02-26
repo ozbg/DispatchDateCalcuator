@@ -1,5 +1,18 @@
-# app/config.py
+"""
+Configuration for the CMYKhub Dispatch Calculator
 
-# Example time adjustments (mimicking your JS values):
-TIME_ADJUST = 11       # e.g., 11 hrs for your "daylight savings"
-WA_TIME_ADJUST = -3    # e.g., -3 from your baseline
+Timezone handling:
+- Each hub should specify its timezone in cmyk_hubs.json
+- Valid timezone examples:
+  - 'Australia/Melbourne' (VIC)
+  - 'Australia/Sydney' (NSW)
+  - 'Australia/Brisbane' (QLD)
+  - 'Australia/Perth' (WA)
+  
+The system uses pytz for timezone handling, which automatically manages:
+- Different timezone offsets
+- Daylight savings transitions
+- Historical timezone changes
+"""
+
+# Any future config constants can be added here

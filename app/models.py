@@ -120,6 +120,7 @@ class HubSelectionRule(BaseModel):
     hubId: str
     priority: int = 0
     enabled: bool = True
+    timezone: str = "Australia/Melbourne"  # Default timezone if not specified
     sizeConstraints: Optional[HubSizeConstraint] = None
     orderCriteria: Optional[OrderMatchingCriteria] = None
     startDate: Optional[str] = None

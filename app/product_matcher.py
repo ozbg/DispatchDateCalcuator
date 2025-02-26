@@ -70,8 +70,8 @@ def determine_grain_direction(orientation: str, width: float, height: float, des
         short_edge = height
 
     # BC thresholds
-    BC_LONG = 92
-    BC_SHORT = 57
+    BC_LONG = 100
+    BC_SHORT = 65
     desc_lower = description.lower()
 
     if (long_edge <= BC_LONG and short_edge <= BC_SHORT) or ("bc" in desc_lower):

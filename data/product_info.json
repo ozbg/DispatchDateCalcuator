@@ -19,21 +19,7 @@
       "Friday"
     ],
     "Days_to_produce": 2,
-    "Modified_run_date": [
-      [
-        "2025-02-24",
-        "2025-02-25",
-        "2025-02-26",
-        [
-          "vic"
-        ],
-        [
-          "1",
-          "2",
-          "4"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "2": {
     "Product_Category": "Offset 450+ NV Branding Cards",
@@ -198,24 +184,7 @@
       "Thursday"
     ],
     "Days_to_produce": "1",
-    "Modified_run_date": [
-      [
-        "2025-01-08",
-        "2025-01-09",
-        "2025-01-10",
-        [
-          "nsw",
-          "vic",
-          "wa",
-          "qld",
-          "nqld"
-        ],
-        [
-          "1",
-          "2"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "10": {
     "Product_Category": "Offset 450gsm Branding Card",
@@ -429,25 +398,7 @@
       "Thursday"
     ],
     "Days_to_produce": "1",
-    "Modified_run_date": [
-      [
-        "2025-02-20",
-        "2025-02-27",
-        "2025-02-28",
-        [
-          "nsw",
-          "vic",
-          "wa",
-          "qld",
-          "nqld"
-        ],
-        [
-          "1",
-          "2",
-          "4"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "20": {
     "Product_Category": "Offset Flyer",
@@ -588,24 +539,7 @@
       "Wednesday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [
-      [
-        "2025-01-08",
-        "2025-01-15",
-        "2025-01-16",
-        [
-          "nsw",
-          "vic",
-          "wa",
-          "qld",
-          "nqld"
-        ],
-        [
-          "1",
-          "2"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "26": {
     "Product_Category": "Offset Flyer",
@@ -623,24 +557,7 @@
       "Wednesday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [
-      [
-        "2025-01-08",
-        "2025-01-15",
-        "2025-01-16",
-        [
-          "nsw",
-          "vic",
-          "wa",
-          "qld",
-          "nqld"
-        ],
-        [
-          "1",
-          "2"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "27": {
     "Product_Category": "Offset Flyer",

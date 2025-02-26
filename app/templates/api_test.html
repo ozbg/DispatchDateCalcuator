@@ -158,10 +158,58 @@
 <!-- Debug Panel -->
 <div class="debug-panel">
     <h3>Debug Messages</h3>
+    
+    <!-- Debug Filter -->
+    <div class="debug-filter">
+        <input type="text" id="debugFilter" placeholder="Filter debug messages...">
+        <div class="level-filters">
+            <label><input type="checkbox" value="debug" checked> Debug</label>
+            <label><input type="checkbox" value="info" checked> Info</label>
+            <label><input type="checkbox" value="warning" checked> Warning</label>
+            <label><input type="checkbox" value="error" checked> Error</label>
+        </div>
+    </div>
+    
     <div id="debugOutput" class="debug-content">
         <p class="placeholder-text">Debug messages will appear here after running the API test...</p>
     </div>
 </div>
+
+<style>
+.debug-filter {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.debug-filter input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.level-filters {
+    display: flex;
+    gap: 20px;
+}
+
+.level-filters label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
+.level-filters input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+</style>
 
 <style>
 .debug-panel {
@@ -338,28 +386,64 @@ async function fetchDebugLogs() {
     try {
         const response = await fetch('/debug-logs');
         const logs = await response.json();
-        const debugOutput = document.getElementById('debugOutput');
-        
-        if (logs.length === 0) {
-            debugOutput.innerHTML = '<p class="placeholder-text">No debug messages available...</p>';
-            return;
-        }
-
-        debugOutput.innerHTML = logs.map(log => {
-            const timestamp = `<span class="timestamp">${log.timestamp}</span>`;
-            const level = `<span class="level-${log.level.toLowerCase()}">${log.level}</span>`;
-            const message = `<span class="message">${log.message}</span>`;
-            return `<div>${timestamp} ${level}: ${message}</div>`;
-        }).join('\n');
-        
-        // Auto-scroll to bottom of debug panel
-        debugOutput.scrollTop = debugOutput.scrollHeight;
+        filterAndDisplayLogs(logs);
     } catch (error) {
         console.error('Error fetching debug logs:', error);
         document.getElementById('debugOutput').innerHTML =
             '<p class="level-error">Error fetching debug logs: ' + error.message + '</p>';
     }
 }
+
+function filterAndDisplayLogs(logs) {
+    const debugOutput = document.getElementById('debugOutput');
+    
+    if (logs.length === 0) {
+        debugOutput.innerHTML = '<p class="placeholder-text">No debug messages available...</p>';
+        return;
+    }
+
+    // Get filter values
+    const filterText = document.getElementById('debugFilter').value.toLowerCase();
+    const enabledLevels = Array.from(document.querySelectorAll('.level-filters input:checked'))
+        .map(cb => cb.value);
+
+    // Filter logs
+    const filteredLogs = logs.filter(log => {
+        const levelMatch = enabledLevels.includes(log.level.toLowerCase());
+        const textMatch = !filterText ||
+            log.message.toLowerCase().includes(filterText) ||
+            log.level.toLowerCase().includes(filterText) ||
+            log.timestamp.toLowerCase().includes(filterText);
+        return levelMatch && textMatch;
+    });
+
+    // Display filtered logs
+    debugOutput.innerHTML = filteredLogs.map(log => {
+        const timestamp = `<span class="timestamp">${log.timestamp}</span>`;
+        const level = `<span class="level-${log.level.toLowerCase()}">${log.level}</span>`;
+        const message = `<span class="message">${log.message}</span>`;
+        return `<div class="log-entry">${timestamp} ${level}: ${message}</div>`;
+    }).join('\n');
+    
+    // Auto-scroll to bottom of debug panel
+    debugOutput.scrollTop = debugOutput.scrollHeight;
+}
+
+// Add event listeners for filters
+document.addEventListener('DOMContentLoaded', function() {
+    const debugFilter = document.getElementById('debugFilter');
+    const levelFilters = document.querySelectorAll('.level-filters input');
+    
+    debugFilter.addEventListener('input', () => {
+        fetchDebugLogs(); // Refetch and refilter
+    });
+    
+    levelFilters.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            fetchDebugLogs(); // Refetch and refilter
+        });
+    });
+});
 
 async function runTest() {
     try {
