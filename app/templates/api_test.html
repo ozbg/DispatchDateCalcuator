@@ -10,17 +10,17 @@
                 <h3>Request Payload</h3>
                 <textarea id="requestPayload" rows="15">{
     "orderId": "TEST123",
-    "misDeliversToPostcode": "3000",
+    "misDeliversToPostcode": "4780",
     "misOrderQTY": 1000,
     "orientation": "portrait",
-    "description": "business cards",
+    "description": "250gsm gloss NV Laminate fold to DL bundles of 100",
     "printType": 1,
     "kinds": 1,
     "preflightedWidth": 90,
     "preflightedHeight": 55,
-    "misCurrentHub": "vic",
+    "misCurrentHub": "nsw",
     "misCurrentHubID": 1,
-    "misDeliversToState": "vic",
+    "misDeliversToState": "qld",
     "orderNotes": "",
     "additionalProductionDays": 0
 }</textarea>
@@ -89,6 +89,10 @@
                     <tr>
                         <td>Total Production Days</td>
                         <td id="totalProductionDays"></td>
+                    </tr>
+                    <tr>
+                        <td>Production Groups</td>
+                        <td id="productionGroups"></td>
                     </tr>
 
                     <!-- Location Info -->
@@ -490,6 +494,7 @@ async function runTest() {
         setContent('daysToProduceBase', result.daysToProduceBase);
         setContent('finishingDays', result.finishingDays);
         setContent('totalProductionDays', result.totalProductionDays);
+        setContent('productionGroups', result.productionGroups?.join(', '));
 
         // Location Info
         setContent('orderPostcode', result.orderPostcode);
