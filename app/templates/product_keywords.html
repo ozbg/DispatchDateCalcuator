@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Product Keywords Management</h2>
+<h2>Product Matching</h2>
 <p><a href="/" class="btn">Back to Admin</a></p>
 
 <div class="help-section">
@@ -8,22 +8,30 @@
     <div class="rule-explanation">
         <div class="rule-box">
             <h4>Match All</h4>
-            <p>ALL these keywords must be present. Like AND logic.</p>
-            <p class="example">Example: ["BC", "450+"] means both "BC" AND "450+" must appear</p>
+            <p>The product description must contain ALL of these keywords, following AND logic.</p>
+            <p class="example">Example: ["BC", "450+"] means the order description must contain both "BC" AND "450+".</p>
         </div>
-       
+
         <div class="rule-box">
             <h4>Match Any Groups</h4>
-            <p>For each group, AT LEAST ONE keyword must match. Like OR logic within each group.</p>
-            <p class="example">Example: [["Branding","BC"]] means either "Branding" OR "BC" must appear</p>
+            <p>For each group, at least one keyword must match within the group, following OR logic.</p>
+            <p class="example">Example:<br>
+                Group 1: ["Branding", "BC"]<br>
+                Group 2: ["450+", "465+"]<br><br>
+                This means the order description must contain either "Branding" OR "BC" and either "450+" OR "465+".</p>
         </div>
 
         <div class="rule-box">
             <h4>Exclude All</h4>
-            <p>NONE of these keywords can be present. Like NOT logic.</p>
-            <p class="example">Example: ["Digital", "UV"] means neither word can appear</p>
+            <p>The product description must NOT contain ANY of these keywords, following NOT logic.</p>
+            <p class="example">Example: ["Digital", "UV"] means the order description must NOT contain "Digital" OR "UV".</p>
         </div>
-         
+
+        <div class="rule-box">
+            <h4>Hierarchy</h4>
+            <p>For a successful match, all rules (Match All, Match Any, Exclude All) must pass.<br><br>
+                The matching process works from top to bottom, and the first matching product determines the product ID used for scheduling.</p>
+        </div>
     </div>
 </div>
 

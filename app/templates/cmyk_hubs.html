@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>CMYK Hubs Management</h2>
+<h2>CMYK Hubs</h2>
 <p><a href="/" class="btn">Back to Admin</a></p>
 
 <div class="help-section">
@@ -8,18 +8,18 @@
     <div class="rule-explanation">
         <div class="rule-box">
             <h4>Next Best Options</h4>
-            <p>Ordered list of alternative hubs when work needs to be moved.</p>
-            <p class="example">Example: If VIC can't produce, try NSW, then QLD</p>
+            <p>An ordered list of alternative hubs when work needs to be reassigned.</p>
+            <p class="example">Example: If VIC can't produce, try NSW, then QLD.</p>
         </div>
         <div class="rule-box">
             <h4>Closed Dates</h4>
-            <p>Dates when the hub is not operating (holidays, maintenance, etc).</p>
-            <p class="example">Example: "2024-12-25" for Christmas Day closure</p>
+            <p>Dates when the hub is not operating due to holidays, maintenance, or other closures.</p>
+            <p class="example">Example: "2024-12-25" for Christmas Day closure.</p>
         </div>
         <div class="rule-box">
-            <h4>Hub Details</h4>
-            <p>Basic hub information and identification.</p>
-            <p class="example">Hub Name, State, CMYK Hub ID for system reference</p>
+            <h4>Postcodes</h4>
+            <p>Postcodes that are geographically closer to this hub than the default state hub.</p>
+            <p class="example">If an order's postcode matches one of these, and this hub can produce the product, it will be automatically transferred here.</p>
         </div>
     </div>
 </div>
@@ -33,6 +33,7 @@
                 <th>Hub</th>
                 <th>State</th>
                 <th>CMYK Hub ID</th>
+                <th>Timezone</th>
                 <th>Next Best Options</th>
                 <th>Closed Dates</th>
                 <th>Postcodes</th>
@@ -45,6 +46,7 @@
                 <td>{{ hub.Hub }}</td>
                 <td>{{ hub.State }}</td>
                 <td>{{ hub.CMHKhubID }}</td>
+                <td>{{ hub.Timezone if hub.Timezone else 'Australia/Melbourne' }}</td>
                 <td>
                     {% for next in hub.Next_Best %}
                         {{ next }}{% if not loop.last %}, {% endif %}
@@ -146,6 +148,20 @@
                         <label for="hubId">CMYK Hub ID:</label>
                         <input type="number" id="hubId" required class="form-control">
                         <small>Unique identifier for system reference</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timezone">Timezone:</label>
+                        <select id="timezone" required class="form-control">
+                            <option value="Australia/Melbourne">Australia/Melbourne</option>
+                            <option value="Australia/Sydney">Australia/Sydney</option>
+                            <option value="Australia/Brisbane">Australia/Brisbane</option>
+                            <option value="Australia/Adelaide">Australia/Adelaide</option>
+                            <option value="Australia/Perth">Australia/Perth</option>
+                            <option value="Australia/Darwin">Australia/Darwin</option>
+                            <option value="Australia/Hobart">Australia/Hobart</option>
+                        </select>
+                        <small>Hub's operating timezone</small>
                     </div>
                 </div>
 
@@ -1010,6 +1026,7 @@ function editHub(index) {
     document.getElementById('hubName').value = hub.Hub;
     document.getElementById('state').value = hub.State;
     document.getElementById('hubId').value = hub.CMHKhubID;
+    document.getElementById('timezone').value = hub.Timezone || 'Australia/Melbourne';
     document.getElementById('postcodes').value = postcodes;
     
     // Clear and repopulate Next Best options
@@ -1132,6 +1149,7 @@ async function saveHub() {
         Hub: hubName,
         State: document.getElementById('state').value,
         CMHKhubID: parseInt(document.getElementById('hubId').value),
+        Timezone: document.getElementById('timezone').value,
         Next_Best: Array.from(document.querySelectorAll('.hub-select')).map(select => select.value).filter(value => value),
         Closed_Dates: closedDates
     };

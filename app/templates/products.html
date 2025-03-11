@@ -1,25 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Products Management</h2>
+<h2>Product Schedule</h2>
 <p><a href="/" class="btn">Back to Admin</a></p>
 
 <div class="help-section">
-    <h3>Managing Products</h3>
+    <h3>Understanding Product Schedule</h3>
     <div class="rule-explanation">
         <div class="rule-box">
             <h4>Production Hubs</h4>
             <p>Select which hubs can produce this product.</p>
-            <p class="example">Example: VIC for specialty finishes, All hubs for standard items</p>
+            <p class="example">If an order matches this product but is placed in a hub that cannot produce it, the system will automatically transfer the product to the nearest hub that can.</p>
         </div>
         <div class="rule-box">
             <h4>Production Days</h4>
-            <p>Days needed to complete production.</p>
-            <p class="example">Example: 2 days for standard cards, 5 days for specialty items</p>
+            <p>The number of days required to produce this product.</p>
+            <p class="example">Additional days may be required for large quantities or extra production processes.</p>
         </div>
         <div class="rule-box">
             <h4>Cutoff Time</h4>
-            <p>Last order time for same-day processing.</p>
-            <p class="example">Example: 12 for noon cutoff, 16 for 4pm cutoff</p>
+            <p>The latest order time for same-day processing.</p>
+            <p class="example">If the order is received before the cutoff time, the dispatch date is calculated from today. If it is received after the cutoff time, the dispatch date is calculated from the next production date (the next day this product is scheduled for printing).</p>
+        </div>
+        <div class="rule-box">
+            <h4>Start Days</h4>
+            <p>The weekdays when production for this product begins.</p>
+            <p class="example"></p>
         </div>
     </div>
 </div>

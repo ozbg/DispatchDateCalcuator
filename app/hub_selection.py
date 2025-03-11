@@ -192,40 +192,51 @@ def find_next_best_hub(
     cmyk_hubs: List[dict]
 ) -> str:
     """
-    Find the "next best" hub from the CMYK hubs list for the given state.
-    cmyk_hubs structure might look like:
-        [
-          {
-            "State": "NY",
-            "Next_Best": ["NJHUB","PAHUB"]
-          },
-          {
-            "State": "CA",
-            "Next_Best": ["AZHUB","COHUB"]
-          }
-        ]
-    If none is found, fallback to the first in available_hubs.
+    Find the "next best" hub from the CMYK hubs list for the given state or current hub.
+    If state is not provided, uses current hub's Next_Best list.
     """
     logger.debug(f"Finding next best hub for current hub: {current_hub}, available hubs: {available_hubs}, state: {delivers_to_state}")
-    # Find the hub entry for current state
-    for hub in cmyk_hubs:
-        if hub["State"].lower() == delivers_to_state.lower():
-            logger.debug(f"State match found in CMYK hubs for state: {hub['State']}")
+    
+    # Convert available_hubs to lowercase for comparison
+    available_hubs_lower = [h.lower() for h in available_hubs]
+    current_hub_lower = current_hub.lower()
+    
+    # If state is empty, look up Next_Best from current hub
+    if not delivers_to_state:
+        logger.debug("No state provided, looking up Next_Best from current hub")
+        # Find current hub entry
+        current_hub_entry = next((h for h in cmyk_hubs if h["Hub"].lower() == current_hub_lower), None)
+        if current_hub_entry and current_hub_entry.get("Next_Best"):
+            logger.debug(f"Found Next_Best list for current hub: {current_hub_entry['Next_Best']}")
             # Check each next best option
-            for next_hub in hub["Next_Best"]:
-                if next_hub.lower() in [h.lower() for h in available_hubs]:
-                    logger.debug(f"Found next best hub: {next_hub} for state: {delivers_to_state}")
+            for next_hub in current_hub_entry["Next_Best"]:
+                if next_hub.lower() in available_hubs_lower:
+                    logger.debug(f"Found valid next best hub: {next_hub} from current hub's Next_Best list")
                     return next_hub.lower()
-            logger.debug(f"No next best hubs in the list matched available hubs for state: {delivers_to_state}")
-
-    # Fallback to first available hub if no next best found
-    if available_hubs:
-        logger.debug(f"No valid next best hub found, using first available: {available_hubs[0]}")
-        return available_hubs[0].lower()
     else:
-        # If there are no available hubs at all, just return current
-        logger.debug("No available hubs provided, returning current hub.")
-        return current_hub.lower()
+        # Look up by state
+        state_lower = delivers_to_state.lower()
+        state_hub = next((h for h in cmyk_hubs if h["State"].lower() == state_lower), None)
+        if state_hub and state_hub.get("Next_Best"):
+            logger.debug(f"Found Next_Best list for state {delivers_to_state}: {state_hub['Next_Best']}")
+            # Check each next best option
+            for next_hub in state_hub["Next_Best"]:
+                if next_hub.lower() in available_hubs_lower:
+                    logger.debug(f"Found valid next best hub: {next_hub} for state: {delivers_to_state}")
+                    return next_hub.lower()
+                else:
+                    logger.debug(f"Next best hub {next_hub} not in available hubs: {available_hubs}")
+
+    # If we get here, no valid next best hub was found
+    # Return first available hub that isn't the current hub
+    for hub in available_hubs_lower:
+        if hub != current_hub_lower:
+            logger.debug(f"No next best hub found, using first different available hub: {hub}")
+            return hub
+
+    # If all else fails, return current hub
+    logger.debug(f"No alternative hub found, keeping current hub: {current_hub}")
+    return current_hub_lower
 
 
 # ------------------------------------------------------------------------

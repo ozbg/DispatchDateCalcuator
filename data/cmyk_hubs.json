@@ -3,58 +3,45 @@
     "CMHKhubID": 1,
     "Closed_Dates": [],
     "Hub": "vic",
-    "Timezone": "Australia/Melbourne",
     "Next_Best": [
       "nsw",
       "qld",
       "nqld",
       "wa"
     ],
-    "State": "vic"
+    "State": "vic",
+    "Timezone": "Australia/Melbourne"
   },
   {
     "CMHKhubID": 1,
     "Closed_Dates": [],
     "Hub": "vic",
-    "Timezone": "Australia/Melbourne",
     "Next_Best": [
       "nsw",
       "qld",
       "nqld",
       "wa"
     ],
-    "State": "sa"
+    "State": "sa",
+    "Timezone": "Australia/Melbourne"
   },
   {
     "CMHKhubID": 1,
     "Closed_Dates": [],
     "Hub": "vic",
-    "Timezone": "Australia/Melbourne",
     "Next_Best": [
       "nsw",
       "qld",
       "nqld",
       "wa"
     ],
-    "State": "tas"
+    "State": "tas",
+    "Timezone": "Australia/Melbourne"
   },
   {
     "Hub": "nsw",
-    "Timezone": "Australia/Sydney",
     "State": "nsw",
     "CMHKhubID": 2,
-    "Next_Best": [
-      "vic",
-      "qld",
-      "nqld",
-      "wa"
-    ],
-    "Closed_Dates": []
-  },
-  {
-    "CMHKhubID": 2,
-    "Closed_Dates": [],
-    "Hub": "nsw",
     "Timezone": "Australia/Sydney",
     "Next_Best": [
       "vic",
@@ -62,93 +49,77 @@
       "nqld",
       "wa"
     ],
-    "State": "act"
+    "Closed_Dates": [
+      "2025-03-14",
+      "2025-03-17"
+    ]
+  },
+  {
+    "CMHKhubID": 2,
+    "Closed_Dates": [
+      "2025-03-14",
+      "2025-03-17"
+    ],
+    "Hub": "nsw",
+    "Next_Best": [
+      "vic",
+      "qld",
+      "nqld",
+      "wa"
+    ],
+    "State": "act",
+    "Timezone": "Australia/Sydney"
   },
   {
     "CMHKhubID": 5,
-    "Closed_Dates": [
-      "2024-12-23",
-      "2024-12-24",
-      "2024-12-25",
-      "2024-12-26",
-      "2024-12-27",
-      "2024-12-30",
-      "2024-12-31",
-      "2025-01-01",
-      "2025-01-15",
-      "2025-01-13"
-    ],
+    "Closed_Dates": [],
     "Hub": "qld",
-    "Timezone": "Australia/Brisbane",
     "Next_Best": [
       "nqld",
       "nsw",
       "vic",
       "wa"
     ],
-    "State": "qld"
+    "State": "qld",
+    "Timezone": "Australia/Brisbane"
   },
   {
     "CMHKhubID": 24,
-    "Closed_Dates": [
-      "2025-02-27"
-    ],
+    "Closed_Dates": [],
     "Hub": "nqld",
-    "Timezone": "Australia/Brisbane",
     "Next_Best": [
       "qld",
       "nsw",
       "vic",
       "wa"
     ],
-    "State": "nqld"
+    "State": "nqld",
+    "Timezone": "Australia/Brisbane"
   },
   {
     "CMHKhubID": 3,
-    "Closed_Dates": [
-      "2024-12-23",
-      "2024-12-24",
-      "2024-12-25",
-      "2024-12-26",
-      "2024-12-27",
-      "2024-12-30",
-      "2024-12-31",
-      "2025-01-01",
-      "2025-01-02",
-      "2025-01-03"
-    ],
+    "Closed_Dates": [],
     "Hub": "wa",
-    "Timezone": "Australia/Perth",
     "Next_Best": [
       "vic",
       "nsw",
       "qld",
       "nqld"
     ],
-    "State": "wa"
+    "State": "wa",
+    "Timezone": "Australia/Perth"
   },
   {
     "CMHKhubID": 3,
-    "Closed_Dates": [
-      "2024-12-23",
-      "2024-12-24",
-      "2024-12-25",
-      "2024-12-26",
-      "2024-12-27",
-      "2024-12-30",
-      "2024-12-31",
-      "2025-01-01",
-      "2025-01-02",
-      "2025-01-03"
-    ],
+    "Closed_Dates": [],
     "Hub": "wa",
-    "Timezone": "Australia/Perth",
     "Next_Best": [
       "vic",
       "nsw",
       "qld",
       "nqld"
     ],
-    "State": "nt"
+    "State": "nt",
+    "Timezone": "Australia/Perth"
   }
 ]

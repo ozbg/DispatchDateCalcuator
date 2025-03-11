@@ -48,6 +48,22 @@
                         <td id="orderId"></td>
                     </tr>
                     <tr>
+                        <td>Order Description</td>
+                        <td id="orderDescription"></td>
+                    </tr>
+                    <tr>
+                        <td>Current Hub</td>
+                        <td><span id="currentHub"></span> (ID: <span id="currentHubId"></span>)</td>
+                    </tr>
+                    <tr>
+                        <td>Preflighted Width</td>
+                        <td id="preflightedWidth"></td>
+                    </tr>
+                    <tr>
+                        <td>Preflighted Height</td>
+                        <td id="preflightedHeight"></td>
+                    </tr>
+                    <tr>
                         <td>Product ID</td>
                         <td id="productId"></td>
                     </tr>
@@ -482,10 +498,15 @@ async function runTest() {
 
         // Product Info
         setContent('orderId', result.orderId);
+        setContent('currentHub', result.currentHub);
+        setContent('currentHubId', result.currentHubId);
         setContent('productId', result.productId);
         setContent('productGroup', result.productGroup);
         setContent('productCategory', result.productCategory);
         setContent('productionHubs', result.productionHubs?.join(', '));
+        setContent('orderDescription', result.orderDescription);
+        setContent('preflightedWidth', result.preflightedWidth);
+        setContent('preflightedHeight', result.preflightedHeight);
 
         // Production Details
         setContent('cutoffStatus', result.cutoffStatus);

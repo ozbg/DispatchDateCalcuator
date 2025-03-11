@@ -57,29 +57,84 @@ def match_any(list_of_lists, desc_lower):
     return True
 
 def determine_grain_direction(orientation: str, width: float, height: float, description: str):
-    logger.debug(f"Determining grain direction for orientation: {orientation}, width: {width}, height: {height}, description: {description}")
-    if orientation.lower() == "portrait":
-        grain = "Vertical"
-        grain_id = 3
-        long_edge = height
-        short_edge = width
-    else:
-        grain = "Horizontal"
-        grain_id = 2
-        long_edge = width
-        short_edge = height
+    """
+    Determines the grain direction for a given order based on orientation, dimensions, and BC size conditions.
 
-    # BC thresholds
+    If the product meets BC size conditions:
+      - Trust the given grain setting.
+      - Adjust the long and short edges to match the expected grain.
+
+    If the product does NOT meet BC size conditions:
+      - The grain is set to "Either".
+      - The given orientation is used without correction.
+
+    Parameters:
+    - orientation (str): Expected orientation ("portrait", "landscape", or other).
+    - width (float): Incoming width of the product.
+    - height (float): Incoming height of the product.
+    - description (str): Text description of the product.
+
+    Returns:
+    - grain (str): The final grain direction ("Vertical", "Horizontal", or "Either").
+    - grain_id (int): The grain direction ID (3 = Vertical, 2 = Horizontal, 1 = Either).
+    """
+
+    logger.debug(f"Determining grain direction for orientation: {orientation}, width: {width}, height: {height}, description: {description}")
+
+    # BC size thresholds
     BC_LONG = 100
     BC_SHORT = 65
     desc_lower = description.lower()
 
-    if (long_edge <= BC_LONG and short_edge <= BC_SHORT) or ("bc" in desc_lower):
-        # Keep the previously assigned grain
-        pass
+    # Determine if product meets BC size conditions
+    is_bc_size = (max(width, height) <= BC_LONG and min(width, height) <= BC_SHORT) or ("bc" in desc_lower)
+
+    # Ensure valid orientation
+    valid_orientations = ["portrait", "landscape"]
+    orientation = orientation.lower()  # Normalize casing
+
+    if orientation not in valid_orientations:
+        logger.warning(f"Unexpected orientation '{orientation}'. Inferring from dimensions.")
+        if height > width:
+            orientation = "portrait"
+        elif width > height:
+            orientation = "landscape"
+        else:
+            # Square case, default to portrait
+            orientation = "portrait"
+
+    # Assign long and short edges based on orientation
+    if orientation == "portrait":
+        long_edge = height
+        short_edge = width
+        grain = "Vertical"
+        grain_id = 3
+    elif orientation == "landscape":
+        long_edge = width
+        short_edge = height
+        grain = "Horizontal"
+        grain_id = 2
     else:
+        # Fallback (should not be hit due to earlier correction)
+        long_edge = max(width, height)
+        short_edge = min(width, height)
         grain = "Either"
         grain_id = 1
 
-    logger.debug(f"Grain direction determined: {grain} (ID={grain_id})")
+    # If it's BC size, trust the grain setting
+    if is_bc_size:
+        logger.debug("BC size detected. Trusting grain setting and adjusting size accordingly.")
+        # No changes to grain, but ensure size alignment
+        if grain == "Vertical":
+            long_edge, short_edge = max(width, height), min(width, height)
+        elif grain == "Horizontal":
+            long_edge, short_edge = max(width, height), min(width, height)
+    else:
+        # Not BC size: Default to "Either" grain direction
+        logger.debug("Not BC size. Setting grain direction to Either.")
+        grain = "Either"
+        grain_id = 1
+
+    logger.debug(f"Final grain direction: {grain} (ID={grain_id}), final orientation: {orientation}, long edge: {long_edge}, short edge: {short_edge}")
+
     return grain, grain_id

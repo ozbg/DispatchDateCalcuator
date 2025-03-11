@@ -42,6 +42,23 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # Set default postcode if it's null or empty
     if not req.misDeliversToPostcode:
         req.misDeliversToPostcode = "0000"
+        
+    # Load CMYK hubs data
+    cmyk_hubs = get_cmyk_hubs_data()
+    
+    # Resolve current hub details
+    from app.hub_utils import resolve_hub_details
+    current_hub, current_hub_id = resolve_hub_details(
+        current_hub=req.misCurrentHub,
+        current_hub_id=req.misCurrentHubID,
+        cmyk_hubs=cmyk_hubs
+    )
+    
+    logger.debug(f"Resolved hub details: hub={current_hub}, id={current_hub_id}")
+    
+    # Update request with resolved values
+    req.misCurrentHub = current_hub
+    req.misCurrentHubID = current_hub_id
     
 
     # ----------------------------------------------------------------
@@ -84,7 +101,24 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     assigned_groups = match_production_groups(req.description, production_groups_data)
     logger.debug(f"Assigned production groups: {assigned_groups}")
     
+    # ----------------------------------------------------------------
+    # Step 1e) Append additional tags to order description before product matching
+    #         - If product is BC size, append " BC" to the description.
+    #         - If description contains "premium uncoated", append " Digital" to the description.
+    # ----------------------------------------------------------------
+    # Check for BC size using dimensions similar to determine_grain_direction
+    BC_LONG = 100
+    BC_SHORT = 65
+    if (max(req.preflightedWidth, req.preflightedHeight) <= BC_LONG and 
+        min(req.preflightedWidth, req.preflightedHeight) <= BC_SHORT and 
+        "bc" not in req.description.lower()):
+        req.description += " BC"
+        logger.debug("Appended ' BC' to description based on BC size criteria.")
     
+    # Check for "premium uncoated" in description and add " Digital" if needed
+    if "premium uncoated" in req.description.lower() and "digital" not in req.description.lower():
+        req.description += " Digital"
+        logger.debug("Appended ' Digital' to description based on premium uncoated condition.")
         
 
     # 2) Product matching
@@ -225,11 +259,16 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     return ScheduleResponse(
         # Core Product Info
         orderId=req.orderId,
+        orderDescription=req.description,
+        currentHub=current_hub,
+        currentHubId=current_hub_id,
         productId=found_product_id,
         productGroup=product_obj["Product_Group"],
         productCategory=product_obj["Product_Category"],
         productionHubs=product_obj["Production_Hub"],
         productionGroups=assigned_groups,
+        preflightedWidth=req.preflightedWidth,
+        preflightedHeight=req.preflightedHeight,
         
         # Production Details
         cutoffStatus=cutoff_status,
@@ -417,7 +456,7 @@ def choose_production_hub(
 
     # 4) QLD cards override. Leave NQLD cards in NQLD. QLD cards, send to VIC.
     if product_id in [6,7,8,9] and misCurrentHub != "nqld" and misDeliversToState == "qld":
-        logger.debug("** QLD Card produce in => vic (overriding...)")
+        logger.debug("** QLD cards override. Leave NQLD cards in NQLD. QLD cards, send to VIC)")
         chosen = "vic"
 
     return chosen

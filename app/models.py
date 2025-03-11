@@ -1,6 +1,6 @@
 #models.py contains the Pydantic models that are used to define the structure of the JSON data that is sent to and received from the API.
 #These models are used to validate the data and ensure that it conforms to the expected structure.
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Union
 from datetime import date
 
@@ -45,19 +45,39 @@ class FinishingRules(BaseModel):
 
 class ScheduleRequest(BaseModel):
     orderId: Optional[str] = None
-    misDeliversToPostcode: str
-    misOrderQTY: int
-    orientation: str
-    description: str
-    printType: int
-    kinds: int
-    preflightedWidth: float
-    preflightedHeight: float
-    misCurrentHub: str
-    misCurrentHubID: int
-    misDeliversToState: str
-    orderNotes: Optional[str] = None
-    additionalProductionDays: Optional[int] = 0
+    misDeliversToPostcode: str = Field(..., description="Delivery postcode", min_length=4, max_length=4)
+    misOrderQTY: int = Field(..., description="Order quantity", gt=0)
+    orientation: str = Field(..., description="Product orientation")
+    description: str = Field(..., description="Product description", min_length=1)
+    printType: int = Field(..., description="Print type")
+    kinds: int = Field(..., description="Number of kinds", gt=0)
+    preflightedWidth: float = Field(..., description="Product width", gt=0)
+    preflightedHeight: float = Field(..., description="Product height", gt=0)
+    misCurrentHub: str = Field(..., description="Current hub")
+    misCurrentHubID: int = Field(..., description="Current hub ID")
+    misDeliversToState: str = Field(..., description="Delivery state")
+    orderNotes: Optional[str] = Field(None, description="Order notes")
+    additionalProductionDays: Optional[int] = Field(0, description="Additional production days", ge=0)
+    
+    @validator('misDeliversToState')
+    def validate_state(cls, v):
+        valid_states = ['vic', 'nsw', 'qld', 'wa', 'sa', 'tas', 'act', 'nt', 'nqld']
+        if v.lower() not in valid_states:
+            raise ValueError(f'Invalid state {v}. Must be one of: {", ".join(valid_states)}')
+        return v.lower()
+        
+    @validator('orientation')
+    def validate_orientation(cls, v):
+        valid_orientations = ['portrait', 'landscape']
+        if v.lower() not in valid_orientations:
+            raise ValueError(f'Invalid orientation {v}. Must be one of: {", ".join(valid_orientations)}')
+        return v.lower()
+        
+    @validator('misDeliversToPostcode')
+    def validate_postcode(cls, v):
+        if not v.isdigit():
+            raise ValueError('Postcode must contain only digits')
+        return v
 
 class RuleConditions(BaseModel):
     quantityLessThan: Optional[int] = None
@@ -146,11 +166,16 @@ class HubSelectionRule(BaseModel):
 class ScheduleResponse(BaseModel):
     # Core Product Info
     orderId: Optional[str] = None
+    orderDescription: Optional[str] = None
+    currentHub: str
+    currentHubId: int
     productId: int
     productGroup: str
     productCategory: str
     productionHubs: List[str]
     productionGroups: Optional[List[str]] = None
+    preflightedWidth: Optional[float] = None
+    preflightedHeight: Optional[float] = None
         
     # Production Details
     cutoffStatus: str

@@ -1,32 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Hub Selection Rules Management</h2>
+<h2>Hub Selection Rules</h2>
 <p><a href="/" class="btn">Back to Admin</a></p>
-
 <div class="help-section">
   <h3>Understanding Hub Selection Rules</h3>
   <div class="rule-explanation">
     <div class="rule-box">
       <h4>Rule Application</h4>
-      <p>Rules only remove hubs from the available list when constraints are not met</p>
-      <p class="example">Example: If a hub exceeds size limits, it's removed as an option</p>
+      <p>If an order meets a rule's criteria, the corresponding hub is removed from the list of potential production hubs.</p>
+      <p class="example">Example: If an order exceeds size limits, the hub is removed as an option.<br><br> The system will then select the closest available hub for production.</p>
     </div>
-    <div class="rule-box">
-      <h4>Hub Selection</h4>
-      <p>After applying rules, system tries to:</p>
-      <ol>
-        <li>Use current hub if still valid</li>
-        <li>Fall back to remaining valid hubs</li>
-      </ol>
-    </div>
+    
     <div class="rule-box">
       <h4>Constraints</h4>
       <ul>
         <li>Size and quantity limits</li>
-        <li>Equipment availability</li>
-        <li>Temporary restrictions</li>
-        <li>Product requirements</li>
+        <li>Required Keywords</li>
+        <li>Excluded Keywords</li>
+        <li>Product ID requirements</li>
       </ul>
+    </div>
+    
+    <div class="rule-box">
+      <h4>Time Restrictions</h4>
+      <p>Define the start and end dates for when this rule applies.</p>
+      <p class="example"></p>
     </div>
   </div>
 </div>
@@ -307,9 +305,8 @@
   border: 1px solid #e9ecef;
 }
 .rule-box h4 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  color: #2c3e50;
+    color: #007bff;
+    margin-top: 0;
 }
 .example {
   font-style: italic;

@@ -1,25 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Production Schedule Overrides</h2>
+<h2>Schedule Overrides</h2>
 <p><a href="/" class="btn">Back to Admin</a></p>
 
 <div class="help-section">
     <h3>Understanding Schedule Overrides</h3>
     <div class="rule-explanation">
         <div class="rule-box">
+            <h4>Default Behavior</h4>
+            <p>If a hub is closed, the default behavior is to move the run to the next available open date.</p>
+            <p class="example">Example: A product prints only on Wednesdays and Fridays. If it was scheduled to print on Friday but the hub is closed, the product will be rescheduled to start printing on Monday.</p>
+        </div>
+        <div class="rule-box">
+            <h4>Products to Override</h4>
+            <p>Select one or more products to modify their standard schedule.</p>
+            <p class="example">Ensure all selected products follow the same schedule. If not, set up multiple overrides separately.</p>
+        </div>
+        <div class="rule-box">
             <h4>Print Dates</h4>
             <p>Specify when production starts and ends for special cases.</p>
-            <p class="example">Example: Moving Christmas period work earlier</p>
+            <p class="example">Select the original run date being moved, then set the new print date and dispatch date.<br><br> Additional production days may be required for large quantities or extra finishing tasks.</p>
         </div>
         <div class="rule-box">
-            <h4>State Selection</h4>
-            <p>Choose which states this override applies to.</p>
-            <p class="example">Example: NSW, VIC closed on different dates</p>
-        </div>
-        <div class="rule-box">
-            <h4>Product Types</h4>
-            <p>Select which product categories are affected.</p>
-            <p class="example">Example: Only Offset products moved forward</p>
+            <h4>Apply To</h4>
+            <p>Choose which states and product categories are affected by the override.</p>
+            <p class="example">Example: Only Offset product runs are affected by the override.</p>
         </div>
     </div>
 </div>
