@@ -33,35 +33,9 @@ logger = logging.getLogger()  # Use the root logger so all logs propagate
 # 2) Initialize FastAPI
 app = FastAPI(title="Scheduler API", version="1.0.0")
 
-# Add request logging middleware
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    """Log all incoming requests and their payload"""
-    # Generate request ID for tracking
-    request_id = str(uuid.uuid4())
-    
-    # Log request details
-    logger.info(f"Request {request_id}: {request.method} {request.url}")
-    
-    # Try to log the request body if it exists
-    try:
-        body = await request.body()
-        if body:
-            logger.debug(f"Request {request_id} body: {body.decode()}")
-    except Exception as e:
-        logger.warning(f"Could not log request {request_id} body: {str(e)}")
-    
-    # Add request ID to request state for logging in route handlers
-    request.state.request_id = request_id
-    
-    # Process the request and capture the response
-    try:
-        response = await call_next(request)
-        logger.info(f"Request {request_id} completed with status {response.status_code}")
-        return response
-    except Exception as e:
-        logger.error(f"Request {request_id} failed: {str(e)}")
-        raise
+# Basic logging setup
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger()  # Use the root logger so all logs propagate
 
 # 3) Create thread-safe containers for debug logs
 debug_messages = deque(maxlen=1000)
@@ -525,67 +499,16 @@ async def delete_rule(rule_id: str):
 
 @app.post("/schedule", response_model=ScheduleResponse)
 def schedule_order(request_data: ScheduleRequest, request: Request):
-    """Process a scheduling request with thorough validation"""
-    request_id = getattr(request.state, 'request_id', 'NO_ID')
-    
-    # Log the incoming request
-    logger.info(f"Processing schedule request {request_id}")
-    logger.debug(f"Schedule request {request_id} payload: {request_data.dict()}")
-    
-    # Validate required fields with detailed logging
-    validation_errors = []
-    
-    # Check postcode format
-    if not request_data.misDeliversToPostcode or not request_data.misDeliversToPostcode.strip():
-        msg = "Missing or empty delivery postcode"
-        validation_errors.append(msg)
-        logger.error(f"Request {request_id}: {msg}")
-    elif not request_data.misDeliversToPostcode.isdigit():
-        msg = f"Invalid postcode format: {request_data.misDeliversToPostcode}"
-        validation_errors.append(msg)
-        logger.error(f"Request {request_id}: {msg}")
-        
-    # Validate dimensions
-    if request_data.preflightedWidth <= 0 or request_data.preflightedHeight <= 0:
-        msg = f"Invalid dimensions: {request_data.preflightedWidth}x{request_data.preflightedHeight}"
-        validation_errors.append(msg)
-        logger.error(f"Request {request_id}: {msg}")
-        
-    # Validate quantity
-    if request_data.misOrderQTY <= 0:
-        msg = f"Invalid order quantity: {request_data.misOrderQTY}"
-        validation_errors.append(msg)
-        logger.error(f"Request {request_id}: {msg}")
-        
-    # Validate kinds
-    if request_data.kinds <= 0:
-        msg = f"Invalid kinds value: {request_data.kinds}"
-        validation_errors.append(msg)
-        logger.error(f"Request {request_id}: {msg}")
-        
-    # Validate state
-    valid_states = ['vic', 'nsw', 'qld', 'wa', 'sa', 'tas', 'act', 'nt', 'nqld']
-    if not request_data.misDeliversToState or request_data.misDeliversToState.lower() not in valid_states:
-        msg = f"Invalid delivery state: {request_data.misDeliversToState}"
-        validation_errors.append(msg)
-        logger.error(f"Request {request_id}: {msg}")
-        
-    # Check for description
-    if not request_data.description or not request_data.description.strip():
-        msg = "Missing or empty product description"
-        validation_errors.append(msg)
-        logger.error(f"Request {request_id}: {msg}")
-        
-    # If any validation errors, raise HTTPException
-    if validation_errors:
-        error_msg = "; ".join(validation_errors)
-        logger.error(f"Request {request_id} failed validation: {error_msg}")
-        raise HTTPException(status_code=400, detail=error_msg)
-        
+    """Process a scheduling request"""
     try:
-        # Process the validated request
-        logger.debug(f"Request {request_id}: Starting order processing")
-    result = process_order(request_data)
+        result = process_order(request_data)
+        if not result:
+            logger.error("Unable to schedule order.")
+            raise HTTPException(status_code=400, detail="Unable to schedule order.")
+        return result
+    except Exception as e:
+        logger.error(f"Error processing order: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
     if not result:
         logger.error("Unable to schedule order.")
         raise HTTPException(status_code=400, detail="Unable to schedule order.")
