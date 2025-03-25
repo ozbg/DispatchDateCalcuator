@@ -47,7 +47,8 @@ TODO
 hub transfers fixed - create test functions and test more thoroughly 
 Make sure all of the finishing rules are in , first look it seems some are missing
 re think and test cutoff times, continue to use current hub or use production hub 
-
+Sort out the "enabel hub tranfers switch , right now it seems to be always on.
+Likewise enable auto impose. 
 
 Make sure this functinoality is up front 
 
@@ -73,8 +74,10 @@ Start Date vs Adjusted Start Date
 Here's a detailed explanation from the code:
 
 
+///////////////////////////////////////////////////////
 
-Confirmed in place; 
+Confirmed Working 
+
 if the delivers to is SA or Tas set deliversTo to VIC, to treat as vic.
 if the delivers to is ACT set deliversTo to NSW, to treat as nsw.
 if the current hub is NQLD,and the delivers to is QLD,  set deliversTo to NQLD, treat as nqld.
@@ -92,7 +95,6 @@ BC Grain Direction
   - Default grain = "Horizontal" (grain_id = 2) 
   - Long edge = width
   - Short edge = height
-
 - If EITHER:
   - The dimensions are business card size (long_edge ≤ 100 AND short_edge ≤ 65)
   - OR description contains "bc" 
@@ -101,19 +103,36 @@ BC Grain Direction
 - ELSE:
   - Set grain = "Either" (grain_id = 1)
 
+SPECIAL OVERRIDE FOR QLD CARDS 
+SEND DEL 2 QLD DIGITAL CARDS TO VIC, UNLESS THE CURRENT HUB IS NQLD , LEAVE NQLD IN NQLD
+If productId is 6,7,8 or 9 && current hub is NOT NQLD, and current hub is QLD, Send to VIC. 
 
 
 
 
-make sure this is dealt with 
+
+///////////////////////////////////////////////////////
 
 
-///// SPECIAL OVERRIDE FOR QLD CARDS , SEND DEL 2 QLD DIGITAL CARDS TO VIC, UNLESS THE CURRENT HUB IS NQLD , LEAVE NQLD IN NQLD
 
 
-    if ( ((productId == 6)||(productId == 7)||(productId == 8)||(productId == 9)) && (misCurrentHub != "nqld") && (misDeliversToState == "qld")) {
-        actualProductionHub = "vic"
-        
-        myLog = myLog + (" ** QLD Card produce in: "+actualProductionHub + "** ")
-      
-    }
+curl -X GET -H "X-API-KEY: 0cddf104f06e58149e1858612bc6cb34" http://127.0.0.1:8000/debug-logs
+
+
+curl -X POST \
+     -H "Content-Type: application/json" \
+     -H "X-API-KEY: 0cddf104f06e58149e1858612bc6cb34" \
+     -d '{
+           "misDeliversToPostcode": "3000",
+           "misOrderQTY": 1000,
+           "orientation": "portrait",
+           "description": "Sample Order",
+           "printType": 1,
+           "kinds": 1,
+           "preflightedWidth": 90.0,
+           "preflightedHeight": 55.0,
+           "misCurrentHub": "vic",
+           "misCurrentHubID": 1,
+           "misDeliversToState": "vic"
+         }' \
+     http://127.0.0.1:8000/schedule

@@ -1,29 +1,15 @@
 {
   "rules": [
     {
-      "id": "rule_1741604641168",
-      "description": "XO",
-      "hubId": "qld",
-      "priority": 0,
-      "enabled": true,
-      "startDate": "2025-03-12",
-      "endDate": "2025-03-20",
-      "sizeConstraints": {
-        "maxWidth": 300,
-        "maxHeight": 300
-      },
-      "orderCriteria": {
-        "maxQuantity": 30
-      }
-    },
-    {
-      "id": "rule_1741674204012",
-      "description": "1000 too many man",
-      "hubId": "vic",
-      "priority": 0,
+      "id": "rule_1742852102108",
+      "description": "QLD North Digital Only",
+      "hubId": "nqld",
+      "priority": 1,
       "enabled": true,
       "orderCriteria": {
-        "maxQuantity": 990
+        "keywords": [
+          "Offset"
+        ]
       }
     }
   ]

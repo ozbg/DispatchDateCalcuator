@@ -14,6 +14,11 @@ import json
 from pathlib import Path
 from typing import List
 import pytz
+
+# >>> NEW IMPORTS FOR AUTH <<<
+from fastapi import Depends
+from app.auth import get_current_user
+
 from app.data_manager import get_production_groups_data, save_production_groups_data
 
 from app.data_manager import (
@@ -30,8 +35,12 @@ from app.schedule_logic import process_order
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()  # Use the root logger so all logs propagate
 
-# 2) Initialize FastAPI
-app = FastAPI(title="Scheduler API", version="1.0.0")
+# 2) Initialize FastAPI with a global dependency for security
+app = FastAPI(
+    title="Scheduler API",
+    version="1.0.0",
+    dependencies=[Depends(get_current_user)]  # <--- GLOBAL SECURITY
+)
 
 # Basic logging setup
 logging.basicConfig(level=logging.DEBUG)
@@ -55,15 +64,11 @@ class DebugHandler(logging.Handler):
 # 5) Attach the DebugHandler to the root logger
 logger.addHandler(DebugHandler())
 
-
-
 @app.get("/debug-logs")
 async def get_debug_logs():
     """Return the latest debug messages"""
     with debug_lock:
         return list(debug_messages)
-
-
 
 # Mount static folder for CSS, images, etc.
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -440,40 +445,6 @@ async def finishing_rules(request: Request):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/finishing-rules/save")
-async def save_rule(request: Request):
-    try:
-        data = await request.json()
-        rules_path = Path("data/finishing_rules.json")
-        with open(rules_path, "r") as f:
-            rules = json.load(f)
-
-        rule_type = data["type"]
-        new_rule = data["rule"]
-
-        if rule_type == "keyword":
-            # Update or add keyword rule
-            existing_rule = next((r for r in rules["keywordRules"] if r["id"] == new_rule["id"]), None)
-            if existing_rule:
-                rules["keywordRules"].remove(existing_rule)
-            rules["keywordRules"].append(new_rule)
-        else:
-            # Update or add center rule
-            existing_rule = next((r for r in rules["centerRules"] if r["id"] == new_rule["id"]), None)
-            if existing_rule:
-                rules["centerRules"].remove(existing_rule)
-            rules["centerRules"].append(new_rule)
-
-        with open(rules_path, "w", encoding='utf-8') as f:
-            json.dump(rules, f, indent=2, ensure_ascii=False)
-
-        return JSONResponse({"success": True, "message": "Rule saved successfully"})
-    except Exception as e:
-        return JSONResponse(
-            {"success": False, "message": f"Error saving rule: {str(e)}"},
-            status_code=500
-        )
 
 @app.post("/finishing-rules/delete/{rule_id}")
 async def delete_rule(rule_id: str):
