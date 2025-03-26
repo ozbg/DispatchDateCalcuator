@@ -225,6 +225,12 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     )
     
     logger.debug(f"Initial hub selection: {initial_hub}, Final hub after rules: {chosen_hub}")
+    
+    # Enable or disable hub transfer
+    enable_auto_hub_transfer = 1 if chosen_hub.lower() != current_hub.lower() else 0
+    logger.debug(f"Setting enableAutoHubTransfer={enable_auto_hub_transfer} (chosen_hub={chosen_hub}, current_hub={current_hub})")
+
+    
 
     # Find the actual cmykHubID for that chosen hub
     chosen_hub_id = find_cmyk_hub_id(chosen_hub, cmyk_hubs)
@@ -297,7 +303,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         # Configuration
         synergyPreflight=product_obj.get("SynergyPreflight"),
         synergyImpose=product_obj.get("SynergyImpose"),
-        enableAutoHubTransfer=product_obj.get("EnableAutoHubTransfer")
+        enableAutoHubTransfer=enable_auto_hub_transfer
     )
 
 # --------------------------------------------------------------------
