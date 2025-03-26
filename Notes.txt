@@ -136,3 +136,26 @@ curl -X POST \
            "misDeliversToState": "vic"
          }' \
      http://127.0.0.1:8000/schedule
+
+
+
+     curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-API-KEY: 0cddf104f06e58149e1858612bc6cb34" \
+  -d '{
+        "orderId": "12345",
+        "misDeliversToPostcode": "3000",
+        "misOrderQTY": 100,
+        "orientation": "portrait",
+        "description": "Premium uncoated postcard",
+        "printType": 1,
+        "kinds": 2,
+        "preflightedWidth": 210.0,
+        "preflightedHeight": 297.0,
+        "misCurrentHub": "vic",
+        "misCurrentHubID": 1,
+        "misDeliversToState": "vic",
+        "orderNotes": "Urgent order, please process quickly.",
+        "additionalProductionDays": 1
+      }' \
+  https://opslogic.onrender.com/schedule

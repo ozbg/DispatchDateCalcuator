@@ -43,6 +43,13 @@ class FinishingRules(BaseModel):
     keywordRules: List[FinishingRule]
     centerRules: List[CenterRule]
 
+class OrderNote(BaseModel):
+    noteText: str
+    dateCreated: str
+    userID: int
+    userName: str
+    type: str
+
 class ScheduleRequest(BaseModel):
     orderId: Optional[str] = None
     misDeliversToPostcode: str
@@ -56,7 +63,7 @@ class ScheduleRequest(BaseModel):
     misCurrentHub: str
     misCurrentHubID: Optional[int] = None
     misDeliversToState: str
-    orderNotes: Optional[str] = None
+    orderNotes: Optional[List[OrderNote]] = None
     additionalProductionDays: Optional[int] = 0
 
 class OrderMatchingCriteria(BaseModel):
