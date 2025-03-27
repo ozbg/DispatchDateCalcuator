@@ -120,13 +120,10 @@
       "Eco",
       "Knight",
       "Natural",
-      "Magnet",
-      "Diecutting",
-      "Forme",
-      "Presentation",
       "Digital",
-      "Premium Uncoated",
-      "#wa"
+      "PremiumUncoated",
+      "#wa",
+      "Presentation"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -139,27 +136,25 @@
         "BC"
       ],
       [
-        "Coated 1 Side",
+        "Coated1Side",
         "Artboard"
       ]
     ],
     "Product_ID": 6
   },
   {
+    "Product_ID": 6,
+    "Match_All": [],
     "Exclude_All": [
       "Laminat",
       "Eco",
       "Knight",
       "Natural",
-      "Magnet",
-      "Diecutting",
-      "Forme",
-      "Presentation",
       "Digital",
-      "Premium Uncoated",
-      "#wa"
+      "PremiumUncoated",
+      "#wa",
+      "Presentation"
     ],
-    "Match_All": [],
     "Match_Any": [
       [
         "350gsm",
@@ -169,23 +164,25 @@
         "Branding",
         "BC"
       ]
-    ],
-    "Product_ID": 6
+    ]
   },
   {
     "Exclude_All": [
-      "Presentation",
       "Digital",
-      "Premium Uncoated",
+      "PremiumUncoated",
       "#wa"
     ],
     "Match_All": [
-      "BC",
       "EcoStar",
       "Silk",
       "350gsm"
     ],
-    "Match_Any": [],
+    "Match_Any": [
+      [
+        "BC",
+        "Branding"
+      ]
+    ],
     "Product_ID": 6
   },
   {
@@ -193,19 +190,17 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated 1 Side Board",
-      "Magnet",
+      "Coated1SideBoard",
       "Digital",
-      "Presentation",
       "#wa"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "Matt Laminate 1S",
-        "Matt Laminating 1S",
-        "Laminating - Matt 1 Side",
-        "Matt Laminate 1 Side"
+        "MattLaminate1S",
+        "MattLaminating1S",
+        "Laminating-Matt1Side",
+        "MattLaminate1Side"
       ],
       [
         "350gsm",
@@ -223,18 +218,16 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated 1 Side Board",
-      "Magnet",
-      "Presentation",
+      "Coated1SideBoard",
       "Digital",
       "#wa"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "Matt Laminate 2S",
-        "Matt Laminating 2S",
-        "2 sides Laminating - Matt 2 Side"
+        "MattLaminate2S",
+        "MattLaminating2S",
+        "2sidesLaminating-Matt2Side"
       ],
       [
         "350gsm",
@@ -252,18 +245,15 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated 1 Side Board",
-      "Magnet",
-      "Digital",
-      "Presentation",
+      "Coated1SideBoard",
       "Digital",
       "#wa"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "Gloss Laminate 1S",
-        "Gloss Laminating 1S"
+        "GlossLaminate1S",
+        "GlossLaminating1S"
       ],
       [
         "350gsm",
@@ -333,21 +323,6 @@
   },
   {
     "Exclude_All": [
-      "Pad",
-      "Forme",
-      "UV",
-      "Variable",
-      "Bind",
-      "Mount",
-      "Scodix",
-      "UV",
-      "Metal",
-      "Cover",
-      "Body",
-      "Perfect",
-      "Saddle",
-      "Bind",
-      "Presentation",
       "#wa"
     ],
     "Match_All": [
@@ -359,19 +334,6 @@
   },
   {
     "Exclude_All": [
-      "UV",
-      "Variable",
-      "Bind",
-      "Mount",
-      "Scodix",
-      "UV",
-      "Metal",
-      "Cover",
-      "Body",
-      "Perfect",
-      "Saddle",
-      "Bind",
-      "Presentation",
       "#wa"
     ],
     "Match_All": [
@@ -379,31 +341,18 @@
     ],
     "Match_Any": [
       [
-        "Knight 2 Sided Linen",
-        "Premium 2 Sided Linen"
+        "Knight2SidedLinen",
+        "Premium2SidedLinen"
       ]
     ],
     "Product_ID": 13
   },
   {
     "Exclude_All": [
-      "UV",
-      "Variable",
-      "Bind",
-      "Mount",
-      "Scodix",
-      "UV",
-      "Metal",
-      "Cover",
-      "Body",
-      "Perfect",
-      "Saddle",
-      "Bind",
-      "Presentation",
       "#wa"
     ],
     "Match_All": [
-      "Natural Board",
+      "NaturalBoard",
       "Digital"
     ],
     "Match_Any": [],
@@ -519,12 +468,11 @@
     "Product_ID": 20
   },
   {
-    "Product_ID": 21,
-    "Match_All": [],
     "Exclude_All": [
       "Digital",
       "#wa"
     ],
+    "Match_All": [],
     "Match_Any": [
       [
         "150gsm",
@@ -534,7 +482,8 @@
         "Silk",
         "Matt"
       ]
-    ]
+    ],
+    "Product_ID": 21
   },
   {
     "Exclude_All": [
@@ -993,14 +942,16 @@
   },
   {
     "Exclude_All": [],
-    "Match_All": [
-      "BC"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Knight",
         "Digital",
         "Board"
+      ],
+      [
+        "BC",
+        "Branding"
       ]
     ],
     "Product_ID": 41

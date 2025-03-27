@@ -25,7 +25,10 @@
     "additionalProductionDays": 0
 }</textarea>
             </div>
-            <button onclick="runTest()" class="test-btn">Run API Test</button>
+            <div class="button-group">
+                <button onclick="runTest()" class="test-btn">Run API Test</button>
+                <button onclick="clearPayload()" class="clear-btn">Clear</button>
+            </div>
             
             <div class="result-section">
                 <h3>Raw JSON Response</h3>
@@ -46,6 +49,10 @@
                     <tr>
                         <td>Order ID</td>
                         <td id="orderId"></td>
+                    </tr>
+                    <tr>
+                        <td>Order QTY</td>
+                        <td id="orderQty"></td>
                     </tr>
                     <tr>
                         <td>Order Description</td>
@@ -400,6 +407,33 @@ pre {
     background: #218838;
 }
 
+.clear-btn {
+    display: block;
+    margin: 20px 0;
+    padding: 17px 35px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 1.4em;
+}
+
+.clear-btn:hover {
+    background: #c82333;
+}
+
+.button-group {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.hub-value {
+    font-weight: bold;
+    color: #000;
+}
+
 h3 {
     font-size: 1.75em;
     margin-bottom: 15px;
@@ -489,19 +523,32 @@ async function runTest() {
         document.getElementById('formattedResponse').style.display = 'block';
         
         // Helper function to safely set content
-        const setContent = (id, value) => {
+        const setContent = (id, value, isHubValue = false) => {
             const element = document.getElementById(id);
             if (element) {
-                element.textContent = value ?? 'N/A';
+                if (isHubValue) {
+                    element.innerHTML = `<span class="hub-value">${value ?? 'N/A'}</span>`;
+                } else {
+                    element.textContent = value ?? 'N/A';
+                }
             }
         };
 
+        // Helper to clear payload
+// Clear function available globally
+function clearPayload() {
+    document.getElementById('requestPayload').value = '';
+    document.getElementById('responseOutput').textContent = '';
+    document.getElementById('formattedResponse').style.display = 'none';
+}
+
         // Product Info
+        setContent('orderQty', payload.misOrderQTY);
         setContent('orderId', result.orderId);
         setContent('currentHub', result.currentHub);
-        setContent('currentHubId', result.currentHubId);
-        setContent('productId', result.productId);
-        setContent('productGroup', result.productGroup);
+        setContent('currentHub', result.currentHub, true);
+        setContent('productionHubs', result.productionHubs?.join(', '), true);
+        setContent('productGroup', result.productGroup, true);
         setContent('productCategory', result.productCategory);
         setContent('productionHubs', result.productionHubs?.join(', '));
         setContent('orderDescription', result.orderDescription);
@@ -514,18 +561,18 @@ async function runTest() {
         setContent('productCutoff', result.productCutoff);
         setContent('daysToProduceBase', result.daysToProduceBase);
         setContent('finishingDays', result.finishingDays);
-        setContent('totalProductionDays', result.totalProductionDays);
+        setContent('totalProductionDays', result.totalProductionDays, true);
         setContent('productionGroups', result.productionGroups?.join(', '));
 
         // Location Info
         setContent('orderPostcode', result.orderPostcode);
-        setContent('chosenProductionHub', result.chosenProductionHub);
+        setContent('chosenProductionHub', result.chosenProductionHub, true);
         setContent('hubTransferTo', result.hubTransferTo);
 
         // Dates
         setContent('startDate', result.startDate);
         setContent('adjustedStartDate', result.adjustedStartDate);
-        setContent('dispatchDate', result.dispatchDate);
+        setContent('dispatchDate', result.dispatchDate, true);
 
         // Processing Info
         setContent('grainDirection', result.grainDirection);

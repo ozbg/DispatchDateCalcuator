@@ -102,10 +102,9 @@
     "Product_ID": 6,
     "Production_Hub": [
       "vic",
-      "wa",
       "nqld"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -117,7 +116,7 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "2",
+    "Days_to_produce": 2,
     "Modified_run_date": []
   },
   "7": {
@@ -126,10 +125,9 @@
     "Product_ID": 7,
     "Production_Hub": [
       "vic",
-      "wa",
       "nqld"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -138,7 +136,7 @@
       "Tuesday",
       "Thursday"
     ],
-    "Days_to_produce": "1",
+    "Days_to_produce": 1,
     "Modified_run_date": []
   },
   "8": {
@@ -147,10 +145,9 @@
     "Product_ID": 8,
     "Production_Hub": [
       "vic",
-      "wa",
       "nqld"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -162,7 +159,7 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "2",
+    "Days_to_produce": 2,
     "Modified_run_date": []
   },
   "9": {
@@ -171,10 +168,9 @@
     "Product_ID": 9,
     "Production_Hub": [
       "vic",
-      "wa",
       "nqld"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -183,7 +179,7 @@
       "Tuesday",
       "Thursday"
     ],
-    "Days_to_produce": "1",
+    "Days_to_produce": 1,
     "Modified_run_date": []
   },
   "10": {
