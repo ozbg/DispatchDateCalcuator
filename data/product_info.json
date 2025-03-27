@@ -1324,5 +1324,31 @@
     ],
     "Days_to_produce": "7",
     "Modified_run_date": []
+  },
+  "99": {
+    "Product_Category": "Default Fallback Product",
+    "Product_Group": "Unknown",
+    "Product_ID": 99,
+    "Production_Hub": [
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
+    ],
+    "Cutoff": 12,
+    "SynergyPreflight": 0,
+    "SynergyImpose": 0,
+    "EnableAutoHubTransfer": 1,
+    "OffsetOnly": "",
+    "Start_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "Days_to_produce": 3,
+    "Modified_run_date": []
   }
 }

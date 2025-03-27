@@ -125,18 +125,18 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     product_keywords = get_product_keywords_data()
     found_product_id = match_product_id(req.description, product_keywords)
     if found_product_id is None:
-        logger.debug("No matching product found => using fallback product_id=0")
-        found_product_id = 0
+        logger.debug("No matching product found => using fallback product_id=99")
+        found_product_id = 99
 
     product_info = get_product_info_data()
     product_obj = product_info.get(str(found_product_id), None)
     if not product_obj:
-        logger.debug("product_id=%s not found in product_info => fallback schedule", found_product_id)
+        logger.debug("product_id=%s not found in product_info => fallback schedule, using product 99", found_product_id)
         # fallback product with all required fields
         product_obj = {
             "Product_Group": "No Group Found",
             "Product_Category": "Unmatched Product",
-            "Product_ID": 0,
+            "Product_ID": 99,
             "Cutoff": "12",
             "Days_to_produce": "2",
             "Production_Hub": ["vic"],
@@ -145,7 +145,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
             "SynergyImpose": 0,
             "EnableAutoHubTransfer": 1,
             "Modified_run_date": [],
-            "Production_Hub": ["vic"]  # Ensure Production_Hub is always present
+            "Production_Hub": ["vic"]
         }
 
     # 3) Determine grain direction
