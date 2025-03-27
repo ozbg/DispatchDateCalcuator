@@ -36,10 +36,33 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()  # Use the root logger so all logs propagate
 
 # 2) Initialize FastAPI with a global dependency for security
+# Define metadata for API tags (used in docs)
+tags_metadata = [
+    {
+        "name": "Scheduling",
+        "description": "Core endpoint for calculating order schedules.",
+    },
+    {
+        "name": "Configuration",
+        "description": "Endpoints for viewing and managing configuration data (Products, Hubs, Rules). Requires authentication.",
+    },
+    {
+        "name": "UI",
+        "description": "Endpoints serving HTML pages for the web interface. Authentication required.",
+        # Removed externalDocs as '#' is not a valid URL and there's no specific external doc link.
+    },
+    {
+        "name": "Internal",
+        "description": "Internal utility endpoints.",
+    },
+]
+
 app = FastAPI(
-    title="Scheduler API",
-    version="1.0.0",
-    dependencies=[Depends(get_current_user)]  # <--- GLOBAL SECURITY
+    title="CMYKhub Dispatch Calculator API",
+    version="1.0.1",
+    description="API for calculating production schedules based on product type, finishing, hub rules, and cutoffs.",
+    dependencies=[Depends(get_current_user)],  # <--- GLOBAL SECURITY
+    openapi_tags=tags_metadata
 )
 
 # Basic logging setup
