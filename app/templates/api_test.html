@@ -504,6 +504,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function clearPayload() {
+    document.getElementById('requestPayload').value = '';
+    document.getElementById('responseOutput').textContent = '';
+    document.getElementById('formattedResponse').style.display = 'none';
+    document.getElementById('debugOutput').innerHTML = '<p class="placeholder-text">Debug messages will appear here after running the API test...</p>';
+}
+
 async function runTest() {
     try {
         const payload = JSON.parse(document.getElementById('requestPayload').value);
@@ -534,12 +541,11 @@ async function runTest() {
             }
         };
 
-        // Helper to clear payload
-// Clear function available globally
 function clearPayload() {
     document.getElementById('requestPayload').value = '';
     document.getElementById('responseOutput').textContent = '';
     document.getElementById('formattedResponse').style.display = 'none';
+    document.getElementById('debugOutput').innerHTML = '<p class="placeholder-text">Debug messages will appear here after running the API test...</p>';
 }
 
         // Product Info
@@ -560,9 +566,9 @@ function clearPayload() {
         setContent('productStartDays', result.productStartDays?.join(', '));
         setContent('productCutoff', result.productCutoff);
         setContent('daysToProduceBase', result.daysToProduceBase);
-        setContent('finishingDays', result.finishingDays);
+        setContent('chosenProductionHub', result.chosenProductionHub, true);
         setContent('totalProductionDays', result.totalProductionDays, true);
-        setContent('productionGroups', result.productionGroups?.join(', '));
+        setContent('dispatchDate', result.dispatchDate, true);
 
         // Location Info
         setContent('orderPostcode', result.orderPostcode);
