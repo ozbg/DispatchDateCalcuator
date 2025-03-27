@@ -67,7 +67,9 @@ def load_hub_rules() -> List[HubSelectionRule]:
                 order_c = OrderMatchingCriteria(
                     maxQuantity=r["orderCriteria"].get("maxQuantity"),
                     productIds=r["orderCriteria"].get("productIds"),
-                    keywords=r["orderCriteria"].get("keywords")
+                    keywords=r["orderCriteria"].get("keywords"),
+                    printTypes=r["orderCriteria"].get("printTypes")
+
                 )
                 logger.debug(f"Rule {r.get('id')} - orderCriteria set to: {r['orderCriteria']}")
 
@@ -254,7 +256,8 @@ def validate_hub_rules(
     quantity: int,
     product_id: int,
     product_group: str,
-    cmyk_hubs: List[dict]
+    print_type: int,
+    cmyk_hubs: List[dict],
 ) -> str:
     """
     Validates hub rules (one hub at a time) and returns the appropriate hub.
@@ -330,6 +333,13 @@ def validate_hub_rules(
                 kw_match = any(kw.lower() in description.lower() for kw in rule.orderCriteria.keywords)
                 logger.debug(f"Rule {rule.id} - Checking keywords in description: '{description}' against {rule.orderCriteria.keywords} => match: {kw_match}")
                 all_conditions_met &= kw_match
+                
+            # Inside that block, after checking productIds, keywords, etc.:
+            if rule.orderCriteria.printTypes:
+                criteria_defined = True
+                pt_match = (print_type in rule.orderCriteria.printTypes)
+                logger.debug(f"Rule {rule.id} - Checking printType: {print_type} in {rule.orderCriteria.printTypes} => match: {pt_match}")
+                all_conditions_met &= pt_match    
 
             # If we actually had criteria and all matched => exclude
             if criteria_defined and all_conditions_met:

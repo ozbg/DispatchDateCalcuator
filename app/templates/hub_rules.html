@@ -83,6 +83,9 @@
                 {% if rule.orderCriteria.productIds %}
                   <li>Product IDs: {{ rule.orderCriteria.productIds|join(", ") }}</li>
                 {% endif %}
+                {% if rule.orderCriteria.printTypes %}
+                  <li>Print Types: {{ rule.orderCriteria.printTypes|join(", ") }}</li>
+                {% endif %}
               {% endif %}
             </ul>
           </td>
@@ -216,6 +219,15 @@
             <div id="productIdTags" class="tag-container"></div>
           </div>
         </div>
+        <!-- New Print Types input -->
+        <div>
+          <label>Print Type(s):</label>
+          <div class="tag-input-container">
+            <input type="text" id="printTypeInput" placeholder="Enter print type (1,2,3,4) and press Enter">
+            <div id="printTypeTags" class="tag-container"></div>
+          </div>
+        </div>
+        <!-- End new Print Types input -->
       </div>
     </div>
 
@@ -501,6 +513,7 @@ function filterTable() {
     document.getElementById('keywordTags').innerHTML = '';
     document.getElementById('excludeKeywordTags').innerHTML = '';
     document.getElementById('productIdTags').innerHTML = '';
+    document.getElementById('printTypeTags').innerHTML = '';
     document.getElementById('startDate').value = '';
     document.getElementById('endDate').value = '';
   }
@@ -546,6 +559,10 @@ function filterTable() {
       }
       if (rule.orderCriteria.productIds && Array.isArray(rule.orderCriteria.productIds)) {
         rule.orderCriteria.productIds.forEach(pid => addTag(String(pid), 'productIdTags'));
+      }
+      // Load Print Types
+      if (rule.orderCriteria.printTypes && Array.isArray(rule.orderCriteria.printTypes)) {
+        rule.orderCriteria.printTypes.forEach(pt => addTag(String(pt), 'printTypeTags'));
       }
     }
 
@@ -599,9 +616,12 @@ function filterTable() {
     const productIds = getTagsArray('productIdTags')
       .map(val => parseInt(val))
       .filter(num => !isNaN(num));
+    const printTypes = getTagsArray('printTypeTags')
+      .map(val => parseInt(val))
+      .filter(num => !isNaN(num) && [1,2,3,4].includes(num));
 
     let orderCriteria = null;
-    if (maxQuantity || keywords.length || excludeKeywords.length || productIds.length) {
+    if (maxQuantity || keywords.length || excludeKeywords.length || productIds.length || printTypes.length) {
       orderCriteria = {};
       if (maxQuantity) {
         orderCriteria.maxQuantity = parseInt(maxQuantity);
@@ -614,6 +634,9 @@ function filterTable() {
       }
       if (productIds.length) {
         orderCriteria.productIds = productIds;
+      }
+      if (printTypes.length) {
+        orderCriteria.printTypes = printTypes;
       }
       rule.orderCriteria = orderCriteria;
     }
@@ -695,7 +718,8 @@ function filterTable() {
       const containerMap = {
         'keywordInput': 'keywordTags',
         'excludeKeywordInput': 'excludeKeywordTags',
-        'productIdInput': 'productIdTags'
+        'productIdInput': 'productIdTags',
+        'printTypeInput': 'printTypeTags'
       };
       addTag(e.target.value.trim(), containerMap[inputId]);
       e.target.value = '';
@@ -705,7 +729,7 @@ function filterTable() {
 
   // Initialize tag input events
   function initializeTagInputs() {
-    ['keywordInput', 'excludeKeywordInput', 'productIdInput'].forEach(inputId => {
+    ['keywordInput', 'excludeKeywordInput', 'productIdInput', 'printTypeInput'].forEach(inputId => {
       const inputElem = document.getElementById(inputId);
       if (inputElem) {
         // Remove any existing listener to avoid duplication

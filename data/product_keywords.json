@@ -491,20 +491,7 @@
   },
   {
     "Exclude_All": [
-      "UV",
-      "Variable",
-      "Bind",
-      "Mount",
-      "Scodix",
-      "UV",
-      "Metal",
-      "Cover",
-      "Body",
-      "Perfect",
-      "Saddle",
-      "Bind",
       "Digital",
-      "Presentation",
       "#wa"
     ],
     "Match_All": [
@@ -520,31 +507,24 @@
     "Product_ID": 19
   },
   {
-    "Product_ID": 20,
+    "Exclude_All": [
+      "Digital",
+      "#wa"
+    ],
     "Match_All": [
       "Gloss",
       "150gsm"
     ],
-    "Exclude_All": [
-      "Digital",
-      "#wa"
-    ],
-    "Match_Any": []
+    "Match_Any": [],
+    "Product_ID": 20
   },
   {
+    "Product_ID": 21,
+    "Match_All": [],
     "Exclude_All": [
-      "UV",
-      "Variable",
-      "Bind",
-      "Mount",
-      "Scodix",
-      "UV",
-      "Metal",
       "Digital",
-      "Presentation",
       "#wa"
     ],
-    "Match_All": [],
     "Match_Any": [
       [
         "150gsm",
@@ -554,8 +534,7 @@
         "Silk",
         "Matt"
       ]
-    ],
-    "Product_ID": 21
+    ]
   },
   {
     "Exclude_All": [

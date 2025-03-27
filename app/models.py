@@ -224,6 +224,8 @@ class OrderMatchingCriteria(BaseModel):
     excludeProductIds: Optional[List[int]] = None
     productGroups: Optional[List[str]] = None
     excludeProductGroups: Optional[List[str]] = None
+    printTypes: Optional[List[int]] = Field(None, description="Rule applies if the order's printType is in this list.")
+
 
 class HubSizeConstraint(BaseModel):
     """Size constraints for hub production capabilities"""

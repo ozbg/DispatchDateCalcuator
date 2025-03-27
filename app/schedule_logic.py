@@ -221,7 +221,8 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         quantity=req.misOrderQTY,
         product_id=found_product_id,
         product_group=product_obj["Product_Group"],
-        cmyk_hubs=cmyk_hubs
+        cmyk_hubs=cmyk_hubs,
+        print_type=req.printType
     )
     
     logger.debug(f"Initial hub selection: {initial_hub}, Final hub after rules: {chosen_hub}")
