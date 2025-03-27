@@ -159,3 +159,45 @@ curl -X POST \
         "additionalProductionDays": 1
       }' \
   https://opslogic.onrender.com/schedule
+
+
+  Option Shift F to format JSON in VSCODE
+
+
+
+
+  samlpe Order orderNotes
+  [
+  {
+    "order_id": "2392546",
+    "type": "Hub",
+    "note_text": "ProductionManager: \r\nPreflight passed. Turnaround time required.\r\n",
+    "user_id": "23711",
+    "user_name": "CP Preflight08",
+    "date_created": "2025-03-25T13:19:08.246Z",
+    "last_updated": "2025-03-26T00:19:09.170Z"
+  },
+  {
+    "order_id": "2392546",
+    "type": "Hub",
+    "note_text": "#PREPRESS - SIZE DIFFERENT - 210x297mm",
+    "user_id": "23711",
+    "user_name": "CP Preflight08",
+    "date_created": "2025-03-24T19:13:04.441Z",
+    "last_updated": "2025-03-25T06:13:32.798Z"
+  },
+  {
+    "order_id": "2392546",
+    "type": "Centre",
+    "note_text": "#Dispatch please use custom labels and ensure boxes weight less than 16kg.\nStock required by 12pm Mon 24/03 (warehouse hours are 7:30am-3pm Mon-Fri).\n",
+    "user_id": "12853",
+    "user_name": "Chris Liew",
+    "date_created": "2025-03-24T18:08:20.385Z",
+    "last_updated": "2025-03-25T05:37:11.649Z"
+  }
+]
+
+printType 			
+1. Offset. 2. Digital, 3. Offset + Digital. 4. Wideformat
+
+			

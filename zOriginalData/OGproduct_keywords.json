@@ -1,0 +1,1452 @@
+[
+    {
+        "Product_ID": 1,
+        "Match_All": [
+            "NV",
+            "450+"
+        ],
+        "Exclude_All": [
+            "NVS",
+            "NVU",
+            "NVM",
+            "Digital"
+        ],
+        "Match_Any": [
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 1,
+        "Match_All": [
+            "Velvet",
+            "BC",
+            "Artboard",
+            "Laminat"
+        ],
+        "Exclude_All": [
+            "NVS",
+            "NVU",
+            "NVM",
+            "Holographic",
+            "Digital"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 2,
+        "Match_All": [
+            "NVS",
+            "450+",
+            "Scodix"
+        ],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 3,
+        "Match_All": [
+            "NVU",
+            "450+",
+            "UV"
+        ],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 4,
+        "Match_All": [
+            "NVM",
+            "450+",
+            "Gold"
+        ],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 5,
+        "Match_All": [
+            "NVM",
+            "450+",
+            "Silver"
+        ],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 5,
+        "Match_All": [
+            "Artboard",
+            "Holographic"
+        ],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 6,
+        "Match_All": [],
+        "Exclude_All": [
+            "Laminat",
+            "Eco",
+            "Knight",
+            "Natural",
+            "Magnet",
+            "Diecutting",
+            "Forme",
+            "Presentation",
+            "Digital",
+            "Premium Uncoated"
+        ],
+        "Match_Any": [
+            [
+                "350gsm",
+                "400gsm"
+            ],
+            [
+                "Branding",
+                "BC"
+            ],
+            [
+                "Coated 1 Side",
+                "Artboard"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 6,
+        "Match_All": [],
+        "Exclude_All": [
+            "Laminat",
+            "Eco",
+            "Knight",
+            "Natural",
+            "Magnet",
+            "Diecutting",
+            "Forme",
+            "Presentation",
+            "Digital",
+            "Premium Uncoated"
+        ],
+        "Match_Any": [
+            [
+                "350gsm",
+                "400gsm"
+            ],
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 6,
+        "Match_All": [
+            "BC",
+            "EcoStar",
+            "Silk",
+            "350gsm"
+        ],
+        "Exclude_All": [
+            "Presentation",
+            "Digital",
+            "Premium Uncoated"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 7,
+        "Match_All": [],
+        "Exclude_All": [
+            "Eco",
+            "Knight",
+            "Natural",
+            "Coated 1 Side Board",
+            "Magnet",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "Matt Laminate 1S",
+                "Matt Laminating 1S",
+                "Laminating - Matt 1 Side",
+                "Matt Laminate 1 Side"
+            ],
+            [
+                "350gsm",
+                "400gsm"
+            ],
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 8,
+        "Match_All": [],
+        "Exclude_All": [
+            "Eco",
+            "Knight",
+            "Natural",
+            "Coated 1 Side Board",
+            "Magnet",
+            "Presentation",
+            "Digital"
+        ],
+        "Match_Any": [
+            [
+                "Matt Laminate 2S",
+                "Matt Laminating 2S",
+                "2 sides Laminating - Matt 2 Side"
+            ],
+            [
+                "350gsm",
+                "400gsm"
+            ],
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 9,
+        "Match_All": [],
+        "Exclude_All": [
+            "Eco",
+            "Knight",
+            "Natural",
+            "Coated 1 Side Board",
+            "Magnet",
+            "Digital",
+            "Presentation",
+            "Digital"
+        ],
+        "Match_Any": [
+            [
+                "Gloss Laminate 1S",
+                "Gloss Laminating 1S"
+            ],
+            [
+                "350gsm",
+                "400gsm"
+            ],
+            [
+                "Branding",
+                "BC"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 10,
+        "Match_All": [
+            "450"
+        ],
+        "Exclude_All": [
+            "NV",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "Gloss Laminate",
+                "Gloss Laminating"
+            ],
+            [
+                "Artboard"
+            ]
+        ],
+        "Notes": "All Offset 450 Artboard uses the same schedule, so dont need to match BC or Branding"
+    },
+    {
+        "Product_ID": 10,
+        "Match_All": [
+            "450"
+        ],
+        "Exclude_All": [
+            "NV",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "Gloss Laminate",
+                "Gloss Laminating"
+            ]
+        ],
+        "Notes": "All Offset 450 Artboard uses the same schedule, so dont need to match BC or Branding"
+    },
+    {
+        "Product_ID": 11,
+        "Match_All": [
+            "350gsm"
+        ],
+        "Exclude_All": [
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "EcoStar Uncoated",
+                "Premium Uncoated"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 12,
+        "Match_All": [
+            "Synthetic",
+            "Digital"
+        ],
+        "Exclude_All": [
+            "Pad",
+            "Forme",
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 13,
+        "Match_All": [
+            "Digital"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "Knight 2 Sided Linen",
+                "Premium 2 Sided Linen"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 14,
+        "Match_All": [
+            "Natural Board",
+            "Digital"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 15,
+        "Match_All": [
+            "Digital"
+        ],
+        "Exclude_All": [
+            "Linen",
+            "Natural",
+            "stax",
+            "UV",
+            "Metal",
+            "Scodix",
+            "cast",
+            "adhesive",
+            "Metallic Gold",
+            "Metallic Sliver",
+            "BC",
+            "Presentation",
+            "Mount",
+            "#wa"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 16,
+        "Match_All": [
+            "Digital"
+        ],
+        "Exclude_All": [
+            "BC",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "UV",
+                "Metal",
+                "Scodix"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 17,
+        "Match_All": [
+            "700gsm",
+            "Uncoated",
+            "stax"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 18,
+        "Match_All": [
+            "350gsm",
+            "Magnet",
+            "Laminat"
+        ],
+        "Exclude_All": [
+            "Stick on Magnet",
+            "Magnet Patch",
+            "Magnetic Backing",
+            "Magnets",
+            "Presentation"
+        ],
+        "Match_Any": [],
+    },
+    {
+        "Product_ID": 19,
+        "Match_All": [
+            "Gloss"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "115gsm",
+                "128gsm",
+                "113gsm"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 20,
+        "Match_All": [
+            "Gloss",
+            "150gsm"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 21,
+        "Match_All": [],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Digital",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "150gsm",
+                "170gsm"
+            ],
+            [
+                "Silk",
+                "Matt"
+            ]
+        ] // this hit on Gloss 50gsm with Matt Lam, testing gsm Matt
+    },
+    {
+        "Product_ID": 22,
+        "Match_All": [
+            "Gloss"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "170gsm",
+                "200gsm",
+                "250gsm"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 23,
+        "Match_All": [],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "BC",
+            "Branding",
+            "Presentation",
+            "Mount",
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "310gsm",
+                "350gsm",
+                "400gsm"
+            ],
+            [
+                "Artboard",
+                "Board"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 23,
+        "Match_All": [
+            "300gsm"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "BC",
+            "Branding",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "Gloss",
+                "Silk"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 24,
+        "Match_All": [
+            "100gsm",
+            "Laser"
+        ],
+        "Exclude_All": [
+            "Pad",
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation",
+            "#wa"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 25,
+        "Match_All": [],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "120gsm",
+                "Knight"
+            ],
+            [
+                "120gsm",
+                "Premium Uncoated"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 26,
+        "Match_All": [
+            "Ecostar"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "100gsm",
+                "120gsm",
+                "140gsm"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 27,
+        "Match_All": [
+            "Laser"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "120gsm",
+                "150gsm",
+                "140gsm",
+                "160gsm"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 28,
+        "Match_All": [
+            "Laser"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "200gsm",
+                "240gsm",
+                "250gsm",
+                "300gsm"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 29,
+        "Match_All": [],
+        "Exclude_All": [
+            "scodix",
+            "metal"
+        ],
+        "Match_Any": [
+            [
+                "Presentation Folder"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 29,
+        "Match_All": [],
+        "Exclude_All": [
+            "scodix",
+            "metal"
+        ],
+        "Match_Any": [
+            [
+                "Forme",
+                "diecut"
+            ],
+            [
+                "Artboard"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 30,
+        "Match_All": [],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "scodix",
+                "metal"
+            ],
+            [
+                "Presentation Folder",
+                "wallet"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 30,
+        "Match_All": [],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "scodix",
+                "metal"
+            ],
+            [
+                "Forme",
+                "diecut"
+            ],
+            [
+                "Artboard"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 31,
+        "Match_All": [
+            "100gsm",
+            "Laser",
+            "Pad"
+        ],
+        "Exclude_All": [],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 32,
+        "Match_All": [],
+        "Exclude_All": [
+            "Synthetic",
+            "Roll"
+        ],
+        "Match_Any": [
+            [
+                "Self Adhesive",
+                "Cast Gloss"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 33,
+        "Match_All": [],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Hanger",
+                "Wobbler",
+                "Card Holder",
+                "Voucher Card",
+                "Circle 350gsm Artboard"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 34,
+        "Match_All": [
+            "Digital"
+        ],
+        "Exclude_All": [
+            "Hi Bulk",
+            "Metallic"
+        ],
+        "Match_Any": [
+            [
+                "Scodix",
+                "Metal"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 35,
+        "Match_All": [
+            "Uncoated"
+        ],
+        "Exclude_All": [
+            "Digital"
+        ],
+        "Match_Any": [
+            [
+                "200gsm",
+                "240gsm",
+                "250gsm",
+                "325gsm",
+                "300gsm"
+            ],
+            [
+                "Ecostar",
+                "Premium Uncoated"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 36,
+        "Match_All": [
+            "Silk"
+        ],
+        "Exclude_All": [
+            "BC"
+        ],
+        "Match_Any": [
+            [
+                "130gsm",
+                "150gsm",
+                "250gsm",
+                "300gsm"
+            ],
+            [
+                "EcoStar"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 37,
+        "Match_All": [],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Metallic Gold",
+                "Metallic Silver"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 38,
+        "Match_All": [
+            "Synthetic"
+        ],
+        "Exclude_All": [
+            "Roll",
+            "#wa"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 39,
+        "Match_All": [
+            "White Repositional"
+        ],
+        "Exclude_All": [
+            "#wa"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 40,
+        "Match_All": [],
+        "Exclude_All": [
+            "Diecut",
+            "Pad",
+            "Forme",
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Digital",
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "Silk",
+                "gsm Matt"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 41,
+        "Match_All": [
+            "BC"
+        ],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Knight",
+                "Digital",
+                "Board"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 44,
+        "Match_All": [
+            "Mounted",
+            "Strut"
+        ],
+        "Exclude_All": [],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 45,
+        "Match_All": [],
+        "Exclude_All": [
+            "#wa"
+        ],
+        "Match_Any": [
+            [
+                "Wallet",
+                "Banker",
+                "Pocket"
+            ],
+            [
+                "Moist",
+                "Peel",
+                "Seal"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 46,
+        "Match_All": [
+            "DISSABLED"
+        ],
+        "Exclude_All": [],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 47,
+        "Match_All": [
+            "DISSABLED"
+        ],
+        "Exclude_All": [],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 48,
+        "Match_All": [
+            "Roll Label"
+        ],
+        "Exclude_All": [],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 49,
+        "Match_All": [
+            "Synthetic",
+            "Digital",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "Pad",
+            "Forme",
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 50,
+        "Match_All": [
+            "Digital",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "Knight 2 Sided Linen",
+                "Premium 2 Sided Linen"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 51,
+        "Match_All": [
+            "Natural Board",
+            "Digital",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 52,
+        "Match_All": [
+            "Digital",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "Linen",
+            "Natural",
+            "stax",
+            "UV",
+            "Metal",
+            "Scodix",
+            "cast",
+            "adhesive",
+            "Metallic Gold",
+            "Metallic Sliver",
+            "BC",
+            "Presentation",
+            "Mount"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 53,
+        "Match_All": [
+            "Gloss",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "115gsm",
+                "128gsm",
+                "113gsm"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 54,
+        "Match_All": [
+            "Gloss",
+            "150gsm",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 55,
+        "Match_All": [
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "150gsm",
+                "170gsm"
+            ],
+            [
+                "Silk",
+                "Matt"
+            ]
+        ] // this hit on Gloss 50gsm with Matt Lam, testing gsm Matt
+    },
+    {
+        "Product_ID": 56,
+        "Match_All": [
+            "Gloss",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "170gsm",
+                "200gsm",
+                "250gsm"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 57,
+        "Match_All": [
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "BC",
+            "Branding",
+            "Presentation",
+            "Mount"
+        ],
+        "Match_Any": [
+            [
+                "310gsm",
+                "350gsm",
+                "400gsm"
+            ],
+            [
+                "Artboard",
+                "Board"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 57,
+        "Match_All": [
+            "300gsm",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Digital",
+            "BC",
+            "Branding",
+            "Presentation"
+        ],
+        "Match_Any": [
+            [
+                "Gloss",
+                "Silk"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 58,
+        "Match_All": [
+            "100gsm",
+            "Laser",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "Pad",
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Cover",
+            "Body",
+            "Perfect",
+            "Saddle",
+            "Bind",
+            "Presentation"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 59,
+        "Match_All": [
+            "#wa"
+        ],
+        "Exclude_All": [
+            "Diecut",
+            "Pad",
+            "Forme",
+            "UV",
+            "Variable",
+            "Bind",
+            "Mount",
+            "Scodix",
+            "UV",
+            "Metal",
+            "Digital"
+        ],
+        "Match_Any": [
+            [
+                "Silk",
+                "gsm Matt"
+            ]
+        ]
+    },
+    {
+        "Product_ID": 60,
+        "Match_All": [
+            "Synthetic",
+            "#wa"
+        ],
+        "Exclude_All": [
+            "Roll"
+        ],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 61,
+        "Match_All": [
+            "White Repositional",
+            "#wa"
+        ],
+        "Exclude_All": [],
+        "Match_Any": []
+    },
+    {
+        "Product_ID": 62,
+        "Match_All": [
+            "#wa"
+        ],
+        "Exclude_All": [],
+        "Match_Any": [
+            [
+                "Wallet",
+                "Banker",
+                "Pocket"
+            ],
+            [
+                "Moist",
+                "Peel",
+                "Seal"
+            ]
+        ]
+    }
+]

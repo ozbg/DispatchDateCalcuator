@@ -962,13 +962,11 @@
     "Modified_run_date": []
   },
   "46": {
-    "Product_Category": "WA Offset 350gsm Cards",
-    "Product_Group": "Offset WA 350gsm Cards",
+    "Product_Category": "Disabled",
+    "Product_Group": "",
     "Product_ID": 46,
-    "Production_Hub": [
-      "wa"
-    ],
-    "Cutoff": "12",
+    "Production_Hub": [],
+    "Cutoff": null,
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
@@ -977,17 +975,15 @@
       "Monday",
       "Wednesday"
     ],
-    "Days_to_produce": "1",
+    "Days_to_produce": null,
     "Modified_run_date": []
   },
   "47": {
-    "Product_Category": "WA Offset 350gsm Cards",
-    "Product_Group": "Offset WA 350gsm Cards + Laminate",
+    "Product_Category": "Disabled",
+    "Product_Group": "",
     "Product_ID": 47,
-    "Production_Hub": [
-      "wa"
-    ],
-    "Cutoff": "12",
+    "Production_Hub": [],
+    "Cutoff": null,
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
@@ -996,7 +992,7 @@
       "Monday",
       "Wednesday"
     ],
-    "Days_to_produce": "1",
+    "Days_to_produce": null,
     "Modified_run_date": []
   },
   "48": {

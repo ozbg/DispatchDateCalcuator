@@ -4,7 +4,8 @@
       "NVS",
       "NVU",
       "NVM",
-      "Digital"
+      "Digital",
+      "Holographic"
     ],
     "Match_All": [
       "NV",
@@ -19,12 +20,6 @@
     "Product_ID": 1
   },
   {
-    "Product_ID": 1,
-    "Match_All": [
-      "Velvet",
-      "Artboard",
-      "Laminat"
-    ],
     "Exclude_All": [
       "NVS",
       "NVU",
@@ -32,12 +27,18 @@
       "Holographic",
       "Digital"
     ],
+    "Match_All": [
+      "Velvet",
+      "Artboard",
+      "Laminat"
+    ],
     "Match_Any": [
       [
         "Branding",
         "BC"
       ]
-    ]
+    ],
+    "Product_ID": 1
   },
   {
     "Exclude_All": [],
@@ -1067,160 +1068,20 @@
     "Product_ID": 45
   },
   {
-    "Exclude_All": [
-      "Laminat",
-      "Eco",
-      "Knight",
-      "Natural",
-      "Magnet",
-      "Diecutting",
-      "Forme",
-      "Presentation",
-      "Digital",
-      "Premium Uncoated"
-    ],
-    "Match_All": [],
-    "Match_Any": [
-      [
-        "350gsm",
-        "400gsm"
-      ],
-      [
-        "Branding",
-        "BC"
-      ],
-      [
-        "Coated 1 Side",
-        "Artboard"
-      ]
-    ],
-    "Product_ID": 46
-  },
-  {
-    "Exclude_All": [
-      "Laminat",
-      "Eco",
-      "Knight",
-      "Natural",
-      "Magnet",
-      "Diecutting",
-      "Forme",
-      "Presentation",
-      "Digital",
-      "Premium Uncoated"
-    ],
-    "Match_All": [],
-    "Match_Any": [
-      [
-        "350gsm",
-        "400gsm"
-      ],
-      [
-        "Branding",
-        "BC"
-      ]
-    ],
-    "Product_ID": 46
-  },
-  {
-    "Exclude_All": [
-      "Presentation",
-      "Digital",
-      "Premium Uncoated"
-    ],
+    "Exclude_All": [],
     "Match_All": [
-      "BC",
-      "EcoStar",
-      "Silk",
-      "350gsm"
+      "DISSABLED"
     ],
     "Match_Any": [],
     "Product_ID": 46
   },
   {
-    "Exclude_All": [
-      "Eco",
-      "Knight",
-      "Natural",
-      "Coated 1 Side Board",
-      "Magnet",
-      "Digital",
-      "Presentation"
+    "Product_ID": 47,
+    "Match_All": [
+      "DISSABLED"
     ],
-    "Match_All": [],
-    "Match_Any": [
-      [
-        "Matt Laminate 1S",
-        "Matt Laminating 1S",
-        "Laminating - Matt 1 Side",
-        "Matt Laminate 1 Side"
-      ],
-      [
-        "350gsm",
-        "400gsm"
-      ],
-      [
-        "Branding",
-        "BC"
-      ]
-    ],
-    "Product_ID": 47
-  },
-  {
-    "Exclude_All": [
-      "Eco",
-      "Knight",
-      "Natural",
-      "Coated 1 Side Board",
-      "Magnet",
-      "Presentation",
-      "Digital"
-    ],
-    "Match_All": [],
-    "Match_Any": [
-      [
-        "Matt Laminate 2S",
-        "Matt Laminating 2S",
-        "2 sides Laminating - Matt 2 Side"
-      ],
-      [
-        "350gsm",
-        "400gsm"
-      ],
-      [
-        "Branding",
-        "BC"
-      ]
-    ],
-    "Product_ID": 47
-  },
-  {
-    "Exclude_All": [
-      "Eco",
-      "Knight",
-      "Natural",
-      "Coated 1 Side Board",
-      "Magnet",
-      "Digital",
-      "Presentation",
-      "Digital"
-    ],
-    "Match_All": [],
-    "Match_Any": [
-      [
-        "Gloss Laminate 1S",
-        "Gloss Laminating 1S"
-      ],
-      [
-        "350gsm",
-        "400gsm"
-      ],
-      [
-        "Branding",
-        "BC"
-      ]
-    ],
-    "Product_ID": 47
+    "Exclude_All": [],
+    "Match_Any": []
   },
   {
     "Exclude_All": [],
