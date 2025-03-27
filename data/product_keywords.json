@@ -519,12 +519,12 @@
     "Product_ID": 20
   },
   {
+    "Product_ID": 21,
+    "Match_All": [],
     "Exclude_All": [
       "Digital",
-      "#wa",
-      "saddle"
+      "#wa"
     ],
-    "Match_All": [],
     "Match_Any": [
       [
         "150gsm",
@@ -534,8 +534,7 @@
         "Silk",
         "Matt"
       ]
-    ],
-    "Product_ID": 21
+    ]
   },
   {
     "Exclude_All": [
@@ -981,8 +980,7 @@
       "UV",
       "Metal",
       "Digital",
-      "#wa",
-      "saddle"
+      "#wa"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -1429,11 +1427,9 @@
     "Product_ID": 62
   },
   {
-    "Product_ID": 99,
-    "Match_All": [
-      "DEFAULTFALLBACK"
-    ],
     "Exclude_All": [],
-    "Match_Any": []
+    "Match_All": [],
+    "Match_Any": [],
+    "Product_ID": 1
   }
 ]
