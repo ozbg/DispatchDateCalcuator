@@ -3,16 +3,18 @@
     {
       "id": "fold_crease",
       "description": "Folding, Creasing, Perfing, Scoring",
+      "addDays": 1,
+      "enabled": true,
       "keywords": [
         "fold",
         "crease",
         "perf",
         "score"
       ],
-      "matchType": "any",
-      "caseSensitive": false,
-      "addDays": 1,
-      "enabled": true
+      "excludeKeywords": [
+        "Folder"
+      ],
+      "matchType": "any"
     },
     {
       "id": "round_corner",
