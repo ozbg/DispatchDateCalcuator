@@ -619,13 +619,12 @@
     "Product_ID": 27
   },
   {
-    "Product_ID": 28,
-    "Match_All": [
-      "Laser"
-    ],
     "Exclude_All": [
       "Digital",
       "Presentation"
+    ],
+    "Match_All": [
+      "Laser"
     ],
     "Match_Any": [
       [
@@ -634,7 +633,8 @@
         "250gsm",
         "300gsm"
       ]
-    ]
+    ],
+    "Product_ID": 28
   },
   {
     "Exclude_All": [
@@ -1257,11 +1257,5 @@
       ]
     ],
     "Product_ID": 62
-  },
-  {
-    "Exclude_All": [],
-    "Match_All": [],
-    "Match_Any": [],
-    "Product_ID": 1
   }
 ]
