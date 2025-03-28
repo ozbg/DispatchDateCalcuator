@@ -1,11 +1,12 @@
 #product_matcher.py
 #This module contains the logic for matching product IDs based on description and determining the grain direction based on orientation, width, height, and description.
 import logging
+from app.data_manager import get_product_info_data  # <-- Add this import so we can fetch product info
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def match_product_id(description: str, product_keywords: list) -> int:
+def match_product_id(description: str, product_keywords: list, order_print_type: int) -> int:
     logger.debug(f"Matching product ID for description: {description}")
     desc_lower = description.lower()
 
@@ -26,6 +27,18 @@ def match_product_id(description: str, product_keywords: list) -> int:
         if not match_any(item.get("Match_Any", []), desc_lower):
             logger.debug(f"Description '{description}' did not match any keywords for product ID {product_id}.")
             continue
+        
+        # 4. Now check the product's printTypes to ensure it supports the requested printType
+        product_info = get_product_info_data()
+        product_data = product_info.get(str(product_id), {})
+        allowed_print_types = product_data.get("printTypes", [])
+        if order_print_type not in allowed_print_types:
+            logger.debug(
+                f"Product ID {product_id} does not support printType {order_print_type}. "
+                f"Allowed: {allowed_print_types}. Skipping."
+            )
+            continue        
+        
 
         logger.debug(f"Matched product ID {product_id} for description='{description}'.")
         return product_id

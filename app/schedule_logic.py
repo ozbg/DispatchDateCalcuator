@@ -123,7 +123,11 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
 
     # 2) Product matching
     product_keywords = get_product_keywords_data()
-    found_product_id = match_product_id(req.description, product_keywords)
+
+    logger.debug(f"Calling match_product_id with description='{req.description[:50]}...', "
+             f"printType={req.printType}")
+    found_product_id = match_product_id(req.description, product_keywords, req.printType)
+
     if found_product_id is None:
         logger.debug("No matching product found => using fallback product_id=99")
         found_product_id = 99

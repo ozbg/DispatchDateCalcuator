@@ -41,6 +41,7 @@
             <th>Days to Produce</th>
             <th>Cutoff</th>
             <th>Start Days</th>
+            <th>Print Types</th>
             <th>Actions</th>
         </tr>
         <tr class="filter-row">
@@ -51,6 +52,7 @@
             <th><input type="text" class="column-filter" data-column="4" placeholder="Filter Days..."></th>
             <th><input type="text" class="column-filter" data-column="5" placeholder="Filter Cutoff..."></th>
             <th><input type="text" class="column-filter" data-column="6" placeholder="Filter Start Days..."></th>
+            <th><input type="text" class="column-filter" data-column="7" placeholder="Filter Print Types..."></th>
             <th></th>
         </tr>
     </thead>
@@ -64,6 +66,8 @@
             <td>{{ product.Days_to_produce }}</td>
             <td>{{ product.Cutoff }}</td>
             <td>{{ product.Start_days|join(", ") }}</td>
+            <td>{{ product.printTypes|join(", ") }}</td>
+
             <td>
                 <button onclick="editProduct('{{ id }}')" class="edit-btn">Edit</button>
                 <button onclick="deleteProduct('{{ id }}')" class="delete-btn">Delete</button>
@@ -126,7 +130,18 @@
             </div>
             <small>Select which hubs can produce this product</small>
         </div>
-
+        <div class="form-group">
+             <label>Print Types:</label>
+             <div class="checkbox-group">
+             <div class="checkbox-row">
+                   <label><input type="checkbox" name="print_types" value="1"> Offset (1)</label>
+                   <label><input type="checkbox" name="print_types" value="2"> Digital (2)</label>
+                  <label><input type="checkbox" name="print_types" value="3"> Offset + Digital (3)</label>
+               <label><input type="checkbox" name="print_types" value="4"> Wideformat (4)</label>
+                   </div>
+              </div>
+               <small>Select allowable print types for this product</small>
+             </div>
         <div class="button-group">
             <button onclick="saveProduct()" class="save-btn">Save Product</button>
             <button onclick="closeForm()" class="cancel-btn">Cancel</button>
@@ -370,7 +385,7 @@ function filterTable() {
     });
 }
 let currentProductId = null;
-let product_data = {{ product_data|tojson }};
+product_data = {{ product_data|tojson }};
 
 function editProduct(id) {
     currentProductId = id;
@@ -395,6 +410,16 @@ function editProduct(id) {
         cb.checked = product.Production_Hub.includes(cb.value);
     });
     
+
+
+   // Reset and set printTypes checkboxes
+    const printTypesCheckboxes = document.querySelectorAll('input[name="print_types"]');
+    // Convert product.printTypes to string array for easy compare
+    const prodPrintTypes = (product.printTypes || []).map(pt => String(pt));
+    printTypesCheckboxes.forEach(cb => {
+        cb.checked = prodPrintTypes.includes(cb.value);
+    });
+
     document.getElementById('editForm').style.display = 'block';
 }
 
@@ -414,8 +439,10 @@ async function saveProduct() {
         Start_days: Array.from(document.querySelectorAll('input[name="start_days"]:checked'))
             .map(cb => cb.value),
         Production_Hub: Array.from(document.querySelectorAll('.checkbox-row input[type="checkbox"]:checked'))
-            .filter(cb => !cb.name || cb.name !== 'start_days')
+        .filter(cb => !cb.name || (cb.name !== 'start_days' && cb.name !== 'print_types'))
             .map(cb => cb.value)
+        ,printTypes: Array.from(document.querySelectorAll('input[name="print_types"]:checked'))
+           .map(cb => parseInt(cb.value))
     };
     
     try {
@@ -445,6 +472,9 @@ async function saveProduct() {
             }
             
             closeForm();
+            // Reload the page (this will refresh everything)
+            location.reload();
+
         } else {
             alert('Error saving product: ' + result.message);
         }

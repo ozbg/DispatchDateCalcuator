@@ -568,7 +568,9 @@ async def update_product(request: Request, product_id: str):
             "Product_Group": product_data.get("Product_Group"),
             "Cutoff": product_data.get("Cutoff"),
             "Days_to_produce": product_data.get("Days_to_produce"),
-            "Production_Hub": product_data.get("Production_Hub", [])
+            "Production_Hub": product_data.get("Production_Hub", []),
+            "printTypes": product_data.get("printTypes", [])
+
         })
 
         save_product_info_data(data)
