@@ -8,12 +8,19 @@
     ],
     "Cutoff": 12,
     "printTypes": [
-      1
+      1,
+      2
     ],
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -35,7 +42,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Wednesday",
@@ -61,7 +74,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Wednesday",
       "Friday"
@@ -80,7 +99,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Wednesday"
     ],
@@ -101,7 +126,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Wednesday"
     ],
@@ -126,7 +157,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -152,7 +189,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Tuesday",
       "Thursday"
@@ -175,7 +218,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -201,7 +250,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Tuesday",
       "Thursday"
@@ -220,7 +275,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday"
     ],
@@ -241,7 +302,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Tuesday",
       "Thursday"
@@ -264,7 +331,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -292,7 +365,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -318,7 +397,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -347,7 +432,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -375,7 +466,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -397,7 +494,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday"
     ],
@@ -418,7 +521,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday"
     ],
@@ -443,7 +552,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Thursday"
     ],
@@ -468,7 +583,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -497,7 +618,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday"
     ],
@@ -522,7 +649,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Tuesday",
       "Friday"
@@ -548,7 +681,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -577,7 +716,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -605,7 +750,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Wednesday"
     ],
@@ -626,7 +777,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Wednesday"
     ],
@@ -647,7 +804,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Wednesday"
     ],
@@ -668,7 +831,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Friday"
     ],
@@ -692,7 +861,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -717,7 +892,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -743,7 +924,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -775,7 +962,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -804,7 +997,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -826,7 +1025,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -851,7 +1056,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Friday"
     ],
@@ -879,7 +1090,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -905,7 +1122,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -928,7 +1151,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -956,7 +1185,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": null,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -987,7 +1222,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday"
     ],
@@ -1015,7 +1256,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1037,7 +1284,13 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday"
     ],
@@ -1078,7 +1331,13 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1102,7 +1361,13 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Wednesday"
@@ -1122,7 +1387,13 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Wednesday"
@@ -1149,7 +1420,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1171,7 +1448,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1196,7 +1479,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1221,7 +1510,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1246,7 +1541,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1271,7 +1572,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1296,7 +1603,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1321,7 +1634,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1346,7 +1665,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1371,7 +1696,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1396,7 +1727,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1421,7 +1758,13 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1446,7 +1789,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1473,7 +1822,13 @@
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": null,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1500,7 +1855,13 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1535,7 +1896,13 @@
     "SynergyPreflight": 0,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "OffsetOnly": "",
+    "scheduleAppliesTo": [
+      1,
+      2,
+      3,
+      5,
+      24
+    ],
     "Start_days": [
       "Monday",
       "Tuesday",

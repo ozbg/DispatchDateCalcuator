@@ -6,7 +6,7 @@ from app.data_manager import get_product_info_data  # <-- Add this import so we 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def match_product_id(description: str, product_keywords: list, order_print_type: int) -> int:
+def match_product_id(description: str, product_keywords: list, order_print_type: int, order_mis_hub_id: int) -> int:
     logger.debug(f"Matching product ID for description: {description}")
     desc_lower = description.lower()
 
@@ -39,7 +39,16 @@ def match_product_id(description: str, product_keywords: list, order_print_type:
             )
             continue        
         
-
+        # Check the product's scheduleAppliesTo if present
+        schedule_applies = product_data.get("scheduleAppliesTo", [])
+        if schedule_applies:
+            if order_mis_hub_id not in schedule_applies:
+                logger.debug(
+                    f"Product ID {product_id} does not allow hubID={order_mis_hub_id}. "
+                    f"Allowed: {schedule_applies}. Skipping."
+                )
+                continue
+        
         logger.debug(f"Matched product ID {product_id} for description='{description}'.")
         return product_id
 

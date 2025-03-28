@@ -42,6 +42,7 @@
             <th>Cutoff</th>
             <th>Start Days</th>
             <th>Print Types</th>
+            <th>Schedule Applies To</th>
             <th>Actions</th>
         </tr>
         <tr class="filter-row">
@@ -53,6 +54,7 @@
             <th><input type="text" class="column-filter" data-column="5" placeholder="Filter Cutoff..."></th>
             <th><input type="text" class="column-filter" data-column="6" placeholder="Filter Start Days..."></th>
             <th><input type="text" class="column-filter" data-column="7" placeholder="Filter Print Types..."></th>
+            <th><input type="text" class="column-filter" data-column="8" placeholder="Filter SchedApplies..."></th>
             <th></th>
         </tr>
     </thead>
@@ -67,6 +69,7 @@
             <td>{{ product.Cutoff }}</td>
             <td>{{ product.Start_days|join(", ") }}</td>
             <td>{{ product.printTypes|join(", ") }}</td>
+            <td>{{ product.scheduleAppliesTo|join(", ") }}</td>
 
             <td>
                 <button onclick="editProduct('{{ id }}')" class="edit-btn">Edit</button>
@@ -142,6 +145,24 @@
               </div>
                <small>Select allowable print types for this product</small>
              </div>
+
+            <div class="form-group">
+                    <label>Schedule Applies To (Hub IDs):</label>
+                    <div class="checkbox-group">
+                    <div class="checkbox-row">
+                        <label><input type="checkbox" name="schedule_applies_to" value="1"> 1: VIC</label>
+                        <label><input type="checkbox" name="schedule_applies_to" value="2"> 2: NSW</label>
+                        <label><input type="checkbox" name="schedule_applies_to" value="3"> 3: WA</label>
+                        <label><input type="checkbox" name="schedule_applies_to" value="5"> 5: QLD</label>
+                        <label><input type="checkbox" name="schedule_applies_to" value="24"> 24: NQLD</label>
+                        <!-- Add more if you have more known Hub IDs -->
+                    </div>
+                    </div>
+                    <small>Select which misCurrentHubIDs apply to this product</small>
+                </div>
+
+
+
         <div class="button-group">
             <button onclick="saveProduct()" class="save-btn">Save Product</button>
             <button onclick="closeForm()" class="cancel-btn">Cancel</button>
@@ -420,6 +441,15 @@ function editProduct(id) {
         cb.checked = prodPrintTypes.includes(cb.value);
     });
 
+   // Reset and set scheduleAppliesTo checkboxes
+    const scheduleAppliesCheckboxes = document.querySelectorAll('input[name="schedule_applies_to"]');
+    const prodSchedApplies = (product.scheduleAppliesTo || []).map(sa => String(sa));
+    scheduleAppliesCheckboxes.forEach(cb => {
+        cb.checked = prodSchedApplies.includes(cb.value);
+    });
+
+
+
     document.getElementById('editForm').style.display = 'block';
 }
 
@@ -432,18 +462,32 @@ async function saveProduct() {
     if (!currentProductId) return;
     
     const productData = {
-        Product_Category: document.getElementById('productCategory').value,
-        Product_Group: document.getElementById('productGroup').value,
-        Cutoff: parseInt(document.getElementById('cutoff').value),
-        Days_to_produce: parseInt(document.getElementById('daysToProduce').value),
-        Start_days: Array.from(document.querySelectorAll('input[name="start_days"]:checked'))
-            .map(cb => cb.value),
-        Production_Hub: Array.from(document.querySelectorAll('.checkbox-row input[type="checkbox"]:checked'))
-        .filter(cb => !cb.name || (cb.name !== 'start_days' && cb.name !== 'print_types'))
-            .map(cb => cb.value)
-        ,printTypes: Array.from(document.querySelectorAll('input[name="print_types"]:checked'))
-           .map(cb => parseInt(cb.value))
-    };
+    Product_Category: document.getElementById('productCategory').value,
+    Product_Group: document.getElementById('productGroup').value,
+    Cutoff: parseInt(document.getElementById('cutoff').value),
+    Days_to_produce: parseInt(document.getElementById('daysToProduce').value),
+    Start_days: Array.from(document.querySelectorAll('input[name="start_days"]:checked'))
+        .map(cb => cb.value),
+    
+    Production_Hub: Array.from(
+      document.querySelectorAll('.checkbox-row input[type="checkbox"]:checked')
+    )
+    .filter(cb => 
+      !cb.name 
+      || (
+        cb.name !== 'start_days' 
+        && cb.name !== 'print_types' 
+        && cb.name !== 'schedule_applies_to'
+      )
+    )
+    .map(cb => cb.value),
+    
+    printTypes: Array.from(document.querySelectorAll('input[name="print_types"]:checked'))
+      .map(cb => parseInt(cb.value)),
+
+    scheduleAppliesTo: Array.from(document.querySelectorAll('input[name="schedule_applies_to"]:checked'))
+      .map(cb => parseInt(cb.value))
+};
     
     try {
         const response = await fetch(`/products/edit/${currentProductId}`, {
