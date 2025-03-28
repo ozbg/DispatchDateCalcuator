@@ -640,16 +640,16 @@
   },
   "31": {
     "Product_Category": "Offset Pads",
-    "Product_Group": "100gsm Laser Pads",
+    "Product_Group": "Offset 100gsm Laser Pads",
     "Product_ID": 31,
     "Production_Hub": [
-      "vic",
       "nsw",
+      "vic",
+      "wa",
       "qld",
-      "nqld",
-      "wa"
+      "nqld"
     ],
-    "Cutoff": "16",
+    "Cutoff": 16,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
@@ -661,7 +661,7 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "5",
+    "Days_to_produce": 5,
     "Modified_run_date": []
   },
   "32": {
@@ -875,16 +875,16 @@
   },
   "41": {
     "Product_Category": "Digital Branding Cards BC",
-    "Product_Group": "Branding Cards with or without Lamination",
+    "Product_Group": "Digital Branding Cards with or without Lamination",
     "Product_ID": 41,
     "Production_Hub": [
-      "vic",
       "nsw",
+      "vic",
+      "wa",
       "qld",
-      "nqld",
-      "wa"
+      "nqld"
     ],
-    "Cutoff": "12",
+    "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
@@ -896,7 +896,7 @@
       "Thursday",
       "Friday"
     ],
-    "Days_to_produce": "1",
+    "Days_to_produce": 1,
     "Modified_run_date": []
   },
   "44": {
