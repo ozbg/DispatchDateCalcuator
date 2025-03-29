@@ -876,7 +876,20 @@
       "Friday"
     ],
     "Days_to_produce": 3,
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-03-31",
+        "2025-04-01",
+        "2025-04-10",
+        [
+          "nqld"
+        ],
+        [
+          "1",
+          "2"
+        ]
+      ]
+    ]
   },
   "30": {
     "Product_Category": "Diecut Artboard + Scodix or Metal",
@@ -1295,24 +1308,7 @@
       "Monday"
     ],
     "Days_to_produce": 4,
-    "Modified_run_date": [
-      [
-        "2025-01-06",
-        "2025-01-06",
-        "2025-01-10",
-        [
-          "nsw",
-          "vic",
-          "wa",
-          "qld",
-          "nqld"
-        ],
-        [
-          "1",
-          "2"
-        ]
-      ]
-    ],
+    "Modified_run_date": [],
     "printTypes": [
       1,
       2,

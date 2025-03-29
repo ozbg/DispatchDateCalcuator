@@ -14,7 +14,8 @@
       "excludeKeywords": [
         "Folder"
       ],
-      "matchType": "any"
+      "matchType": "any",
+      "conditions": null
     },
     {
       "id": "round_corner",
@@ -141,24 +142,21 @@
     {
       "id": "laminating",
       "description": "Additional Laminating",
+      "addDays": 1,
+      "enabled": true,
       "keywords": [
         "lamin"
       ],
       "excludeKeywords": [
-        "no lamin",
         "bc",
         "strut",
         "branding",
-        "roll label",
-        "presentation"
+        "roll label"
       ],
       "matchType": "any",
-      "caseSensitive": false,
-      "addDays": 1,
       "conditions": {
-        "productGroupNotContains": "lamin"
-      },
-      "enabled": true
+        "productIdNotEqual": 29
+      }
     },
     {
       "id": "large_quantity",

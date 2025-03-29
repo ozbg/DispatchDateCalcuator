@@ -19,7 +19,7 @@
     "preflightedWidth": 90,
     "preflightedHeight": 55,
     "misCurrentHub": "nsw",
-    "misCurrentHubID": 1,
+    "misCurrentHubID": 2,
     "misDeliversToState": "qld",
     "orderNotes": [],
     "additionalProductionDays": 0
@@ -29,7 +29,7 @@
                 <button onclick="runTest()" class="test-btn">Run API Test</button>
                 <button onclick="clearPayload()" class="clear-btn">Clear</button>
             </div>
-            
+
             <div class="result-section">
                 <h3>Raw JSON Response</h3>
                 <pre id="responseOutput"></pre>
@@ -50,10 +50,7 @@
                         <td>Order ID</td>
                         <td id="orderId"></td>
                     </tr>
-                    <tr>
-                        <td>Order QTY</td>
-                        <td id="orderQty"></td>
-                    </tr>
+                    <!-- Removed line setting orderQty from payload -->
                     <tr>
                         <td>Order Description</td>
                         <td id="orderDescription"></td>
@@ -72,7 +69,7 @@
                     </tr>
                     <tr>
                         <td>Product ID</td>
-                        <td id="productId"></td>
+                        <td id="productId"></td> <!-- Cell exists, was not populated -->
                     </tr>
                     <tr>
                         <td>Product Group</td>
@@ -107,7 +104,7 @@
                     </tr>
                     <tr>
                         <td>Finishing Days</td>
-                        <td id="finishingDays"></td>
+                        <td id="finishingDays"></td> <!-- Cell exists, was not populated -->
                     </tr>
                     <tr>
                         <td>Total Production Days</td>
@@ -115,7 +112,7 @@
                     </tr>
                     <tr>
                         <td>Production Groups</td>
-                        <td id="productionGroups"></td>
+                        <td id="productionGroups"></td> <!-- Cell exists, was not populated -->
                     </tr>
 
                     <!-- Location Info -->
@@ -130,7 +127,7 @@
                     </tr>
                     <tr>
                         <td>Hub Transfer To</td>
-                        <td id="hubTransferTo"></td>
+                        <td id="hubTransferTo"></td> <!-- Cell exists, was not populated -->
                     </tr>
 
                     <!-- Dates -->
@@ -156,7 +153,7 @@
                     </tr>
                     <tr>
                         <td>Order Quantity</td>
-                        <td id="orderQuantity"></td>
+                        <td id="orderQuantity"></td> <!-- Was populated from payload, now from response -->
                     </tr>
                     <tr>
                         <td>Order Kinds</td>
@@ -190,7 +187,7 @@
 <!-- Debug Panel -->
 <div class="debug-panel">
     <h3>Debug Messages</h3>
-    
+
     <!-- Debug Filter -->
     <div class="debug-filter">
         <input type="text" id="debugFilter" placeholder="Filter debug messages...">
@@ -201,12 +198,13 @@
             <label><input type="checkbox" value="error" checked> Error</label>
         </div>
     </div>
-    
+
     <div id="debugOutput" class="debug-content">
         <p class="placeholder-text">Debug messages will appear here after running the API test...</p>
     </div>
 </div>
 
+<!-- Styles remain the same -->
 <style>
 .debug-filter {
     margin-bottom: 15px;
@@ -241,9 +239,6 @@
     width: 16px;
     height: 16px;
 }
-</style>
-
-<style>
 .debug-panel {
     margin-top: 40px;
     padding: 20px;
@@ -333,6 +328,7 @@ textarea {
     border-radius: 7px;
     font-size: 1.4em;
     min-height: 600px;
+    box-sizing: border-box; /* Added */
 }
 
 pre {
@@ -346,6 +342,8 @@ pre {
     font-family: monospace;
     font-size: 1.4em;
     min-height: 600px;
+    box-sizing: border-box; /* Added */
+    margin: 0; /* Added */
 }
 
 .formatted-response {
@@ -353,6 +351,7 @@ pre {
     padding: 20px;
     background: #f8f9fa;
     border-radius: 7px;
+    border: 2px solid #ccc; /* Added for consistency */
 }
 
 .response-table {
@@ -372,6 +371,7 @@ pre {
 .response-table th {
     background-color: #f1f1f1;
     font-weight: bold;
+    display: none; /* Hide header row */
 }
 
 .response-table tr:hover {
@@ -392,8 +392,8 @@ pre {
 }
 
 .test-btn {
-    display: block;
-    margin: 20px 0;
+    /* display: block; Remove block */
+    /* margin: 20px 0; Remove margin */
     padding: 17px 35px;
     background: #28a745;
     color: white;
@@ -408,8 +408,8 @@ pre {
 }
 
 .clear-btn {
-    display: block;
-    margin: 20px 0;
+    /* display: block; Remove block */
+    /* margin: 20px 0; Remove margin */
     padding: 17px 35px;
     background: #dc3545;
     color: white;
@@ -438,24 +438,57 @@ h3 {
     font-size: 1.75em;
     margin-bottom: 15px;
 }
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .layout-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    .left-panel {
+        flex: 1 1 auto; /* Allow left panel to take full width */
+        min-width: 0; /* Override fixed width */
+        width: 100%; /* Ensure it takes full width */
+    }
+    .right-panel {
+        position: static; /* Remove sticky positioning */
+        width: 100%; /* Take full width */
+    }
+    textarea, pre {
+        min-height: 300px; /* Reduce min-height on smaller screens */
+    }
+}
 </style>
 
 <script>
+// --- Debug Log Functions ---
 async function fetchDebugLogs() {
     try {
         const response = await fetch('/debug-logs');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const logs = await response.json();
         filterAndDisplayLogs(logs);
     } catch (error) {
         console.error('Error fetching debug logs:', error);
-        document.getElementById('debugOutput').innerHTML =
-            '<p class="level-error">Error fetching debug logs: ' + error.message + '</p>';
+        const debugOutput = document.getElementById('debugOutput');
+        if (debugOutput) {
+             debugOutput.innerHTML = `<div class="log-entry level-error">Error fetching debug logs: ${error.message}</div>`;
+        }
     }
 }
 
 function filterAndDisplayLogs(logs) {
     const debugOutput = document.getElementById('debugOutput');
-    
+    if (!debugOutput) return;
+
+    if (!Array.isArray(logs)) {
+        console.error("Received non-array data for logs:", logs);
+        debugOutput.innerHTML = '<div class="log-entry level-error">Invalid log data received.</div>';
+        return;
+    }
+
     if (logs.length === 0) {
         debugOutput.innerHTML = '<p class="placeholder-text">No debug messages available...</p>';
         return;
@@ -464,14 +497,19 @@ function filterAndDisplayLogs(logs) {
     // Get filter values
     const filterText = document.getElementById('debugFilter').value.toLowerCase();
     const enabledLevels = Array.from(document.querySelectorAll('.level-filters input:checked'))
-        .map(cb => cb.value);
+        .map(cb => cb.value.toLowerCase()); // Ensure lowercase comparison
 
     // Filter logs
     const filteredLogs = logs.filter(log => {
-        const levelMatch = enabledLevels.includes(log.level.toLowerCase());
+        if (!log || typeof log.level !== 'string' || typeof log.message !== 'string' || typeof log.timestamp !== 'string') {
+             console.warn("Skipping invalid log entry:", log);
+             return false; // Skip malformed log entries
+        }
+        const logLevelLower = log.level.toLowerCase();
+        const levelMatch = enabledLevels.includes(logLevelLower);
         const textMatch = !filterText ||
             log.message.toLowerCase().includes(filterText) ||
-            log.level.toLowerCase().includes(filterText) ||
+            logLevelLower.includes(filterText) ||
             log.timestamp.toLowerCase().includes(filterText);
         return levelMatch && textMatch;
     });
@@ -479,110 +517,113 @@ function filterAndDisplayLogs(logs) {
     // Display filtered logs
     debugOutput.innerHTML = filteredLogs.map(log => {
         const timestamp = `<span class="timestamp">${log.timestamp}</span>`;
-        const level = `<span class="level-${log.level.toLowerCase()}">${log.level}</span>`;
-        const message = `<span class="message">${log.message}</span>`;
-        return `<div class="log-entry">${timestamp} ${level}: ${message}</div>`;
+        const levelClass = `level-${log.level.toLowerCase()}`;
+        const level = `<span class="${levelClass}">${log.level}</span>`;
+        // Basic HTML escaping for the message to prevent XSS
+        const message = log.message.replace(/</g, "<").replace(/>/g, ">");
+        return `<div class="log-entry">${timestamp} ${level}: <span class="message">${message}</span></div>`;
     }).join('\n');
-    
+
     // Auto-scroll to bottom of debug panel
     debugOutput.scrollTop = debugOutput.scrollHeight;
 }
 
-// Add event listeners for filters
-document.addEventListener('DOMContentLoaded', function() {
-    const debugFilter = document.getElementById('debugFilter');
-    const levelFilters = document.querySelectorAll('.level-filters input');
-    
-    debugFilter.addEventListener('input', () => {
-        fetchDebugLogs(); // Refetch and refilter
-    });
-    
-    levelFilters.forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            fetchDebugLogs(); // Refetch and refilter
-        });
-    });
-});
-
+// --- API Test Functions ---
 function clearPayload() {
-    document.getElementById('requestPayload').value = '';
-    document.getElementById('responseOutput').textContent = '';
-    document.getElementById('formattedResponse').style.display = 'none';
-    document.getElementById('debugOutput').innerHTML = '<p class="placeholder-text">Debug messages will appear here after running the API test...</p>';
+    const requestPayload = document.getElementById('requestPayload');
+    const responseOutput = document.getElementById('responseOutput');
+    const formattedResponse = document.getElementById('formattedResponse');
+    const debugOutput = document.getElementById('debugOutput');
+
+    if (requestPayload) requestPayload.value = '{}'; // Set to empty JSON object
+    if (responseOutput) responseOutput.textContent = '';
+    if (formattedResponse) formattedResponse.style.display = 'none';
+    if (debugOutput) debugOutput.innerHTML = '<p class="placeholder-text">Debug messages will appear here after running the API test...</p>';
 }
+
+// Helper function to safely set content in the formatted table
+const setContent = (id, value, isHubValue = false) => {
+    const element = document.getElementById(id);
+    if (element) {
+        let displayValue = value ?? 'N/A'; // Use 'N/A' for null or undefined
+        if (Array.isArray(value)) {
+            displayValue = value.join(', '); // Join arrays with comma
+        }
+        if (isHubValue) {
+            element.innerHTML = `<span class="hub-value">${displayValue}</span>`;
+        } else {
+            element.textContent = displayValue;
+        }
+    } else {
+        console.warn(`Element with ID '${id}' not found.`);
+    }
+};
 
 async function runTest() {
+    const responseOutput = document.getElementById('responseOutput');
+    const formattedDiv = document.getElementById('formattedResponse');
+    const requestPayloadEl = document.getElementById('requestPayload');
+
+    // Clear previous results
+    if(responseOutput) responseOutput.textContent = 'Running test...';
+    if(formattedDiv) formattedDiv.style.display = 'none';
+
     try {
-        const payload = JSON.parse(document.getElementById('requestPayload').value);
+        const payload = JSON.parse(requestPayloadEl.value);
+
         const response = await fetch('/schedule', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        
+
         const result = await response.json();
-        const formattedResult = JSON.stringify(result, null, 2);
-        document.getElementById('responseOutput').textContent = formattedResult;
-        
-        // Update formatted table
-        document.getElementById('formattedResponse').style.display = 'block';
-        
-        // Helper function to safely set content
-        const setContent = (id, value, isHubValue = false) => {
-            const element = document.getElementById(id);
-            if (element) {
-                if (isHubValue) {
-                    element.innerHTML = `<span class="hub-value">${value ?? 'N/A'}</span>`;
-                } else {
-                    element.textContent = value ?? 'N/A';
-                }
-            }
-        };
+        const formattedResult = JSON.stringify(result, null, 2); // Pretty print JSON
 
-function clearPayload() {
-    document.getElementById('requestPayload').value = '';
-    document.getElementById('responseOutput').textContent = '';
-    document.getElementById('formattedResponse').style.display = 'none';
-    document.getElementById('debugOutput').innerHTML = '<p class="placeholder-text">Debug messages will appear here after running the API test...</p>';
-}
+        if(responseOutput) responseOutput.textContent = formattedResult;
 
+        if (!response.ok) {
+            throw new Error(`API Error ${response.status}: ${result.detail || response.statusText}`);
+        }
+
+        // Update formatted table only on success
+        if(formattedDiv) formattedDiv.style.display = 'block';
+
+        // --- Populate Formatted Table ---
         // Product Info
-        setContent('orderQty', payload.misOrderQTY);
         setContent('orderId', result.orderId);
-        setContent('currentHub', result.currentHub);
-        setContent('currentHub', result.currentHub, true);
-        setContent('productionHubs', result.productionHubs?.join(', '), true);
-        setContent('productGroup', result.productGroup, true);
-        setContent('productCategory', result.productCategory);
-        setContent('productionHubs', result.productionHubs?.join(', '));
         setContent('orderDescription', result.orderDescription);
+        setContent('currentHub', result.currentHub, true);
+        setContent('currentHubId', result.currentHubId); // *** ADDED ***
         setContent('preflightedWidth', result.preflightedWidth);
         setContent('preflightedHeight', result.preflightedHeight);
+        setContent('productId', result.productId, true); // *** ADDED *** (marked as hubValue for emphasis)
+        setContent('productGroup', result.productGroup, true);
+        setContent('productCategory', result.productCategory);
+        setContent('productionHubs', result.productionHubs); // Will be joined by setContent
 
         // Production Details
         setContent('cutoffStatus', result.cutoffStatus);
-        setContent('productStartDays', result.productStartDays?.join(', '));
+        setContent('productStartDays', result.productStartDays); // Will be joined
         setContent('productCutoff', result.productCutoff);
         setContent('daysToProduceBase', result.daysToProduceBase);
-        setContent('chosenProductionHub', result.chosenProductionHub, true);
-        setContent('totalProductionDays', result.totalProductionDays, true);
-        setContent('dispatchDate', result.dispatchDate, true);
+        setContent('finishingDays', result.finishingDays); // *** ADDED ***
+        setContent('totalProductionDays', result.totalProductionDays, true); // Emphasize total
+        setContent('productionGroups', result.productionGroups); // *** ADDED *** (Will be joined)
 
         // Location Info
         setContent('orderPostcode', result.orderPostcode);
-        setContent('chosenProductionHub', result.chosenProductionHub, true);
-        setContent('hubTransferTo', result.hubTransferTo);
+        setContent('chosenProductionHub', result.chosenProductionHub, true); // Emphasize chosen
+        setContent('hubTransferTo', result.hubTransferTo); // *** ADDED ***
 
         // Dates
         setContent('startDate', result.startDate);
         setContent('adjustedStartDate', result.adjustedStartDate);
-        setContent('dispatchDate', result.dispatchDate, true);
+        setContent('dispatchDate', result.dispatchDate, true); // Emphasize final date
 
         // Processing Info
         setContent('grainDirection', result.grainDirection);
-        setContent('orderQuantity', result.orderQuantity);
+        setContent('orderQuantity', result.orderQuantity); // *** Now from response ***
         setContent('orderKinds', result.orderKinds);
         setContent('totalQuantity', result.totalQuantity);
 
@@ -590,13 +631,35 @@ function clearPayload() {
         setContent('synergyPreflight', result.synergyPreflight);
         setContent('synergyImpose', result.synergyImpose);
         setContent('enableAutoHubTransfer', result.enableAutoHubTransfer);
+        // --- End Populate Table ---
 
-        // Fetch and display debug logs after API call completes
-        await fetchDebugLogs();
     } catch (error) {
-        document.getElementById('responseOutput').textContent = 'Error: ' + error.message;
-        document.getElementById('formattedResponse').style.display = 'none';
+        console.error('API Test Error:', error);
+        if(responseOutput) responseOutput.textContent = 'Error: ' + error.message;
+        if(formattedDiv) formattedDiv.style.display = 'none'; // Hide table on error
+    } finally {
+        // Fetch and display debug logs regardless of API call success/failure
+        await fetchDebugLogs();
     }
 }
+
+
+// --- Initialization ---
+document.addEventListener('DOMContentLoaded', function() {
+    const debugFilter = document.getElementById('debugFilter');
+    const levelFilters = document.querySelectorAll('.level-filters input');
+
+    if (debugFilter) {
+        debugFilter.addEventListener('input', fetchDebugLogs); // Refetch and refilter on text change
+    }
+
+    levelFilters.forEach(checkbox => {
+        checkbox.addEventListener('change', fetchDebugLogs); // Refetch and refilter on level change
+    });
+
+    // Initial fetch of logs on page load
+    fetchDebugLogs();
+});
+
 </script>
 {% endblock %}
