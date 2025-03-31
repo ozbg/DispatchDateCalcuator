@@ -4,7 +4,6 @@
       "NVS",
       "NVU",
       "NVM",
-      "Digital",
       "Holographic"
     ],
     "Match_All": [
@@ -24,8 +23,7 @@
       "NVS",
       "NVU",
       "NVM",
-      "Holographic",
-      "Digital"
+      "Holographic"
     ],
     "Match_All": [
       "Velvet",
@@ -120,9 +118,7 @@
       "Eco",
       "Knight",
       "Natural",
-      "Digital",
       "PremiumUncoated",
-      "#wa",
       "Presentation"
     ],
     "Match_All": [],
@@ -148,9 +144,7 @@
       "Eco",
       "Knight",
       "Natural",
-      "Digital",
       "PremiumUncoated",
-      "#wa",
       "Presentation"
     ],
     "Match_All": [],
@@ -168,9 +162,7 @@
   },
   {
     "Exclude_All": [
-      "Digital",
-      "PremiumUncoated",
-      "#wa"
+      "PremiumUncoated"
     ],
     "Match_All": [
       "EcoStar",
@@ -190,9 +182,7 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard",
-      "Digital",
-      "#wa"
+      "Coated1SideBoard"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -218,9 +208,7 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard",
-      "Digital",
-      "#wa"
+      "Coated1SideBoard"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -245,9 +233,7 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard",
-      "Digital",
-      "#wa"
+      "Coated1SideBoard"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -269,7 +255,6 @@
   {
     "Exclude_All": [
       "NV",
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
@@ -284,13 +269,11 @@
         "Artboard"
       ]
     ],
-    "Notes": "All Offset 450 Artboard uses the same schedule, so dont need to match BC or Branding",
     "Product_ID": 10
   },
   {
     "Exclude_All": [
       "NV",
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
@@ -302,12 +285,10 @@
         "Gloss Laminating"
       ]
     ],
-    "Notes": "All Offset 450 Artboard uses the same schedule, so dont need to match BC or Branding",
     "Product_ID": 10
   },
   {
     "Exclude_All": [
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
@@ -322,23 +303,16 @@
     "Product_ID": 11
   },
   {
-    "Exclude_All": [
-      "#wa"
-    ],
+    "Exclude_All": [],
     "Match_All": [
-      "Synthetic",
-      "Digital"
+      "Synthetic"
     ],
     "Match_Any": [],
     "Product_ID": 12
   },
   {
-    "Exclude_All": [
-      "#wa"
-    ],
-    "Match_All": [
-      "Digital"
-    ],
+    "Exclude_All": [],
+    "Match_All": [],
     "Match_Any": [
       [
         "Knight2SidedLinen",
@@ -348,12 +322,9 @@
     "Product_ID": 13
   },
   {
-    "Exclude_All": [
-      "#wa"
-    ],
+    "Exclude_All": [],
     "Match_All": [
-      "NaturalBoard",
-      "Digital"
+      "NaturalBoard"
     ],
     "Match_Any": [],
     "Product_ID": 14
@@ -372,12 +343,9 @@
       "Metallic Sliver",
       "BC",
       "Presentation",
-      "Mount",
-      "#wa"
+      "Mount"
     ],
-    "Match_All": [
-      "Digital"
-    ],
+    "Match_All": [],
     "Match_Any": [],
     "Product_ID": 15
   },
@@ -386,9 +354,7 @@
       "BC",
       "Presentation"
     ],
-    "Match_All": [
-      "Digital"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "UV",
@@ -425,10 +391,7 @@
     "Product_ID": 18
   },
   {
-    "Exclude_All": [
-      "Digital",
-      "#wa"
-    ],
+    "Exclude_All": [],
     "Match_All": [
       "Gloss"
     ],
@@ -442,10 +405,7 @@
     "Product_ID": 19
   },
   {
-    "Exclude_All": [
-      "Digital",
-      "#wa"
-    ],
+    "Exclude_All": [],
     "Match_All": [
       "Gloss",
       "150gsm"
@@ -454,10 +414,7 @@
     "Product_ID": 20
   },
   {
-    "Exclude_All": [
-      "Digital",
-      "#wa"
-    ],
+    "Exclude_All": [],
     "Match_All": [],
     "Match_Any": [
       [
@@ -473,9 +430,7 @@
   },
   {
     "Exclude_All": [
-      "Digital",
-      "Presentation",
-      "#wa"
+      "Presentation"
     ],
     "Match_All": [
       "Gloss"
@@ -502,12 +457,10 @@
       "Perfect",
       "Saddle",
       "Bind",
-      "Digital",
       "BC",
       "Branding",
       "Presentation",
-      "Mount",
-      "#wa"
+      "Mount"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -536,11 +489,9 @@
       "Perfect",
       "Saddle",
       "Bind",
-      "Digital",
       "BC",
       "Branding",
-      "Presentation",
-      "#wa"
+      "Presentation"
     ],
     "Match_All": [
       "300gsm"
@@ -555,8 +506,7 @@
   },
   {
     "Exclude_All": [
-      "Pad",
-      "#wa"
+      "Pad"
     ],
     "Match_All": [
       "100gsm",
@@ -567,7 +517,6 @@
   },
   {
     "Exclude_All": [
-      "Digital",
       "Presentation"
     ],
     "Match_All": [],
@@ -585,7 +534,6 @@
   },
   {
     "Exclude_All": [
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
@@ -602,7 +550,6 @@
   },
   {
     "Exclude_All": [
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
@@ -620,7 +567,6 @@
   },
   {
     "Exclude_All": [
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
@@ -742,9 +688,7 @@
       "Hi Bulk",
       "Metallic"
     ],
-    "Match_All": [
-      "Digital"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Scodix",
@@ -754,9 +698,7 @@
     "Product_ID": 34
   },
   {
-    "Exclude_All": [
-      "Digital"
-    ],
+    "Exclude_All": [],
     "Match_All": [
       "Uncoated"
     ],
@@ -807,20 +749,15 @@
     "Product_ID": 37
   },
   {
-    "Exclude_All": [
-      "Roll",
-      "#wa"
-    ],
+    "Product_ID": 38,
     "Match_All": [
-      "Synthetic"
+      "DISSABLED"
     ],
-    "Match_Any": [],
-    "Product_ID": 38
+    "Exclude_All": [],
+    "Match_Any": []
   },
   {
-    "Exclude_All": [
-      "#wa"
-    ],
+    "Exclude_All": [],
     "Match_All": [
       "White Repositional"
     ],
@@ -838,9 +775,7 @@
       "Mount",
       "Scodix",
       "UV",
-      "Metal",
-      "Digital",
-      "#wa"
+      "Metal"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -857,7 +792,6 @@
     "Match_Any": [
       [
         "Knight",
-        "Digital",
         "Board"
       ],
       [
@@ -877,9 +811,7 @@
     "Product_ID": 44
   },
   {
-    "Exclude_All": [
-      "#wa"
-    ],
+    "Exclude_All": [],
     "Match_All": [],
     "Match_Any": [
       [
@@ -922,19 +854,14 @@
   {
     "Exclude_All": [],
     "Match_All": [
-      "Synthetic",
-      "Digital",
-      "#wa"
+      "Synthetic"
     ],
     "Match_Any": [],
     "Product_ID": 49
   },
   {
     "Exclude_All": [],
-    "Match_All": [
-      "Digital",
-      "#wa"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Knight2SidedLinen",
@@ -960,9 +887,7 @@
       "Presentation"
     ],
     "Match_All": [
-      "Natural Board",
-      "Digital",
-      "#wa"
+      "Natural Board"
     ],
     "Match_Any": [],
     "Product_ID": 51
@@ -983,10 +908,7 @@
       "Presentation",
       "Mount"
     ],
-    "Match_All": [
-      "Digital",
-      "#wa"
-    ],
+    "Match_All": [],
     "Match_Any": [],
     "Product_ID": 52
   },
@@ -1004,12 +926,10 @@
       "Perfect",
       "Saddle",
       "Bind",
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
-      "Gloss",
-      "#wa"
+      "Gloss"
     ],
     "Match_Any": [
       [
@@ -1034,13 +954,11 @@
       "Perfect",
       "Saddle",
       "Bind",
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
       "Gloss",
-      "150gsm",
-      "#wa"
+      "150gsm"
     ],
     "Match_Any": [],
     "Product_ID": 54
@@ -1054,12 +972,9 @@
       "Scodix",
       "UV",
       "Metal",
-      "Digital",
       "Presentation"
     ],
-    "Match_All": [
-      "#wa"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "150gsm",
@@ -1086,12 +1001,10 @@
       "Perfect",
       "Saddle",
       "Bind",
-      "Digital",
       "Presentation"
     ],
     "Match_All": [
-      "Gloss",
-      "#wa"
+      "Gloss"
     ],
     "Match_Any": [
       [
@@ -1116,15 +1029,12 @@
       "Perfect",
       "Saddle",
       "Bind",
-      "Digital",
       "BC",
       "Branding",
       "Presentation",
       "Mount"
     ],
-    "Match_All": [
-      "#wa"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "310gsm",
@@ -1152,14 +1062,12 @@
       "Perfect",
       "Saddle",
       "Bind",
-      "Digital",
       "BC",
       "Branding",
       "Presentation"
     ],
     "Match_All": [
-      "300gsm",
-      "#wa"
+      "300gsm"
     ],
     "Match_Any": [
       [
@@ -1188,8 +1096,7 @@
     ],
     "Match_All": [
       "100gsm",
-      "Laser",
-      "#wa"
+      "Laser"
     ],
     "Match_Any": [],
     "Product_ID": 58
@@ -1205,12 +1112,9 @@
       "Mount",
       "Scodix",
       "UV",
-      "Metal",
-      "Digital"
+      "Metal"
     ],
-    "Match_All": [
-      "#wa"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Silk",
@@ -1220,12 +1124,9 @@
     "Product_ID": 59
   },
   {
-    "Exclude_All": [
-      "Roll"
-    ],
+    "Exclude_All": [],
     "Match_All": [
-      "Synthetic",
-      "#wa"
+      "DISSABLED"
     ],
     "Match_Any": [],
     "Product_ID": 60
@@ -1233,17 +1134,14 @@
   {
     "Exclude_All": [],
     "Match_All": [
-      "White Repositional",
-      "#wa"
+      "White Repositional"
     ],
     "Match_Any": [],
     "Product_ID": 61
   },
   {
     "Exclude_All": [],
-    "Match_All": [
-      "#wa"
-    ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Wallet",

@@ -90,9 +90,9 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # ----------------------------------------------------------------
     # Step 1c) Add #wa tag to WA orders for special product matching
     # ----------------------------------------------------------------
-    if req.misCurrentHub.lower() == "wa":
-        logger.debug("Current hub is WA => appending #wa tag to description")
-        req.description = f"{req.description} #wa"    
+    #if req.misCurrentHub.lower() == "wa":
+    #    logger.debug("Current hub is WA => appending #wa tag to description")
+    #    req.description = f"{req.description} #wa"    
     
     # ----------------------------------------------------------------
     # Step 1d) Assign production groups based on order description

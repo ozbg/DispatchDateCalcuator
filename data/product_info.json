@@ -8,8 +8,7 @@
     ],
     "Cutoff": 12,
     "printTypes": [
-      1,
-      2
+      1
     ],
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
@@ -160,7 +159,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -192,7 +190,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -221,7 +218,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -253,7 +249,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -334,7 +329,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -368,7 +362,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -400,7 +393,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -435,7 +427,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -555,7 +546,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -586,7 +576,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -621,7 +610,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -652,7 +640,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -684,7 +671,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -719,7 +705,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -845,7 +830,7 @@
     "Modified_run_date": []
   },
   "29": {
-    "Product_Category": "Diecut Artboard",
+    "Product_Category": "Offset Diecut Artboard",
     "Product_Group": "Standard Presentation Folder or Diecut Artboard Including Laminate",
     "Product_ID": 29,
     "Production_Hub": [
@@ -892,7 +877,7 @@
     ]
   },
   "30": {
-    "Product_Category": "Diecut Artboard + Scodix or Metal",
+    "Product_Category": "Offset Diecut Artboard + Scodix or Metal",
     "Product_Group": "Standard Presentation Folder or Diecut Artboard Including Laminate",
     "Product_ID": 30,
     "Production_Hub": [
@@ -993,7 +978,7 @@
     "Modified_run_date": []
   },
   "33": {
-    "Product_Category": "Diecut Promotional",
+    "Product_Category": "Offset Diecut Promotional",
     "Product_Group": "Hanger, Wobbler, Circle, Card Holder, Voucher Card ",
     "Product_ID": 33,
     "Production_Hub": [
@@ -1086,7 +1071,7 @@
     ]
   },
   "36": {
-    "Product_Category": "Ecostar Silk",
+    "Product_Category": "Offset Ecostar Silk",
     "Product_Group": "130gsm, 150gsm, 250gsm, 300gsm  Ecostar Silk",
     "Product_ID": 36,
     "Production_Hub": [
@@ -1153,24 +1138,15 @@
     "Modified_run_date": []
   },
   "38": {
-    "Product_Category": "Synthetic",
-    "Product_Group": "Synthetic (2 days product)",
+    "Product_Category": "DISSABLED",
+    "Product_Group": "",
     "Product_ID": 38,
-    "Production_Hub": [
-      "wa",
-      "qld"
-    ],
+    "Production_Hub": [],
     "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
-    ],
+    "scheduleAppliesTo": [],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1180,15 +1156,11 @@
     ],
     "Days_to_produce": 2,
     "Modified_run_date": [],
-    "printTypes": [
-      1,
-      2,
-      3
-    ]
+    "printTypes": []
   },
   "39": {
-    "Product_Category": "White Repositional",
-    "Product_Group": "White Repositional (2 days product)",
+    "Product_Category": "White Repositionable",
+    "Product_Group": "White Repositionable (2 days product)",
     "Product_ID": 39,
     "Production_Hub": [
       "wa",
@@ -1201,7 +1173,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -1215,9 +1186,7 @@
     "Days_to_produce": 2,
     "Modified_run_date": [],
     "printTypes": [
-      1,
-      2,
-      3
+      1
     ]
   },
   "40": {
@@ -1238,7 +1207,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -1330,7 +1298,6 @@
     "scheduleAppliesTo": [
       1,
       2,
-      3,
       5,
       24
     ],
@@ -1344,8 +1311,7 @@
     "Days_to_produce": 5,
     "Modified_run_date": [],
     "printTypes": [
-      2,
-      3
+      2
     ]
   },
   "46": {
@@ -1357,22 +1323,14 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
-    "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
-    ],
+    "scheduleAppliesTo": [],
     "Start_days": [
       "Monday",
       "Wednesday"
     ],
     "Days_to_produce": null,
     "Modified_run_date": [],
-    "printTypes": [
-      1
-    ]
+    "printTypes": []
   },
   "47": {
     "Product_Category": "Disabled",
@@ -1383,22 +1341,14 @@
     "SynergyPreflight": null,
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
-    "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
-    ],
+    "scheduleAppliesTo": [],
     "Start_days": [
       "Monday",
       "Wednesday"
     ],
     "Days_to_produce": null,
     "Modified_run_date": [],
-    "printTypes": [
-      1
-    ]
+    "printTypes": []
   },
   "48": {
     "Product_Category": "Roll Label",
@@ -1409,7 +1359,6 @@
     ],
     "Cutoff": 12,
     "printTypes": [
-      1,
       2,
       3
     ],
@@ -1445,11 +1394,7 @@
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1476,11 +1421,7 @@
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1507,11 +1448,7 @@
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1538,11 +1475,7 @@
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1569,11 +1502,7 @@
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1600,11 +1529,7 @@
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1631,11 +1556,7 @@
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1662,11 +1583,7 @@
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1693,11 +1610,7 @@
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1724,11 +1637,7 @@
     "SynergyImpose": 1,
     "EnableAutoHubTransfer": 1,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1744,7 +1653,7 @@
     ]
   },
   "59": {
-    "Product_Category": "Offset Flyer",
+    "Product_Category": "WA Offset Flyer",
     "Product_Group": "WA Offset 113,128,200,250gsm Silk/Matt 1S or 2S",
     "Product_ID": 59,
     "Production_Hub": [
@@ -1755,11 +1664,7 @@
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1775,23 +1680,15 @@
     ]
   },
   "60": {
-    "Product_Category": "WA Synthetic",
-    "Product_Group": "WA Synthetic",
+    "Product_Category": "DISSABLED",
+    "Product_Group": "",
     "Product_ID": 60,
-    "Production_Hub": [
-      "wa"
-    ],
+    "Production_Hub": [],
     "Cutoff": 12,
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": 1,
-    "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
-    ],
+    "scheduleAppliesTo": [],
     "Start_days": [
       "Monday",
       "Tuesday",
@@ -1801,15 +1698,11 @@
     ],
     "Days_to_produce": 3,
     "Modified_run_date": [],
-    "printTypes": [
-      1,
-      2,
-      3
-    ]
+    "printTypes": []
   },
   "61": {
-    "Product_Category": "WA White Repositional",
-    "Product_Group": "WA White Repositional",
+    "Product_Category": "WA White Repositionable",
+    "Product_Group": "WA White Repositionable",
     "Product_ID": 61,
     "Production_Hub": [
       "wa"
@@ -1819,11 +1712,7 @@
     "SynergyImpose": 0,
     "EnableAutoHubTransfer": null,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1852,11 +1741,7 @@
     "SynergyImpose": null,
     "EnableAutoHubTransfer": null,
     "scheduleAppliesTo": [
-      1,
-      2,
-      3,
-      5,
-      24
+      3
     ],
     "Start_days": [
       "Monday",
@@ -1868,8 +1753,7 @@
     "Days_to_produce": 7,
     "Modified_run_date": [],
     "printTypes": [
-      2,
-      3
+      2
     ]
   },
   "99": {
