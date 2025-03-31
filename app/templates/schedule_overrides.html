@@ -18,12 +18,13 @@
         </div>
         <div class="rule-box">
             <h4>Print Dates</h4>
-            <p>Specify when production starts and ends for special cases.</p>
-            <p class="example">Select the original run date being moved, then set the new print date and dispatch date.<br><br> Additional production days may be required for large quantities or extra finishing tasks.</p>
+            <!-- Updated Explanation -->
+            <p>Specify the original print date and the new print date for special cases.</p>
+            <p class="example">Select the original run date being moved, then set the new print date.<br><br> The dispatch date will be automatically recalculated based on the new print date and the product's total production time.</p>
         </div>
         <div class="rule-box">
             <h4>Apply To</h4>
-            <p>Choose which states and product categories are affected by the override.</p>
+            <p>Choose which states and product types are affected by the override.</p>
             <p class="example">Example: Only Offset product runs are affected by the override.</p>
         </div>
     </div>
@@ -38,17 +39,14 @@
             </div>
             <div class="date-group">
                 <div class="date-item">
-                    <label for="productionDate">Print Date</label>
+                    <label for="productionDate">Original Print Date</label> <!-- Renamed label for clarity -->
                     <input type="date" id="productionDate" required>
                 </div>
                 <div class="date-item">
                     <label for="newProductionDate">New Print Date</label>
                     <input type="date" id="newProductionDate" required>
                 </div>
-                <div class="date-item">
-                    <label for="dispatchDate">New Dispatch Date</label>
-                    <input type="date" id="dispatchDate" required>
-                </div>
+                <!-- REMOVED New Dispatch Date Input -->
             </div>
             <div class="item">
                 <label>Apply To</label>
@@ -80,25 +78,27 @@
                 <th>Product ID</th>
                 <th>Product Category</th>
                 <th>Product Group</th>
-                <th>Print Date</th>
+                <th>Original Print Date</th> <!-- Renamed header -->
                 <th>New Print Date</th>
-                <th>New Dispatch Date</th>
+                <!-- REMOVED New Dispatch Date Header -->
                 <th>States</th>
-                <th>Products</th>
+                <th>Product Types</th> <!-- Renamed header -->
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
+            <!-- Rows added by JS -->
         </tbody>
     </table>
 </div>
 
 <div class="json-preview">
-    <h3>Product Info JSON</h3>
+    <h3>Product Info JSON (Includes Overrides)</h3> <!-- Updated header -->
     <textarea id="productInfoJSON" readonly></textarea>
     <button class="select-btn" onclick="selectAllJSON()">Select All</button>
 </div>
 
+<!-- Styles remain the same -->
 <style>
 .help-section {
     background: #f8f9fa;
@@ -160,7 +160,7 @@
 .date-group {
     display: flex;
     gap: 20px;
-    justify-content: space-between;
+    justify-content: space-between; /* Keeps remaining items spaced */
 }
 
 .date-item {
@@ -175,10 +175,12 @@
 }
 
 .date-item input[type="date"] {
-    width: 50%;
+    /* Changed width to be more flexible */
+    width: calc(100% - 34px); /* Adjust padding */
     padding: 17px;
     border: 1px solid #ddd;
     font-size: 1.0em;
+    box-sizing: border-box;
 }
 
 .checkbox-group {
@@ -282,16 +284,25 @@ th {
 }
 
 /* Edit mode styles */
-.edit-mode input {
+.edit-mode input[type="date"] { /* Target date inputs specifically */
     width: 100%;
     padding: 8px;
     border: 1px solid #007bff;
     border-radius: 3px;
     font-size: 1em;
+    box-sizing: border-box; /* Ensure padding is included */
 }
 
 .edit-mode .checkbox-cell {
     padding: 8px;
+    /* Optional: Add alignment if needed */
+    vertical-align: middle;
+}
+
+.edit-mode .checkbox-cell label {
+    display: block; /* Stack checkboxes vertically */
+    margin-bottom: 4px;
+    font-size: 0.9em;
 }
 
 .edit-mode .save-edit-btn,
@@ -320,174 +331,245 @@ let product_info = {};
 
 function displayOverrides() {
     const table = document.getElementById("overrideTable").getElementsByTagName('tbody')[0];
-    table.innerHTML = '';
+    table.innerHTML = ''; // Clear existing rows
 
     for (const productId in product_info) {
-        const overrides = product_info[productId].Modified_run_date;
-        
-        for (let i = 0; i < overrides.length; i++) {
-            const row = table.insertRow();
-            
-            row.insertCell().textContent = productId;
-            row.insertCell().textContent = product_info[productId].Product_Category;
-            row.insertCell().textContent = product_info[productId].Product_Group;
-            row.insertCell().textContent = overrides[i][0];
-            row.insertCell().textContent = overrides[i][1];
-            row.insertCell().textContent = overrides[i][2];
-            row.insertCell().textContent = overrides[i][3].join(", ");
-            row.insertCell().textContent = overrides[i][4].join(", ");
+        const overrides = product_info[productId]?.Modified_run_date || []; // Handle case where key might not exist
 
-            const actionCell = row.insertCell();
-            const editBtn = document.createElement("button");
-            editBtn.textContent = "Edit";
-            editBtn.className = "edit-btn";
-            editBtn.onclick = () => editOverride(row, productId, i);
-            
-            const deleteBtn = document.createElement("button");
-            deleteBtn.textContent = "Delete";
-            deleteBtn.className = "delete-btn";
-            deleteBtn.onclick = () => deleteOverride(productId, i);
-            
-            actionCell.appendChild(editBtn);
-            actionCell.appendChild(deleteBtn);
+        for (let i = 0; i < overrides.length; i++) {
+            // Check if the override array has the expected length (now 4)
+            if (overrides[i] && overrides[i].length >= 4) {
+                const row = table.insertRow();
+
+                row.insertCell().textContent = productId;
+                row.insertCell().textContent = product_info[productId]?.Product_Category || 'N/A';
+                row.insertCell().textContent = product_info[productId]?.Product_Group || 'N/A';
+                row.insertCell().textContent = overrides[i][0]; // Original Print Date
+                row.insertCell().textContent = overrides[i][1]; // New Print Date
+                // REMOVED cell for Dispatch Date
+                row.insertCell().textContent = (overrides[i][2] || []).join(", "); // States (index 2)
+                row.insertCell().textContent = (overrides[i][3] || []).join(", "); // Product Types (index 3)
+
+                const actionCell = row.insertCell();
+                const editBtn = document.createElement("button");
+                editBtn.textContent = "Edit";
+                editBtn.className = "edit-btn";
+                editBtn.onclick = () => editOverride(row, productId, i);
+
+                const deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "Delete";
+                deleteBtn.className = "delete-btn";
+                deleteBtn.onclick = () => deleteOverride(productId, i);
+
+                actionCell.appendChild(editBtn);
+                actionCell.appendChild(deleteBtn);
+            } else {
+                 console.warn(`Skipping invalid override structure for product ${productId} at index ${i}:`, overrides[i]);
+            }
         }
     }
 }
 
 function editOverride(row, productId, index) {
     const override = product_info[productId].Modified_run_date[index];
-    const cells = row.cells;
-    
-    // Save original content for cancel
+    // Ensure override exists and has correct length before proceeding
+    if (!override || override.length < 4) {
+        console.error("Cannot edit invalid override data:", override);
+        alert("Error: Cannot edit this override due to invalid data structure.");
+        return;
+    }
+    const cells = row.cells; // Get cells AFTER validation
+
+    // Save original content for cancel (excluding dispatch date)
     const originalContent = {
         printDate: override[0],
         newPrintDate: override[1],
-        dispatchDate: override[2],
-        states: override[3],
-        products: override[4]
+        states: override[2], // Now index 2
+        products: override[3] // Now index 3
     };
 
     // Convert cells to edit mode
-    cells[3].innerHTML = `<input type="date" value="${override[0]}">`;
-    cells[4].innerHTML = `<input type="date" value="${override[1]}">`;
-    cells[5].innerHTML = `<input type="date" value="${override[2]}">`;
-    
-    // States checkboxes
-    const statesCell = cells[6];
+    cells[3].innerHTML = `<input type="date" value="${override[0]}">`; // Original Print Date
+    cells[4].innerHTML = `<input type="date" value="${override[1]}">`; // New Print Date
+    // Cell 5 (Dispatch Date) is GONE
+
+    // States checkboxes (now in cell index 5)
+    const statesCell = cells[5];
     statesCell.innerHTML = '';
-    statesCell.className = 'checkbox-cell';
+    statesCell.className = 'checkbox-cell'; // Add class for styling
     const states = ['nsw', 'vic', 'wa', 'qld', 'nqld'];
+    const currentStates = override[2] || []; // Default to empty array if null/undefined
     states.forEach(state => {
         const label = document.createElement('label');
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = state;
-        checkbox.checked = override[3].includes(state);
+        checkbox.checked = currentStates.includes(state);
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(state.toUpperCase()));
         statesCell.appendChild(label);
     });
 
-    // Products checkboxes
-    const productsCell = cells[7];
+    // Products checkboxes (now in cell index 6)
+    const productsCell = cells[6];
     productsCell.innerHTML = '';
-    productsCell.className = 'checkbox-cell';
+    productsCell.className = 'checkbox-cell'; // Add class for styling
     const products = [
         {value: '1', label: 'Offset'},
         {value: '2', label: 'Digital'},
         {value: '4', label: 'WF'}
     ];
+    const currentProducts = override[3] || []; // Default to empty array if null/undefined
     products.forEach(product => {
         const label = document.createElement('label');
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.value = product.value;
-        checkbox.checked = override[4].includes(product.value);
+        // Ensure comparison is correct (value is string, currentProducts might be numbers)
+        checkbox.checked = currentProducts.map(String).includes(product.value);
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(product.label));
         productsCell.appendChild(label);
     });
 
-    // Replace action buttons
-    const actionCell = cells[8];
+    // Replace action buttons (now in cell index 7)
+    const actionCell = cells[7];
     actionCell.innerHTML = '';
-    
+
     const saveBtn = document.createElement('button');
     saveBtn.textContent = 'Save';
     saveBtn.className = 'save-edit-btn';
     saveBtn.onclick = () => saveEditedOverride(row, productId, index);
-    
+
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = 'Cancel';
     cancelBtn.className = 'cancel-edit-btn';
-    cancelBtn.onclick = () => cancelEdit(row, originalContent);
-    
+    cancelBtn.onclick = () => cancelEdit(row, originalContent); // Pass originalContent
+
     actionCell.appendChild(saveBtn);
     actionCell.appendChild(cancelBtn);
-    
-    row.className = 'edit-mode';
+
+    row.className = 'edit-mode'; // Apply edit mode class
 }
 
 function saveEditedOverride(row, productId, index) {
     const cells = row.cells;
+    // Ensure we have enough cells before trying to access them
+    if (cells.length < 7) { // Need cells up to index 6
+         console.error("Error saving edit: Row structure seems incorrect.");
+         alert("Error saving changes. Please refresh the page.");
+         return;
+    }
+
+    // Read values from inputs, adjusting indices
     const newOverride = [
-        cells[3].querySelector('input').value,
-        cells[4].querySelector('input').value,
-        cells[5].querySelector('input').value,
-        Array.from(cells[6].querySelectorAll('input:checked')).map(cb => cb.value),
-        Array.from(cells[7].querySelectorAll('input:checked')).map(cb => cb.value)
+        cells[3].querySelector('input[type="date"]')?.value || '', // Original Print Date
+        cells[4].querySelector('input[type="date"]')?.value || '', // New Print Date
+        // No dispatch date at index 2
+        Array.from(cells[5].querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value), // States (was cell 6)
+        Array.from(cells[6].querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)  // Products (was cell 7)
     ];
-    
+
+    // Basic validation
+    if (!newOverride[0] || !newOverride[1]) {
+        alert("Original Print Date and New Print Date cannot be empty.");
+        return;
+    }
+
     product_info[productId].Modified_run_date[index] = newOverride;
-    saveOverrides();
+    saveOverrides(); // This will call displayOverrides on success
 }
 
+// Cancel function remains the same - redraws the table
 function cancelEdit(row, originalContent) {
-    displayOverrides(); // Refresh the entire table
+    displayOverrides(); // Simplest way to revert - redraw the whole table
 }
 
+// Delete function remains the same
 function deleteOverride(productId, index) {
     if (confirm('Are you sure you want to delete this override?')) {
-        product_info[productId].Modified_run_date.splice(index, 1);
-        saveOverrides();
+        if (product_info[productId] && product_info[productId].Modified_run_date) {
+             product_info[productId].Modified_run_date.splice(index, 1);
+             saveOverrides(); // Save and refresh table
+        } else {
+             console.error(`Could not find override to delete for product ${productId} at index ${index}`);
+        }
     }
 }
 
+// Populate dropdown remains the same
 function populateProductDropdown() {
     const select = document.getElementById("productID");
-    select.innerHTML = '';
-    
-    for (const productId in product_info) {
-        const option = document.createElement("option");
-        option.value = productId;
-        option.textContent = `${productId} - ${product_info[productId].Product_Category} - ${product_info[productId].Product_Group}`;
-        select.appendChild(option);
+    select.innerHTML = ''; // Clear existing options
+
+    // Sort product IDs numerically or alphabetically if desired
+    const sortedProductIds = Object.keys(product_info).sort((a, b) => {
+        // Example: Sort numerically if IDs are numbers, otherwise alphabetically
+        const numA = parseInt(a);
+        const numB = parseInt(b);
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return numA - numB;
+        }
+        return a.localeCompare(b);
+    });
+
+    for (const productId of sortedProductIds) {
+        const product = product_info[productId];
+        if (product) { // Ensure product data exists
+            const option = document.createElement("option");
+            option.value = productId;
+            option.textContent = `${productId} - ${product.Product_Category || 'No Category'} - ${product.Product_Group || 'No Group'}`;
+            select.appendChild(option);
+        }
     }
 }
 
+// Update form submission handler
 document.getElementById("overrideForm").onsubmit = function(e) {
     e.preventDefault();
-    
+
     const productIDs = Array.from(document.getElementById("productID").selectedOptions).map(opt => opt.value);
+    const originalPrintDate = document.getElementById("productionDate").value;
+    const newPrintDate = document.getElementById("newProductionDate").value;
+
+    // Basic validation
+    if (!originalPrintDate || !newPrintDate) {
+        alert("Original Print Date and New Print Date are required.");
+        return;
+    }
+     if (productIDs.length === 0) {
+        alert("Please select at least one product to apply the override to.");
+        return;
+    }
+
+    // Create the 4-element override array
     const override = [
-        document.getElementById("productionDate").value,
-        document.getElementById("newProductionDate").value,
-        document.getElementById("dispatchDate").value,
+        originalPrintDate,
+        newPrintDate,
+        // No dispatch date
         Array.from(document.querySelectorAll('input[type="checkbox"][id^="state"]:checked')).map(cb => cb.value),
         Array.from(document.querySelectorAll('input[type="checkbox"][id^="product"]:checked')).map(cb => cb.value)
     ];
 
+    // Add the override to each selected product
     for (const productId of productIDs) {
+        if (!product_info[productId]) {
+             console.warn(`Product ID ${productId} not found in product_info while adding override.`);
+             continue; // Skip if product doesn't exist
+        }
         if (!product_info[productId].Modified_run_date) {
-            product_info[productId].Modified_run_date = [];
+            product_info[productId].Modified_run_date = []; // Initialize if it doesn't exist
         }
         product_info[productId].Modified_run_date.push(override);
     }
 
-    saveOverrides();
-    this.reset();
+    saveOverrides(); // Save changes
+    this.reset(); // Reset the form
+    // Clear selection in multi-select (optional, improves UX)
+    Array.from(document.getElementById("productID").options).forEach(option => option.selected = false);
 };
 
+// Save function remains the same
 function saveOverrides() {
     fetch('/save-overrides', {
         method: 'POST',
@@ -496,27 +578,52 @@ function saveOverrides() {
         },
         body: JSON.stringify(product_info)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            // Attempt to get error message from backend
+            return response.json().then(err => { throw new Error(err.message || `HTTP error! status: ${response.status}`) });
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            displayOverrides();
-            document.getElementById("productInfoJSON").value = JSON.stringify(product_info, null, 2);
+            // Update local data in case save modifies it (though unlikely here)
+            // product_info = data.updated_data || product_info; // If backend sent updated data back
+            displayOverrides(); // Refresh the table display
+            document.getElementById("productInfoJSON").value = JSON.stringify(product_info, null, 2); // Update JSON preview
         } else {
             alert('Error saving overrides: ' + data.message);
         }
     })
     .catch(error => {
-        alert('Error saving overrides: ' + error);
+        console.error('Error during saveOverrides fetch:', error);
+        alert('Error saving overrides: ' + error.message);
     });
 }
 
+// SelectAll JSON remains the same
 function selectAllJSON() {
     const textarea = document.getElementById("productInfoJSON");
     textarea.select();
-    textarea.setSelectionRange(0, textarea.value.length);
+    textarea.setSelectionRange(0, textarea.value.length); // For mobile friendliness
+    try {
+        // Modern browsers
+        navigator.clipboard.writeText(textarea.value);
+        // Optionally provide feedback: alert('Copied!');
+    } catch (err) {
+        // Fallback for older browsers
+        console.warn('Clipboard API not available, trying execCommand');
+        try {
+            document.execCommand('copy');
+             // Optionally provide feedback: alert('Copied!');
+        } catch (execErr) {
+            console.error('Failed to copy JSON:', execErr);
+            alert('Failed to copy JSON automatically. Please select and copy manually.');
+        }
+    }
 }
 
-// Initial load
+// Initial load remains the same
 fetch('/get-products')
     .then(response => response.json())
     .then(data => {
@@ -526,7 +633,8 @@ fetch('/get-products')
         document.getElementById("productInfoJSON").value = JSON.stringify(product_info, null, 2);
     })
     .catch(error => {
-        alert('Error loading product data: ' + error);
+        console.error('Error loading product data:', error); // Log error to console
+        alert('Error loading product data: ' + error.message); // Show user friendly message
     });
 </script>
 {% endblock %}

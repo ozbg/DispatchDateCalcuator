@@ -389,12 +389,12 @@ def check_modified_run_dates(adjusted_start_date: datetime.date, product_obj: di
     modified_dates = product_obj.get("Modified_run_date", [])
     
     for modified_date in modified_dates:
-        if len(modified_date) < 5:  # Ensure array has all required elements
+        if len(modified_date) < 4:  # Ensure array has all required elements
             continue
             
         scheduled_print_date = datetime.strptime(modified_date[0], "%Y-%m-%d").date()
         new_print_date = datetime.strptime(modified_date[1], "%Y-%m-%d").date()
-        affected_states = [s.lower() for s in modified_date[3]]
+        affected_states = [s.lower() for s in modified_date[2]]
         
         # If this modification applies to our state and date
         if (state.lower() in affected_states and
