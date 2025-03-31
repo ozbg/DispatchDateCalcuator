@@ -248,7 +248,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     modified_start = check_modified_run_dates(
         adjusted_start_date,
         product_obj,
-        req.misDeliversToState
+        chosen_hub
     )
     
     if modified_start:
@@ -373,35 +373,62 @@ def get_next_valid_start_day(date, allowed_start_days):
             return current_date
         current_date += timedelta(days=1)
 
-def check_modified_run_dates(adjusted_start_date: datetime.date, product_obj: dict, state: str) -> datetime.date:
+def check_modified_run_dates(adjusted_start_date: datetime.date, product_obj: dict, chosen_hub: str) -> Optional[datetime.date]: # MODIFIED: Renamed 'state' argument to 'chosen_hub'
     """
-    Check if there's a modified run date that applies to this order.
+    Check if there's a modified run date that applies to this order based on
+    original print date and the chosen production hub.
     Only returns the new print date if a modification applies.
-    
+
     Args:
         adjusted_start_date: The calculated start date after weekday adjustments
         product_obj: The product object containing Modified_run_date array
-        state: The delivery state (e.g., 'vic', 'nsw')
-    
+        chosen_hub: The final selected production hub (e.g., 'vic', 'nsw') # MODIFIED: Description updated
+
     Returns:
         datetime.date: New start date if modified, None if no modification applies
     """
     modified_dates = product_obj.get("Modified_run_date", [])
-    
+    logger.debug(f"Checking modified run dates for product {product_obj.get('Product_ID', 'N/A')} against date {adjusted_start_date} and chosen hub {chosen_hub}") # MODIFIED: Log message updated
+
     for modified_date in modified_dates:
-        if len(modified_date) < 4:  # Ensure array has all required elements
+        # Expecting 3 elements: [OrigPrint, NewPrint, [States/Hubs]] - Assume the list contains hub names matching state abbreviations for now
+        if not isinstance(modified_date, list) or len(modified_date) < 3:
+            logger.warning(f"Skipping malformed override entry: {modified_date}")
             continue
-            
-        scheduled_print_date = datetime.strptime(modified_date[0], "%Y-%m-%d").date()
-        new_print_date = datetime.strptime(modified_date[1], "%Y-%m-%d").date()
-        affected_states = [s.lower() for s in modified_date[2]]
-        
-        # If this modification applies to our state and date
-        if (state.lower() in affected_states and
+
+        try:
+            # Validate and parse dates
+            scheduled_print_date_str = modified_date[0]
+            new_print_date_str = modified_date[1]
+            if not scheduled_print_date_str or not new_print_date_str:
+                 logger.warning(f"Skipping override due to missing date(s): {modified_date}")
+                 continue
+            scheduled_print_date = datetime.strptime(scheduled_print_date_str, "%Y-%m-%d").date()
+            new_print_date = datetime.strptime(new_print_date_str, "%Y-%m-%d").date()
+
+            # Validate states/hubs list (assuming it contains hub names like 'vic', 'nsw')
+            affected_hubs_raw = modified_date[2] # Renamed variable for clarity
+            if not isinstance(affected_hubs_raw, list):
+                 logger.warning(f"Skipping override due to invalid affected hubs format: {modified_date}")
+                 continue
+            affected_hubs = [h.lower() for h in affected_hubs_raw if isinstance(h, str)] # Renamed variable for clarity
+
+        except (ValueError, TypeError, IndexError) as e:
+            logger.warning(f"Skipping override due to parsing error ({e}): {modified_date}")
+            continue
+
+        logger.debug(f"Evaluating override: TargetDate={scheduled_print_date}, NewDate={new_print_date}, TargetHubs={affected_hubs}") # MODIFIED: Log message updated
+
+        # MODIFIED: If this modification applies to our chosen hub and date
+        if (chosen_hub.lower() in affected_hubs and
             adjusted_start_date == scheduled_print_date):
-            logger.debug(f"Found modified start date: {new_print_date}")
+            logger.debug(f"Override MATCHED: Applying modified start date: {new_print_date} for original {scheduled_print_date} in hub {chosen_hub}") # MODIFIED: Log message updated
             return new_print_date
-            
+        else:
+             # MODIFIED: Updated log condition check description
+            logger.debug(f"Override NO MATCH: Hub match ({chosen_hub.lower()} in {affected_hubs}): {chosen_hub.lower() in affected_hubs}, Date match: {adjusted_start_date == scheduled_print_date}")
+
+    logger.debug("No applicable modified run date found.")
     return None
 
 def add_business_days(start_date, total_prod_days, closed_dates):

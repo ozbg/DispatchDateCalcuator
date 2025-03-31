@@ -28,7 +28,15 @@
       "Friday"
     ],
     "Days_to_produce": 2,
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-04-01",
+        "2025-04-23",
+        [
+          "vic"
+        ]
+      ]
+    ]
   },
   "2": {
     "Product_Category": "Offset 450+ NV Branding Cards",
@@ -861,19 +869,7 @@
       "Friday"
     ],
     "Days_to_produce": 3,
-    "Modified_run_date": [
-      [
-        "2025-03-31",
-        "2025-04-01",
-        [
-          "nqld"
-        ],
-        [
-          "1",
-          "2"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "30": {
     "Product_Category": "Offset Diecut Artboard + Scodix or Metal",
@@ -1403,17 +1399,7 @@
       "Friday"
     ],
     "Days_to_produce": 2,
-    "Modified_run_date": [
-      [
-        "2025-04-01",
-        "2025-04-15",
-        [
-          "vic",
-          "wa"
-        ],
-        []
-      ]
-    ],
+    "Modified_run_date": [],
     "printTypes": [
       2
     ]
