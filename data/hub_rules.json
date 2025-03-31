@@ -1,18 +1,6 @@
 {
   "rules": [
     {
-      "id": "rule_1742852102108",
-      "description": "QLD North Digital Only",
-      "hubId": "nqld",
-      "priority": 2,
-      "enabled": true,
-      "orderCriteria": {
-        "keywords": [
-          "Offset"
-        ]
-      }
-    },
-    {
       "id": "rule_1743058416061",
       "description": "QLD Digital Only",
       "hubId": "nqld",

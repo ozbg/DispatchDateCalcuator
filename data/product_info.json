@@ -1247,7 +1247,15 @@
       "Friday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-04-01",
+        "2025-04-09",
+        [
+          "nqld"
+        ]
+      ]
+    ]
   },
   "44": {
     "Product_Category": "Mounted Strut Card",
