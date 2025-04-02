@@ -25,7 +25,8 @@ from app.data_manager import (
     get_product_info_data, save_product_info_data,
     get_cmyk_hubs_data, save_cmyk_hubs_data,
     get_product_keywords_data, save_product_keywords_data,
-    get_hub_data, save_hub_data
+    get_hub_data, save_hub_data,
+    get_imposing_rules_data, save_imposing_rules_data 
 )
 from app.models import ScheduleRequest, ScheduleResponse
 from app.schedule_logic import process_order
@@ -490,6 +491,72 @@ async def delete_rule(rule_id: str):
             {"success": False, "message": f"Error deleting rule: {str(e)}"},
             status_code=500
         )
+
+# --- NEW: Imposing Rules ---
+@app.get("/imposing-rules", response_class=HTMLResponse, tags=["UI"])
+async def imposing_rules_page(request: Request):
+    """Serves the HTML page for managing imposing rules."""
+    try:
+        rules = get_imposing_rules_data() # Get list of rules
+        logger.debug(f"Loaded {len(rules)} imposing rules for UI.")
+        return templates.TemplateResponse(
+            "imposing_rules.html",
+            {
+                "request": request,
+                "rules": rules,
+            }
+        )
+    except Exception as e:
+        logger.error(f"Error loading imposing rules page: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Error loading page: {e}")
+
+@app.post("/imposing-rules/save", tags=["Configuration"])
+async def save_imposing_rules_endpoint(request: Request):
+    """Saves the entire list of imposing rules."""
+    try:
+        # The frontend sends the entire list of potentially modified rules
+        rules_list = await request.json()
+        if not isinstance(rules_list, list):
+             raise ValueError("Invalid data format: Expected a list of rules.")
+
+        # Optional: Add validation for each rule in the list here if needed
+        # e.g., using Pydantic models: [ImposingRule(**r) for r in rules_list]
+
+        save_imposing_rules_data(rules_list) # Save the list
+        logger.info(f"Saved {len(rules_list)} imposing rules.")
+        return JSONResponse({"success": True, "message": "Imposing rules saved successfully"})
+    except ValueError as ve:
+         logger.error(f"Validation error saving imposing rules: {ve}")
+         return JSONResponse({"success": False, "message": str(ve)}, status_code=400)
+    except Exception as e:
+        logger.error(f"Error saving imposing rules: {str(e)}", exc_info=True)
+        return JSONResponse({"success": False, "message": f"Error saving rules: {str(e)}"}, status_code=500)
+
+@app.post("/imposing-rules/delete/{rule_id}", tags=["Configuration"])
+async def delete_imposing_rule_endpoint(rule_id: str):
+    """Deletes a specific imposing rule by its ID."""
+    try:
+        current_rules = get_imposing_rules_data() # Get list of rules
+        original_length = len(current_rules)
+
+        # Filter out the rule to delete
+        updated_rules = [r for r in current_rules if r.get("id") != rule_id]
+
+        if len(updated_rules) == original_length:
+            logger.warning(f"Imposing rule ID {rule_id} not found for deletion.")
+            raise HTTPException(status_code=404, detail=f"Rule with ID {rule_id} not found.")
+
+        save_imposing_rules_data(updated_rules) # Save the updated list
+
+        logger.info(f"Successfully deleted imposing rule with ID: {rule_id}")
+        return JSONResponse({"success": True, "message": "Rule deleted successfully"})
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        logger.error(f"Error deleting imposing rule {rule_id}: {e}", exc_info=True)
+        return JSONResponse({"success": False, "message": f"Error deleting rule: {str(e)}"}, status_code=500)
+
+
 
 @app.post("/schedule", response_model=ScheduleResponse)
 def schedule_order(request_data: ScheduleRequest, request: Request):

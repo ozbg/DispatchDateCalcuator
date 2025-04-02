@@ -1,0 +1,18 @@
+{
+  "rules": [
+    {
+      "id": "impose_rule_1743559250917_4qbn3",
+      "description": "Test Product 22",
+      "priority": 0,
+      "enabled": true,
+      "imposingAction": 2,
+      "orderCriteria": {
+        "productIds": [
+          22
+        ]
+      },
+      "startDate": null,
+      "endDate": null
+    }
+  ]
+}

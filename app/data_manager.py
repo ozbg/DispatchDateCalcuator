@@ -149,6 +149,54 @@ def get_hub_data() -> List[Dict]:
 def save_hub_data(data: List[Dict]):
     save_json_file(DATA_DIR / "hub_data.json", data, "hub data")
 
+
+# ---------- Imposing Rules ----------
+def get_imposing_rules_data() -> List[Dict]:
+    """Load imposing rules from imposing_rules.json"""
+    required_fields = ["id", "description", "priority", "enabled", "orderCriteria", "imposingAction"]
+    filepath = DATA_DIR / "imposing_rules.json"
+    context = "imposing rules"
+
+    # Create the file with default structure if it doesn't exist
+    if not filepath.exists():
+        logger.warning(f"{context} file not found at {filepath}. Creating a default empty file.")
+        default_data = {"rules": []}
+        try:
+            save_json_file(filepath, default_data, context)
+            return default_data["rules"] # Return the empty list
+        except Exception as e:
+            logger.error(f"Failed to create default {context} file: {e}")
+            raise # Re-raise the exception if saving failed
+
+    # Load data if file exists
+    data = load_json_file(filepath, context)
+
+    # Ensure data is in the expected format (dict with 'rules' key)
+    if not isinstance(data, dict) or "rules" not in data:
+         logger.error(f"Invalid structure in {context} file: Expected a dictionary with a 'rules' key.")
+         raise ValueError(f"Invalid structure in {context} file.")
+
+    rules_list = data.get("rules", [])
+
+    # Validate the structure of each rule in the list
+    try:
+        for rule in rules_list:
+             validate_json_structure(rule, required_fields, f"{context} rule {rule.get('id', 'UNKNOWN')}")
+        return rules_list
+    except Exception as e:
+        logger.error(f"Invalid {context} data structure: {str(e)}")
+        raise
+
+def save_imposing_rules_data(rules: List[Dict]):
+    """Save imposing rules to imposing_rules.json"""
+    # Wrap the list in the expected dictionary structure
+    data_to_save = {"rules": rules}
+    save_json_file(DATA_DIR / "imposing_rules.json", data_to_save, "imposing rules")
+
+
+
+
+
 # ---------- Production Groups ----------
 def get_production_groups_data() -> List[Dict]:
     required_fields = ["id", "name", "Match_All", "Match_Any", "Exclude_All"]

@@ -9,7 +9,7 @@ from pathlib import Path
 from pathlib import Path
 from app.data_manager import get_production_groups_data
 from app.production_group_mapper import match_production_groups
-
+from app.imposing_logic import determine_imposing_action
 
 from app.models import (
     ScheduleRequest,
@@ -37,6 +37,8 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
       1) State overrides for SA/TAS => VIC, ACT => NSW, and NQLD override.
       2) Postcode -> Hub override (if any).
       3) Product matching, finishing days, final production hub selection.
+      4) Imposing rule application. # <<< ADDED STEP
+
     """
     
     # Set default postcode if it's null or empty
@@ -265,6 +267,17 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         f"ChosenHub={chosen_hub}, DispatchDate={dispatch_date}"
     )
     logger.debug("SCHEDULE LOG: " + debug_log)
+    
+    # 10) Determine Synergy Impose ---
+    # Get the default value from the matched product first
+    default_synergy_impose = product_obj.get("SynergyImpose", 0) # Default to 0 if not present in product_info
+    logger.debug(f"Default SynergyImpose from product {found_product_id}: {default_synergy_impose}")
+
+    # --- Apply Imposing Rules ---
+    # Call the new logic to potentially override the default SynergyImpose
+    final_synergy_impose = determine_imposing_action(req, found_product_id)
+    logger.debug(f"SynergyImpose after applying rules: {final_synergy_impose}")
+    
 
     # Return comprehensive response
     return ScheduleResponse(
@@ -307,7 +320,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         
         # Configuration
         synergyPreflight=product_obj.get("SynergyPreflight"),
-        synergyImpose=product_obj.get("SynergyImpose"),
+        synergyImpose=final_synergy_impose, 
         enableAutoHubTransfer=enable_auto_hub_transfer
     )
 

@@ -69,7 +69,7 @@ class ScheduleRequest(BaseModel):
     additionalProductionDays: Optional[int] = Field(0, description="Manually specified additional days to add to production time.", example=0)
 
 class OrderMatchingCriteria(BaseModel):
-    """Defines criteria used in HubSelectionRules to match specific orders."""
+    """Defines criteria used in HubSelectionRules and ImposingRules to match specific orders."""
     maxQuantity: Optional[int] = Field(None, description="Rule applies if order quantity is less than or equal to this value.")
     minQuantity: Optional[int] = Field(None, description="Rule applies if order quantity is greater than or equal to this value.")
     keywords: Optional[List[str]] = Field(None, description="Rule applies if any of these keywords are found in the order description (case-insensitive).")
@@ -78,6 +78,18 @@ class OrderMatchingCriteria(BaseModel):
     excludeProductIds: Optional[List[int]] = Field(None, description="Rule applies if the order's product ID is *not* in this list.")
     productGroups: Optional[List[str]] = Field(None, description="Rule applies if the order's product group is in this list (case-insensitive).")
     excludeProductGroups: Optional[List[str]] = Field(None, description="Rule applies if the order's product group is *not* in this list (case-insensitive).")
+    printTypes: Optional[List[int]] = Field(None, description="Rule applies if the order's printType is in this list.")
+
+class ImposingRule(BaseModel):
+    """Defines a rule used to determine the SynergyImpose action."""
+    id: str = Field(..., description="Unique identifier for the imposing rule.")
+    description: str = Field(..., description="Human-readable description of the rule's purpose.")
+    priority: int = Field(0, description="Execution priority (higher numbers run first). The first matching rule determines the action.")
+    enabled: bool = Field(True, description="Whether this rule is currently active.")
+    orderCriteria: OrderMatchingCriteria = Field(..., description="The order must match *all* defined criteria for the rule to apply.")
+    imposingAction: int = Field(..., description="The action to take if the rule matches (0: No Impose, 1: Auto Impose, 2: Manual Impose).")
+    startDate: Optional[str] = Field(None, description="Date (YYYY-MM-DD) from which the rule becomes active.")
+    endDate: Optional[str] = Field(None, description="Date (YYYY-MM-DD) after which the rule is no longer active.")
 
 class HubSizeConstraint(BaseModel):
     """Defines maximum dimensions (width/height) constraints for a hub selection rule."""
