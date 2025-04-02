@@ -327,7 +327,6 @@
     "Product_Group": "Digital Synthetic Print 1S or 2S with or without Laminating",
     "Product_ID": 12,
     "Production_Hub": [
-      "wa",
       "qld"
     ],
     "Cutoff": 12,
@@ -359,7 +358,6 @@
     "Product_ID": 13,
     "Production_Hub": [
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -391,7 +389,6 @@
     "Product_Group": "Digital 290gsm Natural Board Print Print 1S or 2S with or without Laminating",
     "Product_ID": 14,
     "Production_Hub": [
-      "wa",
       "qld"
     ],
     "Cutoff": 12,
@@ -424,7 +421,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -543,7 +539,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -573,7 +568,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -607,7 +601,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -637,7 +630,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -668,7 +660,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -702,7 +693,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -939,7 +929,7 @@
   },
   "32": {
     "Product_Category": "Self Adhesive",
-    "Product_Group": "Self Adhesive",
+    "Product_Group": "Cast Gloss Self Adhesive 170gsm",
     "Product_ID": 32,
     "Production_Hub": [
       "nsw",
@@ -950,7 +940,8 @@
     ],
     "Cutoff": 12,
     "printTypes": [
-      1
+      2,
+      3
     ],
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
@@ -973,7 +964,7 @@
     "Modified_run_date": []
   },
   "33": {
-    "Product_Category": "Offset Diecut Promotional",
+    "Product_Category": "Offset or Digital Diecut Promotional",
     "Product_Group": "Hanger, Wobbler, Circle, Card Holder, Voucher Card ",
     "Product_ID": 33,
     "Production_Hub": [
@@ -985,7 +976,9 @@
     ],
     "Cutoff": 12,
     "printTypes": [
-      1
+      1,
+      2,
+      3
     ],
     "SynergyPreflight": 1,
     "SynergyImpose": 0,
@@ -1134,7 +1127,7 @@
   },
   "38": {
     "Product_Category": "DISSABLED",
-    "Product_Group": "",
+    "Product_Group": "DISSABLED",
     "Product_ID": 38,
     "Production_Hub": [],
     "Cutoff": 12,
@@ -1154,8 +1147,8 @@
     "printTypes": []
   },
   "39": {
-    "Product_Category": "White Repositionable",
-    "Product_Group": "White Repositionable (2 days product)",
+    "Product_Category": "DISSABLED",
+    "Product_Group": "DISSABLED",
     "Product_ID": 39,
     "Production_Hub": [
       "wa",
@@ -1191,7 +1184,6 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "wa",
       "qld",
       "nqld"
     ],
@@ -1291,8 +1283,7 @@
     "Product_Group": "Envelopes",
     "Product_ID": 45,
     "Production_Hub": [
-      "vic",
-      "wa"
+      "vic"
     ],
     "Cutoff": 12,
     "SynergyPreflight": null,
@@ -1314,11 +1305,13 @@
     "Days_to_produce": 5,
     "Modified_run_date": [],
     "printTypes": [
-      2
+      1,
+      2,
+      3
     ]
   },
   "46": {
-    "Product_Category": "Disabled",
+    "Product_Category": "DISSABLED",
     "Product_Group": "",
     "Product_ID": 46,
     "Production_Hub": [],
@@ -1336,7 +1329,7 @@
     "printTypes": []
   },
   "47": {
-    "Product_Category": "Disabled",
+    "Product_Category": "DISSABLED",
     "Product_Group": "",
     "Product_ID": 47,
     "Production_Hub": [],
@@ -1684,7 +1677,7 @@
   },
   "60": {
     "Product_Category": "DISSABLED",
-    "Product_Group": "",
+    "Product_Group": "DISSABLED",
     "Product_ID": 60,
     "Production_Hub": [],
     "Cutoff": 12,
@@ -1704,8 +1697,8 @@
     "printTypes": []
   },
   "61": {
-    "Product_Category": "WA White Repositionable",
-    "Product_Group": "WA White Repositionable",
+    "Product_Category": "DISSABLED",
+    "Product_Group": "DISSABLED",
     "Product_ID": 61,
     "Production_Hub": [
       "wa"
@@ -1756,7 +1749,9 @@
     "Days_to_produce": 7,
     "Modified_run_date": [],
     "printTypes": [
-      2
+      1,
+      2,
+      3
     ]
   },
   "99": {

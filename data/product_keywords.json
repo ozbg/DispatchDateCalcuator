@@ -239,7 +239,8 @@
     "Match_Any": [
       [
         "GlossLaminate1S",
-        "GlossLaminating1S"
+        "GlossLaminating1S",
+        "Laminating - Gloss 1 Side"
       ],
       [
         "350gsm",
@@ -749,20 +750,20 @@
     "Product_ID": 37
   },
   {
-    "Product_ID": 38,
+    "Exclude_All": [],
+    "Match_All": [
+      "DISSABLED"
+    ],
+    "Match_Any": [],
+    "Product_ID": 38
+  },
+  {
+    "Product_ID": 39,
     "Match_All": [
       "DISSABLED"
     ],
     "Exclude_All": [],
     "Match_Any": []
-  },
-  {
-    "Exclude_All": [],
-    "Match_All": [
-      "White Repositional"
-    ],
-    "Match_Any": [],
-    "Product_ID": 39
   },
   {
     "Exclude_All": [
@@ -1134,7 +1135,7 @@
   {
     "Exclude_All": [],
     "Match_All": [
-      "White Repositional"
+      "DISSABLED"
     ],
     "Match_Any": [],
     "Product_ID": 61

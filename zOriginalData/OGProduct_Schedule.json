@@ -1,0 +1,1351 @@
+{
+    "1": {
+      "Product_Category": "Offset 450+ NV Branding Cards",
+      "Product_Group": "NV Print 1S or 2S + New Velvet Laminate 2S **",
+      "Product_ID": 1,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "2": {
+      "Product_Category": "Offset 450+ NV Branding Cards",
+      "Product_Group": "NVS Print 1S or 2S + New Velvet Laminate 2S + Scodix 1S",
+      "Product_ID": 2,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Wednesday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "3": {
+      "Product_Category": "Offset 450+ NV Branding Cards",
+      "Product_Group": "NVU Print 1S or 2S + New Velvet Laminate 2S + UV 1S **",
+      "Product_ID": 3,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Wednesday",
+        "Friday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "4": {
+      "Product_Category": "Offset 450+ NV Branding Cards",
+      "Product_Group": "NVM (Gold) Print 2S + New Velvet Laminate 2S + Metal Gold 1S",
+      "Product_ID": 4,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Wednesday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "5": {
+      "Product_Category": "Offset 450+ NV Branding Cards",
+      "Product_Group": "NVM (Silver) Print 2S + New Velvet Laminate 2S + Metal Silver 1S",
+      "Product_ID": 5,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Wednesday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "6": {
+      "Product_Category": "Offset 350gsm Branding Cards",
+      "Product_Group": "Offset 350gsm Branding Cards Print 1S or 2S",
+      "Product_ID": 6,
+      "Production_Hub": [
+        "vic",
+        "nqld"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "7": {
+      "Product_Category": "Offset 350gsm Branding Cards",
+      "Product_Group": "Offset 350gsm Branding Cards Print 1S or 2S + Matt Laminate 1S",
+      "Product_ID": 7,
+      "Production_Hub": [
+        "vic",
+        "nqld"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "8": {
+      "Product_Category": "Offset 350gsm Branding Cards",
+      "Product_Group": "Offset 350gsm Branding Cards Print 1S or 2S + Matt Laminate 2S",
+      "Product_ID": 8,
+      "Production_Hub": [
+        "vic",
+        "nqld"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "9": {
+      "Product_Category": "Offset 350gsm Branding Cards",
+      "Product_Group": "Offset 350gsm Branding Cards Printed 1S or 2S + Gloss Laminate 1S",
+      "Product_ID": 9,
+      "Production_Hub": [
+        "vic",
+        "nqld"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "10": {
+      "Product_Category": "Offset 450gsm Branding Card",
+      "Product_Group": "Offset 450+ Gloss Branding Cards Printed 1S or 2S + Gloss Laminate 2S",
+      "Product_ID": 10,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": [
+        [
+          "2025-03-10",
+          "2025-03-11",
+          "2025-03-12",
+          [
+            "vic"
+          ],
+          [
+            "1",
+            "2",
+            "4"
+          ]
+        ]
+      ]
+    },
+    "11": {
+      "Product_Category": "Offset Ecostar",
+      "Product_Group": "Offset 350gsm EcoStar Uncoated 100% Recycled",
+      "Product_ID": 11,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Tuesday",
+        "Thursday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "12": {
+      "Product_Category": "Digital Synthetic",
+      "Product_Group": "Digital Synthetic Print 1S or 2S with or without Laminating",
+      "Product_ID": 12,
+      "Production_Hub": [
+        "qld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "13": {
+      "Product_Category": "Digital Knight 2 Sided Linen",
+      "Product_Group": "Digital 350gsm Knight 2 Sided Linen Print 1S or 2S with or without Laminating",
+      "Product_ID": 13,
+      "Production_Hub": [
+        "vic",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "14": {
+      "Product_Category": "Digital Natural Board",
+      "Product_Group": "Digital 290gsm Natural Board Print Print 1S or 2S with or without Laminating",
+      "Product_ID": 14,
+      "Production_Hub": [
+        "qld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "15": {
+      "Product_Category": "Digital Standard Stock",
+      "Product_Group": "Digital Standard Stock Print Print 1S or 2S with or without Laminating",
+      "Product_ID": 15,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "16": {
+      "Product_Category": "Digital Standard Stock",
+      "Product_Group": "Digital Standard Stock Print Print 1S or 2S + UV or Scodix or Metal or Laminating",
+      "Product_ID": 16,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "17": {
+      "Product_Category": "Offset STAX Branding Cards",
+      "Product_Group": "700gsm Uncoated Branding Cards STAX",
+      "Product_ID": 17,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "17",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": [
+        [
+          "2025-03-10",
+          "2025-03-11",
+          "2025-03-17",
+          [
+            "vic"
+          ],
+          [
+            "1",
+            "2",
+            "4"
+          ]
+        ]
+      ]
+    },
+    "18": {
+      "Product_Category": "Offset Magnet",
+      "Product_Group": "Magnet, 350gsm Printed 1S + Gloss Laminate 1S",
+      "Product_ID": 18,
+      "Production_Hub": [
+        "qld"
+      ],
+      "Cutoff": "17",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": [
+        [
+          "2025-03-10",
+          "2025-03-11",
+          "2025-03-17",
+          [
+            "qld"
+          ],
+          [
+            "1",
+            "2",
+            "4"
+          ]
+        ]
+      ]
+    },
+    "19": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 113gsm,115gsm,128gsm Gloss 1S or 2S",
+      "Product_ID": 19,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Thursday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "20": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 150gsm Gloss 1S or 2S",
+      "Product_ID": 20,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "16",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "21": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 150gsm,170gsm  Silk/Matt 1S or 2S",
+      "Product_ID": 21,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "22": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 170gsm,200gsm,250gsm Gloss 1S or 2S",
+      "Product_ID": 22,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Tuesday",
+        "Friday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "23": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 310gsm,350gsm Artboard - 300gsm Gloss/Silk/Matt",
+      "Product_ID": 23,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "24": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 100gsm Laser 1S or 2S",
+      "Product_ID": 24,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "16",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "25": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 120gsm Premium Uncoated (Knight Smooth) 1S or 2S",
+      "Product_ID": 25,
+      "Production_Hub": [
+        "nsw"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Wednesday"
+      ],
+      "Days_to_produce": 1,
+      "Modified_run_date": []
+    },
+    "26": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 100gsm, 140gsm Ecostar Uncoated 100% Recycled",
+      "Product_ID": 26,
+      "Production_Hub": [
+        "nsw"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Wednesday"
+      ],
+      "Days_to_produce": 1,
+      "Modified_run_date": []
+    },
+    "27": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 120gsm, 140gsm, 150gsm, 160gsm Laser 1S or 2S",
+      "Product_ID": 27,
+      "Production_Hub": [
+        "nsw"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Wednesday"
+      ],
+      "Days_to_produce": 1,
+      "Modified_run_date": []
+    },
+    "28": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 200gsm, 240gsm, 300gsm Laser 1S or 2S",
+      "Product_ID": 28,
+      "Production_Hub": [
+        "nsw"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Friday"
+      ],
+      "Days_to_produce": 1,
+      "Modified_run_date": []
+    },
+    "29": {
+      "Product_Category": "Presentation Folder or Diecut Artboard",
+      "Product_Group": "Standard Presentation Folder incl Laminate",
+      "Product_ID": 29,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "30": {
+      "Product_Category": "Presentation Folder or Diecut Artboard + Scodix or Metal",
+      "Product_Group": "Standard Presentation Folder + Scodix or Metal",
+      "Product_ID": 30,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": []
+    },
+    "31": {
+      "Product_Category": "Offset Pads",
+      "Product_Group": "100gsm Laser Pads",
+      "Product_ID": 31,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "16",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "5",
+      "Modified_run_date": []
+    },
+    "32": {
+      "Product_Category": "Self Adhesive",
+      "Product_Group": "Self Adhesive",
+      "Product_ID": 32,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": 2,
+      "Modified_run_date": []
+    },
+    "33": {
+      "Product_Category": "Diecut Promotional",
+      "Product_Group": "Hanger, Wobbler, Circle, Card Holder, Voucher Card ",
+      "Product_ID": 33,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": 5,
+      "Modified_run_date": []
+    },
+    "34": {
+      "Product_Category": "Digital Print + Scodix & Metal",
+      "Product_Group": "Custom Size Digital Print + Scodix or Metal",
+      "Product_ID": 34,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "35": {
+      "Product_Category": "Offset Ecostar Uncoated",
+      "Product_Group": "200gsm,240gsm, 300gsm Ecostar Uncoated",
+      "Product_ID": 35,
+      "Production_Hub": [
+        "nsw"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Friday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "36": {
+      "Product_Category": "Ecostar Silk",
+      "Product_Group": "130gsm, 150gsm, 250gsm, 300gsm  Ecostar Silk",
+      "Product_ID": 36,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": 5,
+      "Modified_run_date": []
+    },
+    "37": {
+      "Product_Category": "Digital Metallic Gold & Silver",
+      "Product_Group": "Metallic Gold & Silver stock any gsm (5day product)",
+      "Product_ID": 37,
+      "Production_Hub": [
+        "qld",
+        "wa"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": 5,
+      "Modified_run_date": []
+    },
+    "38": {
+      "Product_Category": "Synthetic",
+      "Product_Group": "Synthetic (2 days product)",
+      "Product_ID": 38,
+      "Production_Hub": [
+        "qld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "39": {
+      "Product_Category": "White Repositional",
+      "Product_Group": "White Repositional (2 days product)",
+      "Product_ID": 39,
+      "Production_Hub": [
+        "qld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": null,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "40": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "Offset 113,128,200,250gsm Silk/Matt 1S or 2S",
+      "Product_ID": 40,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday"
+      ],
+      "Days_to_produce": "5",
+      "Modified_run_date": []
+    },
+    "41": {
+      "Product_Category": "Digital Branding Cards BC",
+      "Product_Group": "Branding Cards with or without Lamination",
+      "Product_ID": 41,
+      "Production_Hub": [
+        "vic",
+        "nsw",
+        "qld",
+        "nqld",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "1",
+      "Modified_run_date": []
+    },
+    "44": {
+      "Product_Category": "Mounted Strut Card",
+      "Product_Group": "Mounted Strut Card",
+      "Product_ID": 44,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": "17",
+      "SynergyPreflight": null,
+      "SynergyImpose": null,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": []
+    },
+    "45": {
+      "Product_Category": "Envelopes",
+      "Product_Group": "Envelopes",
+      "Product_ID": 45,
+      "Production_Hub": [
+        "vic",
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": null,
+      "SynergyImpose": null,
+      "EnableAutoHubTransfer": null,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "5",
+      "Modified_run_date": []
+    },
+    "46": {
+      "Product_Category": "-",
+      "Product_Group": "-",
+      "Product_ID": 46,
+      "Production_Hub": [
+        "-"
+      ],
+      "Cutoff": "-",
+      "SynergyPreflight": null,
+      "SynergyImpose": null,
+      "EnableAutoHubTransfer": null,
+      "OffsetOnly": "",
+      "Start_days": [
+        "-"
+      ],
+      "Days_to_produce": "-",
+      "Modified_run_date": []
+    },
+    "47": {
+      "Product_Category": "-",
+      "Product_Group": "-",
+      "Product_ID": 47,
+      "Production_Hub": [
+        "-"
+      ],
+      "Cutoff": "-",
+      "SynergyPreflight": null,
+      "SynergyImpose": null,
+      "EnableAutoHubTransfer": null,
+      "OffsetOnly": "",
+      "Start_days": [
+        "-"
+      ],
+      "Days_to_produce": "-",
+      "Modified_run_date": []
+    },
+    "48": {
+      "Product_Category": "Roll Label",
+      "Product_Group": "Digital Standard Roll Label",
+      "Product_ID": 48,
+      "Production_Hub": [
+        "vic"
+      ],
+      "Cutoff": 12,
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": 3,
+      "Modified_run_date": []
+    },
+    "49": {
+      "Product_Category": "WA Digital Synthetic",
+      "Product_Group": "WA Digital Synthetic Print 1S or 2S with or without Laminating",
+      "Product_ID": 49,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "50": {
+      "Product_Category": "WA Digital Knight 2 Sided Linen",
+      "Product_Group": "WA Digital 350gsm Knight 2 Sided Linen Print 1S or 2S with or without Laminating",
+      "Product_ID": 50,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "51": {
+      "Product_Category": "WA Digital Natural Board",
+      "Product_Group": "WA Digital 290gsm Natural Board Print Print 1S or 2S with or without Laminating",
+      "Product_ID": 51,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "52": {
+      "Product_Category": "WA Digital Standard Stock",
+      "Product_Group": "WA Digital Standard Stock Print Print 1S or 2S with or without Laminating",
+      "Product_ID": 52,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "53": {
+      "Product_Category": "WA Offset Flyer",
+      "Product_Group": "WA Offset 113gsm,115gsm,128gsm Gloss 1S or 2S",
+      "Product_ID": 53,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": []
+    },
+    "54": {
+      "Product_Category": "WA Offset Flyer",
+      "Product_Group": "WA Offset 150gsm Gloss 1S or 2S",
+      "Product_ID": 54,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "16",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "55": {
+      "Product_Category": "WA Offset Flyer",
+      "Product_Group": "WA Offset 150gsm,170gsm  Silk/Matt 1S or 2S",
+      "Product_ID": 55,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": []
+    },
+    "56": {
+      "Product_Category": "WA Offset Flyer",
+      "Product_Group": "WA Offset 170gsm,200gsm,250gsm Gloss 1S or 2S",
+      "Product_ID": 56,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": []
+    },
+    "57": {
+      "Product_Category": "WA Offset Flyer",
+      "Product_Group": "WA Offset 310gsm,350gsm Artboard - 300gsm Gloss/Silk/Matt",
+      "Product_ID": 57,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "4",
+      "Modified_run_date": []
+    },
+    "58": {
+      "Product_Category": "WA Offset Flyer",
+      "Product_Group": "WA Offset 100gsm Laser 1S or 2S",
+      "Product_ID": 58,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "16",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 1,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "2",
+      "Modified_run_date": []
+    },
+    "59": {
+      "Product_Category": "Offset Flyer",
+      "Product_Group": "WA Offset 113,128,200,250gsm Silk/Matt 1S or 2S",
+      "Product_ID": 59,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": null,
+      "SynergyImpose": null,
+      "EnableAutoHubTransfer": null,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "5",
+      "Modified_run_date": []
+    },
+    "60": {
+      "Product_Category": "WA Synthetic",
+      "Product_Group": "WA Synthetic",
+      "Product_ID": 60,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": 1,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "61": {
+      "Product_Category": "WA White Repositional",
+      "Product_Group": "WA White Repositional",
+      "Product_ID": 61,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": 1,
+      "SynergyImpose": 0,
+      "EnableAutoHubTransfer": null,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "3",
+      "Modified_run_date": []
+    },
+    "62": {
+      "Product_Category": "WA Envelopes",
+      "Product_Group": "WA Envelopes",
+      "Product_ID": 62,
+      "Production_Hub": [
+        "wa"
+      ],
+      "Cutoff": "12",
+      "SynergyPreflight": null,
+      "SynergyImpose": null,
+      "EnableAutoHubTransfer": null,
+      "OffsetOnly": "",
+      "Start_days": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "Days_to_produce": "7",
+      "Modified_run_date": []
+    }
+  }
