@@ -512,9 +512,9 @@ def choose_production_hub(
             logger.debug("Next best => %s", chosen)
 
     # 4) QLD cards override. Leave NQLD cards in NQLD. QLD cards, send to VIC.
-    if product_id in [6,7,8,9] and misCurrentHub != "nqld" and misDeliversToState == "qld":
-        logger.debug("** QLD cards override. Leave NQLD cards in NQLD. QLD cards, send to VIC)")
-        chosen = "vic"
+    #if product_id in [6,7,8,9] and misCurrentHub != "nqld" and misDeliversToState == "qld":
+     #   logger.debug("** QLD cards override. Leave NQLD cards in NQLD. QLD cards, send to VIC)")
+      #  chosen = "vic"
 
     return chosen
 

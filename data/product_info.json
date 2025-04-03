@@ -154,8 +154,7 @@
     "Product_Group": "Offset 350gsm Branding Cards Print 1S or 2S",
     "Product_ID": 6,
     "Production_Hub": [
-      "vic",
-      "nqld"
+      "vic"
     ],
     "Cutoff": 12,
     "printTypes": [
@@ -167,8 +166,7 @@
     "scheduleAppliesTo": [
       1,
       2,
-      5,
-      24
+      5
     ],
     "Start_days": [
       "Monday",
@@ -185,8 +183,7 @@
     "Product_Group": "Offset 350gsm Branding Cards Print 1S or 2S + Matt Laminate 1S",
     "Product_ID": 7,
     "Production_Hub": [
-      "vic",
-      "nqld"
+      "vic"
     ],
     "Cutoff": 12,
     "printTypes": [
@@ -198,8 +195,7 @@
     "scheduleAppliesTo": [
       1,
       2,
-      5,
-      24
+      5
     ],
     "Start_days": [
       "Tuesday",
@@ -213,8 +209,7 @@
     "Product_Group": "Offset 350gsm Branding Cards Print 1S or 2S + Matt Laminate 2S",
     "Product_ID": 8,
     "Production_Hub": [
-      "vic",
-      "nqld"
+      "vic"
     ],
     "Cutoff": 12,
     "printTypes": [
@@ -226,8 +221,7 @@
     "scheduleAppliesTo": [
       1,
       2,
-      5,
-      24
+      5
     ],
     "Start_days": [
       "Monday",
@@ -244,8 +238,7 @@
     "Product_Group": "Offset 350gsm Branding Cards Printed 1S or 2S + Gloss Laminate 1S",
     "Product_ID": 9,
     "Production_Hub": [
-      "vic",
-      "nqld"
+      "vic"
     ],
     "Cutoff": 12,
     "printTypes": [
@@ -257,8 +250,7 @@
     "scheduleAppliesTo": [
       1,
       2,
-      5,
-      24
+      5
     ],
     "Start_days": [
       "Tuesday",
@@ -1753,6 +1745,122 @@
       2,
       3
     ]
+  },
+  "63": {
+    "Product_Category": "NQLD Digital 350gsm Branding Cards",
+    "Product_Group": "NQLD Digital 350gsm Branding Cards Print 1S or 2S",
+    "Product_ID": 6,
+    "Production_Hub": [
+      "nqld"
+    ],
+    "Cutoff": 12,
+    "printTypes": [
+      1,
+      2,
+      3
+    ],
+    "SynergyPreflight": 1,
+    "SynergyImpose": 0,
+    "EnableAutoHubTransfer": 1,
+    "scheduleAppliesTo": [
+      24
+    ],
+    "Start_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "Days_to_produce": 1,
+    "Modified_run_date": []
+  },
+  "64": {
+    "Product_Category": "NQLD Digital 350gsm Branding Cards",
+    "Product_Group": "NQLD Digital 350gsm Branding Cards Print 1S or 2S + Matt Laminate 1S",
+    "Product_ID": 7,
+    "Production_Hub": [
+      "nqld"
+    ],
+    "Cutoff": 12,
+    "printTypes": [
+      1,
+      2,
+      3
+    ],
+    "SynergyPreflight": 1,
+    "SynergyImpose": 0,
+    "EnableAutoHubTransfer": 1,
+    "scheduleAppliesTo": [
+      24
+    ],
+    "Start_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "Days_to_produce": 1,
+    "Modified_run_date": []
+  },
+  "65": {
+    "Product_Category": "NQLD Digital 350gsm Branding Cards",
+    "Product_Group": "NQLD Digital 350gsm Branding Cards Print 1S or 2S + Matt Laminate 2S",
+    "Product_ID": 8,
+    "Production_Hub": [
+      "nqld"
+    ],
+    "Cutoff": 12,
+    "printTypes": [
+      1,
+      2,
+      3
+    ],
+    "SynergyPreflight": 1,
+    "SynergyImpose": 0,
+    "EnableAutoHubTransfer": 1,
+    "scheduleAppliesTo": [
+      24
+    ],
+    "Start_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "Days_to_produce": 1,
+    "Modified_run_date": []
+  },
+  "66": {
+    "Product_Category": "NQLD Digital 350gsm Branding Cards",
+    "Product_Group": "NQLD Digital 350gsm Branding Cards Printed 1S or 2S + Gloss Laminate 1S",
+    "Product_ID": 9,
+    "Production_Hub": [
+      "nqld"
+    ],
+    "Cutoff": 12,
+    "printTypes": [
+      1,
+      2,
+      3
+    ],
+    "SynergyPreflight": 1,
+    "SynergyImpose": 0,
+    "EnableAutoHubTransfer": 1,
+    "scheduleAppliesTo": [
+      24
+    ],
+    "Start_days": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday"
+    ],
+    "Days_to_produce": 1,
+    "Modified_run_date": []
   },
   "99": {
     "Product_Category": "Default Fallback Product",

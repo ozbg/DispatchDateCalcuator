@@ -36,9 +36,11 @@ def determine_preflight_action(req: ScheduleRequest, product_id: int) -> int:
     # Sort rules by priority (highest first)
     rules.sort(key=lambda x: x.priority, reverse=True)
 
-    # Get the product object details needed for criteria checking
     all_product_info = get_product_info_data()
     product_obj = all_product_info.get(str(product_id)) # Product info uses string keys
+    order_product_group: Optional[str] = product_obj.get("Product_Group") if product_obj else None
+    if not product_obj:
+        logger.warning(f"Product object not found for Product ID {product_id} when checking preflight rules. Product Group checks may fail.")
 
     for rule in rules:
         logger.debug(f"Evaluating preflight rule ID: {rule.id}, Priority: {rule.priority}")
@@ -47,19 +49,19 @@ def determine_preflight_action(req: ScheduleRequest, product_id: int) -> int:
             logger.debug(f"Skipping rule {rule.id} (disabled).")
             continue
 
-        # Check date validity (reusing check_dates from hub_selection)
-        # Note: check_dates expects a model with .id, .startDate, .endDate which PreflightRule has
         if not check_dates(rule):
              logger.debug(f"Skipping rule {rule.id} (outside valid date range).")
              continue
 
-        # Check if order criteria match (reusing check_order_criteria from imposing_logic)
-        # This function expects OrderMatchingCriteria, ScheduleRequest, and product_obj
-        if check_order_criteria(rule.orderCriteria, req, product_obj):
+        if rule.orderCriteria and check_order_criteria(rule.orderCriteria, req, product_id, order_product_group):
             logger.info(f"Preflight rule {rule.id} matched. Setting action to Profile ID {rule.preflightProfileId}.")
             return rule.preflightProfileId
         else:
-             logger.debug(f"Rule {rule.id} did not match order criteria.")
+             # Handle cases where rule.orderCriteria is None or the check fails
+             if not rule.orderCriteria:
+                 logger.debug(f"Rule {rule.id} has no orderCriteria defined.")
+             else:
+                 logger.debug(f"Rule {rule.id} did not match order criteria.")
 
 
     logger.debug("No preflight rules matched. Using default action.")

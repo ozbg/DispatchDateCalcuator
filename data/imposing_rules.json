@@ -1,18 +1,32 @@
 {
   "rules": [
     {
-      "id": "impose_rule_1743559250917_4qbn3",
-      "description": "Digital Boolklets",
-      "priority": 0,
+      "id": "impose_rule_1743659089066_9v3ju",
+      "description": "North QLD Cards Manually Impose as Gang Runs",
+      "priority": 1,
       "enabled": true,
       "imposingAction": 2,
       "orderCriteria": {
-        "productIds": [
-          22
+        "printTypes": [
+          1
         ]
       },
       "startDate": null,
       "endDate": null
+    },
+    {
+      "description": "Digital Boolklets",
+      "enabled": true,
+      "endDate": null,
+      "id": "impose_rule_1743559250917_4qbn3",
+      "imposingAction": 1,
+      "orderCriteria": {
+        "printTypes": [
+          2
+        ]
+      },
+      "priority": 0,
+      "startDate": null
     }
   ]
 }

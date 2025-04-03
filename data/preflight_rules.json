@@ -1,15 +1,17 @@
 {
   "rules": [
     {
-      "id": "preflight_rule_1743568771671_oc6zy",
-      "description": "Preflight Offset or Digital",
+      "id": "preflight_rule_1743660626067_qwsct",
+      "description": "PF this",
       "priority": 0,
       "enabled": true,
       "preflightProfileId": 1,
       "orderCriteria": {
+        "excludeProductIds": [
+          65
+        ],
         "printTypes": [
-          1,
-          2
+          1
         ]
       },
       "startDate": null,

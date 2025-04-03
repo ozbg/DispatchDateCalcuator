@@ -5,8 +5,17 @@
       "description": "QLD Digital Only",
       "hubId": "nqld",
       "priority": 1,
-      "enabled": false,
+      "enabled": true,
+      "startDate": null,
+      "endDate": null,
+      "sizeConstraints": null,
       "orderCriteria": {
+        "excludeProductIds": [
+          63,
+          64,
+          65,
+          66
+        ],
         "printTypes": [
           1
         ]

@@ -10,17 +10,18 @@
       <p>If an order meets a rule's criteria, the corresponding hub is removed from the list of potential production hubs.</p>
       <p class="example">Example: If an order exceeds size limits, the hub is removed as an option.<br><br> The system will then select the closest available hub for production.</p>
     </div>
-    
+
     <div class="rule-box">
       <h4>Constraints</h4>
       <ul>
         <li>Size and quantity limits</li>
         <li>Required Keywords</li>
         <li>Excluded Keywords</li>
-        <li>Product ID requirements</li>
+        <li>Product ID requirements (Include/Exclude)</li> <!-- Updated -->
+        <li>Print Type requirements</li> <!-- Added -->
       </ul>
     </div>
-    
+
     <div class="rule-box">
       <h4>Time Restrictions</h4>
       <p>Define the start and end dates for when this rule applies.</p>
@@ -67,29 +68,46 @@
                   Max size:
                   {{ rule.sizeConstraints.maxWidth if rule.sizeConstraints.maxWidth else "∞" }}
                   x
-                  {{ rule.sizeConstraints.maxHeight if rule.sizeConstraints.maxHeight else "∞" }}
+                  {{ rule.sizeConstraints.maxHeight if rule.sizeConstraints.maxHeight else "∞" }} mm
                 </li>
               {% endif %}
               {% if rule.orderCriteria %}
-                {% if rule.orderCriteria.maxQuantity %}
-                  <li>Max Quantity: {{ rule.orderCriteria.maxQuantity }}</li>
+                {% if rule.orderCriteria.minQuantity is not none %} {# Added min check #}
+                    <li>Min Quantity: {{ rule.orderCriteria.minQuantity }}</li>
+                {% endif %}
+                {% if rule.orderCriteria.maxQuantity is not none %}
+                    <li>Max Quantity: {{ rule.orderCriteria.maxQuantity }}</li>
                 {% endif %}
                 {% if rule.orderCriteria.keywords %}
-                  <li>Required Keywords: {{ rule.orderCriteria.keywords|join(", ") }}</li>
+                    <li>Required Keywords: {{ rule.orderCriteria.keywords|join(", ") }}</li>
                 {% endif %}
                 {% if rule.orderCriteria.excludeKeywords %}
-                  <li>Excluded Keywords: {{ rule.orderCriteria.excludeKeywords|join(", ") }}</li>
+                    <li>Excluded Keywords: {{ rule.orderCriteria.excludeKeywords|join(", ") }}</li>
                 {% endif %}
                 {% if rule.orderCriteria.productIds %}
-                  <li>Product IDs: {{ rule.orderCriteria.productIds|join(", ") }}</li>
+                    <li>Product IDs: {{ rule.orderCriteria.productIds|join(", ") }}</li>
+                {% endif %}
+                {# NEW: Display Excluded Product IDs #}
+                {% if rule.orderCriteria.excludeProductIds %}
+                    <li>Exclude Product IDs: {{ rule.orderCriteria.excludeProductIds|join(", ") }}</li>
+                {% endif %}
+                 {# NEW: Display Product Groups #}
+                {% if rule.orderCriteria.productGroups %}
+                    <li>Product Groups: {{ rule.orderCriteria.productGroups|join(", ") }}</li>
+                {% endif %}
+                 {% if rule.orderCriteria.excludeProductGroups %}
+                    <li>Exclude Product Groups: {{ rule.orderCriteria.excludeProductGroups|join(", ") }}</li>
                 {% endif %}
                 {% if rule.orderCriteria.printTypes %}
                   <li>Print Types: {{ rule.orderCriteria.printTypes|join(", ") }}</li>
                 {% endif %}
               {% endif %}
+               {% if not rule.sizeConstraints and not rule.orderCriteria %}
+                 <li>No Constraints</li>
+               {% endif %}
             </ul>
           </td>
-          <td>{{ "Active" if rule.enabled else "Disabled" }}</td>
+          <td><span class="status-{{ 'active' if rule.enabled else 'disabled' }}">{{ "Active" if rule.enabled else "Disabled" }}</span></td>
           <td>{{ rule.endDate if rule.endDate else "Permanent" }}</td>
           <td>
             <button class="edit-btn"
@@ -114,661 +132,624 @@
     <h3 id="modalTitle">Edit Hub Rule</h3>
     <input type="hidden" id="ruleId">
 
-    <!-- Basic Info -->
-    <div class="form-group">
-      <label for="description">Description:</label>
-      <input type="text" id="description" required>
-    </div>
-
-    <div class="form-group">
-      <label for="hubId">Production Hub:</label>
-      <select id="hubId" required class="form-control">
-        <option value="vic">Victoria (VIC)</option>
-        <option value="nsw">New South Wales (NSW)</option>
-        <option value="qld">Queensland (QLD)</option>
-        <option value="nqld">North Queensland (NQLD)</option>
-        <option value="wa">Western Australia (WA)</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label for="priority">Priority:</label>
-      <input type="number" id="priority" value="0">
-    </div>
-
-    <div class="form-group">
-      <label>
-        <input type="checkbox" id="enabled" checked>
-        Rule Enabled
-      </label>
-    </div>
-
-    <!-- Time Restrictions -->
-    <div class="form-group">
-      <h4>Time Restrictions</h4>
-      <div class="time-restrictions">
-        <label>Start Date:
-          <input type="date" id="startDate">
-        </label>
-        <label>End Date:
-          <input type="date" id="endDate">
-        </label>
-      </div>
-    </div>
-
-    <!-- Size Constraints Panel -->
-    <div class="form-group">
-      <h4>Size Constraints</h4>
-      <div class="instruction-box">
-        <p class="info-text">Maximum dimensions allowed for this hub.
-        Order dimensions can be in either orientation.</p>
-        <p><em>Example: For max size 650x450mm:</em></p>
-        <ul>
-          <li>600x400mm is acceptable (fits directly)</li>
-          <li>400x600mm is acceptable (fits when rotated)</li>
-          <li>300x655mm is not acceptable (exceeds both max dimensions)</li>
-          <li>600x455mm is not acceptable (exceeds max height in both orientations)</li>
-        </ul>
-      </div>
-      <div class="size-constraints">
-        <label>Max Width (mm):
-          <input type="number" id="maxWidth" step="0.1">
-        </label>
-        <label>Max Height (mm):
-          <input type="number" id="maxHeight" step="0.1">
-        </label>
-      </div>
-    </div>
-
-    <!-- Order Matching Requirements Panel -->
-    <div class="form-group">
-      <h4>Order Matching Requirements</h4>
-      <div class="instruction-box">
-        <p class="info-text">For a rule to apply, ALL these conditions in this block must be met (AND logic):</p>
-        <ul>
-          <li><strong>Max Quantity:</strong> The order quantity must exceed or meet this number to match (depending on your code logic).</li>
-          <li><strong>Required Keywords:</strong> Any or all typed keywords must be present (depending on your code logic).</li>
-          <li><strong>Excluded Keywords:</strong> These must be absent from the description if used.</li>
-          <li><strong>Product IDs:</strong> The order's product ID must be in this list.</li>
-        </ul>
-      </div>
-
-      <div class="matching-inputs">
-        <div>
-          <label>Max Quantity:</label>
-          <input type="number" id="maxQuantity" placeholder="Maximum order quantity">
+    <!-- Basic Info Section (No Change)-->
+    <div class="form-section">
+        <h4>Basic Information</h4>
+        <!-- ... hubId, description, priority, enabled ... -->
+         <div class="form-group">
+            <label for="description">Description:</label>
+            <input type="text" id="description" required class="form-control">
         </div>
-        <div>
-          <label>Required Keywords:</label>
-          <div class="tag-input-container">
-            <input type="text" id="keywordInput" placeholder="Type and press Enter">
-            <div id="keywordTags" class="tag-container"></div>
-          </div>
+
+        <div class="form-group">
+            <label for="hubId">Production Hub (Rule Applies To):</label>
+            <select id="hubId" required class="form-control">
+                {# Populate options dynamically if possible, otherwise hardcode #}
+                 <option value="">-- Select Hub --</option>
+                 {% for hub in hubs %} {# Assuming 'hubs' is passed from main.py #}
+                     <option value="{{ hub.Hub|lower }}">{{ hub.Hub }} ({{ hub.State }})</option>
+                 {% endfor %}
+            </select>
+            <small>This rule applies TO this hub, potentially excluding it if criteria match.</small>
         </div>
-        <div>
-          <label>Excluded Keywords:</label>
-          <div class="tag-input-container">
-            <input type="text" id="excludeKeywordInput" placeholder="Type and press Enter">
-            <div id="excludeKeywordTags" class="tag-container"></div>
-          </div>
+
+        <div class="form-group inline-group">
+            <div>
+                <label for="priority">Priority:</label>
+                <input type="number" id="priority" value="0" class="form-control short-input">
+                 <small>Higher numbers checked first.</small>
+            </div>
+             <div>
+                <label class="checkbox-label" style="margin-top: 2rem;">
+                    <input type="checkbox" id="enabled" checked>
+                    Rule Enabled
+                </label>
+             </div>
         </div>
-        <div>
-          <label>Product IDs:</label>
-          <div class="tag-input-container">
-            <input type="text" id="productIdInput" placeholder="Enter product ID and press Enter">
-            <div id="productIdTags" class="tag-container"></div>
-          </div>
-        </div>
-        <!-- New Print Types input -->
-        <div>
-          <label>Print Type(s):</label>
-          <div class="tag-input-container">
-            <input type="text" id="printTypeInput" placeholder="Enter print type (1,2,3,4) and press Enter">
-            <div id="printTypeTags" class="tag-container"></div>
-          </div>
-        </div>
-        <!-- End new Print Types input -->
-      </div>
     </div>
+
+    <!-- Time Restrictions Section (No Change) -->
+    <div class="form-section">
+        <h4>Time Restrictions (Optional)</h4>
+        <div class="form-group inline-group">
+            <div>
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" class="form-control">
+            </div>
+             <div>
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" class="form-control">
+             </div>
+        </div>
+    </div>
+
+    <!-- Size Constraints Section (No Change) -->
+    <div class="form-section">
+        <h4>Size Constraints (Optional)</h4>
+        <!-- ... Instruction Box ... -->
+         <div class="instruction-box">
+            <p class="info-text">If dimensions are set, the rule excludes this hub if the order's preflighted size (W x H or H x W) exceeds BOTH Max Width and Max Height specified here.</p>
+         </div>
+        <div class="form-group inline-group">
+            <div>
+                <label>Max Width (mm):</label>
+                <input type="number" id="maxWidth" step="0.1" class="form-control short-input">
+            </div>
+             <div>
+                <label>Max Height (mm):</label>
+                <input type="number" id="maxHeight" step="0.1" class="form-control short-input">
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Matching Requirements Section (Updated) -->
+    <div class="form-section">
+        <h4>Order Matching Requirements (Optional - All must be met)</h4>
+         <div class="info-text">
+            If any criteria here are met (AND logic), and the size constraint (if set) is also met, the rule excludes this hub.
+            However, if the Product ID is in the 'Exclude Product IDs' list, this rule will NOT exclude the hub, even if other criteria match.
+         </div>
+
+        <div class="matching-grid"> <!-- Use grid for better layout -->
+            <!-- Quantity -->
+             <div class="form-group">
+                <label for="minQuantity">Min Quantity:</label>
+                <input type="number" id="minQuantity" placeholder="e.g., 1" class="form-control">
+             </div>
+             <div class="form-group">
+                <label for="maxQuantity">Max Quantity:</label>
+                <input type="number" id="maxQuantity" placeholder="e.g., 10000" class="form-control">
+             </div>
+
+             <!-- Keywords -->
+            <div class="form-group tag-group">
+                <label>Required Keywords:</label>
+                <div class="tag-input-container">
+                    <input type="text" id="keywordInput" placeholder="Type and press Enter" class="tag-input">
+                    <div id="keywordTags" class="tag-container compact-tags"></div>
+                </div>
+                 <small>Description must contain ANY of these.</small>
+            </div>
+            <div class="form-group tag-group">
+                <label>Excluded Keywords:</label>
+                <div class="tag-input-container">
+                    <input type="text" id="excludeKeywordInput" placeholder="Type and press Enter" class="tag-input">
+                    <div id="excludeKeywordTags" class="tag-container compact-tags"></div>
+                </div>
+                <small>Description must contain NONE of these.</small>
+            </div>
+
+             <!-- Product IDs -->
+             <div class="form-group tag-group">
+                <label>Product IDs:</label>
+                <div class="tag-input-container">
+                    <input type="text" id="productIdInput" placeholder="Type ID and press Enter" class="tag-input">
+                    <div id="productIdTags" class="tag-container compact-tags"></div>
+                </div>
+                 <small>Order Product ID must be in this list.</small>
+            </div>
+             <!-- NEW: Exclude Product IDs -->
+             <div class="form-group tag-group">
+                <label>Exclude Product IDs:</label>
+                 <div class="tag-input-container">
+                    <input type="text" id="excludeProductIdInput" placeholder="Type ID and press Enter" class="tag-input">
+                    <div id="excludeProductIdTags" class="tag-container compact-tags"></div>
+                </div>
+                 <small>Rule ignored if Order Product ID is in this list.</small>
+            </div>
+
+              <!-- Product Groups -->
+             <div class="form-group tag-group">
+                <label>Product Groups:</label>
+                <div class="tag-input-container">
+                    <input type="text" id="productGroupInput" placeholder="Type group name and press Enter" class="tag-input">
+                    <div id="productGroupTags" class="tag-container compact-tags"></div>
+                </div>
+                <small>Order Product Group must be in this list.</small>
+            </div>
+             <div class="form-group tag-group">
+                <label>Exclude Product Groups:</label>
+                 <div class="tag-input-container">
+                    <input type="text" id="excludeProductGroupInput" placeholder="Type group name and press Enter" class="tag-input">
+                    <div id="excludeProductGroupTags" class="tag-container compact-tags"></div>
+                </div>
+                 <small>Order Product Group must NOT be in this list.</small>
+            </div>
+
+
+            <!-- Print Types -->
+            <div class="form-group tag-group">
+                <label>Print Type(s):</label>
+                <div class="tag-input-container">
+                    <input type="text" id="printTypeInput" placeholder="Enter type (1-4) and press Enter" class="tag-input">
+                    <div id="printTypeTags" class="tag-container compact-tags"></div>
+                </div>
+                 <small>Order Print Type must be in this list.</small>
+            </div>
+        </div> <!-- end matching-grid -->
+    </div> <!-- end form-section -->
 
     <div class="button-group">
-      <button onclick="saveRule()" class="save-btn">Save Rule</button>
-      <button onclick="closeEditor()" class="cancel-btn">Cancel</button>
+      <button onclick="saveRule()" class="primary-btn save-btn">Save Rule</button>
+      <button onclick="closeEditor()" class="secondary-btn cancel-btn">Cancel</button>
     </div>
   </div>
 </div>
 
-<!-- CSS (adapt as needed) -->
+<!-- CSS (Use styles similar to imposing_rules.html) -->
 <style>
+/* --- Copy styles from imposing_rules.html or refine from hub_rules.html --- */
 /* General Layout */
-.rules-container {
-  padding: 20px;
-}
-
-.filter-row input {
-    width: calc(100% - 16px);
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 0.9em;
-    margin: 4px 8px;
-    box-sizing: border-box;
-}
-
-.filter-row input:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
-}
-
-.filter-row th {
-    padding: 4px 12px;
-    background: #f1f3f5;
-}
-.rules-table {
-  width: 100%;
-  margin-top: 25px;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-.rules-table th {
-  background: #f8f9fa;
-  padding: 15px;
-  text-align: left;
-  font-weight: 600;
-  color: #2c3e50;
-  border-bottom: 2px solid #dee2e6;
-}
-.rules-table td {
-  padding: 15px;
-  border-bottom: 1px solid #dee2e6;
-  vertical-align: top;
-}
-.rules-table tr:hover {
-  background-color: #f8f9fa;
-}
-.constraints-list {
-  margin: 0;
-  padding-left: 20px;
-  font-size: 0.9em;
-}
+.rules-container { padding: 0 5px; }
+.filter-row input { width: calc(100% - 1rem); padding: 0.375rem 0.5rem; border: 1px solid #ced4da; border-radius: 0.25rem; font-size: 0.875em; box-sizing: border-box; }
+.filter-row th { padding: 0.5rem; background: #f8f9fa; }
+.rules-table { width: 100%; margin-bottom: 2rem; border-collapse: collapse; font-size: 0.9rem; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.07); }
+.rules-table th, .rules-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #dee2e6; vertical-align: top; }
+.rules-table tr:last-child td { border-bottom: none; }
+.rules-table thead th { background: #e9ecef; font-weight: 600; border-bottom-width: 2px; color: #495057; }
+.rules-table tbody tr:hover { background-color: #f8f9fa; }
+.constraints-list { list-style: none; margin: 0; padding: 0; font-size: 0.85em; }
+.constraints-list li { margin-bottom: 0.25rem; word-break: break-word; }
+.status-active { color: #198754; font-weight: bold; }
+.status-disabled { color: #dc3545; }
 
 /* Help Section */
-.help-section {
-  background: #f8f9fa;
-  padding: 20px;
-  margin: 20px 0;
-  border-radius: 8px;
+.help-section { background: #f8f9fa; padding: 20px; margin: 20px 0 30px; border-radius: 8px; border: 1px solid #e9ecef; }
+.rule-explanation { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 15px; }
+.rule-box { background: white; padding: 15px; border-radius: 6px; border: 1px solid #dee2e6; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.rule-box h4 { color: #0d6efd; margin-top: 0; margin-bottom: 0.75rem; font-size: 1.1em; }
+.rule-box ul { padding-left: 20px; margin-bottom: 0; font-size: 0.9em; }
+.rule-box li { margin-bottom: 0.25rem; }
+.example { font-style: italic; color: #6c757d; font-size: 0.875em; margin-top: 0.5rem;}
+
+/* Buttons */
+.add-btn { background: #198754; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 1rem; transition: background-color 0.15s ease-in-out; margin-bottom: 1.5rem; display: inline-block; }
+.add-btn:hover { background: #157347; }
+.rules-table .edit-btn { background: #0d6efd; margin-right: 0.3rem; padding: 0.25rem 0.5rem; font-size: 0.8em; color:white; border:none; border-radius: 0.2rem; cursor: pointer; }
+.rules-table .edit-btn:hover { background: #0b5ed7; }
+.rules-table .delete-btn { background: #dc3545; padding: 0.25rem 0.5rem; font-size: 0.8em; color:white; border:none; border-radius: 0.2rem; cursor: pointer; }
+.rules-table .delete-btn:hover { background: #c82333; }
+
+/* Modal */
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); overflow-y: auto; z-index: 1000; }
+.modal-content { background: #ffffff; border-radius: 0.5rem; padding: 1.5rem 2rem; width: 90%; max-width: 800px; margin: 2.5rem auto; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); max-height: 90vh; overflow-y: auto; position: relative; }
+.modal-content h3 { color: #0a58ca; margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-weight: 500; }
+
+/* Modal Form */
+.form-section { background: #f8f9fa; border-radius: 0.3rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #dee2e6; }
+.form-section h4 { color: #495057; margin: 0 0 1rem 0; padding-bottom: 0.6rem; border-bottom: 1px solid #dee2e6; font-size: 1.1em; font-weight: 600; }
+.form-group { margin-bottom: 1rem; }
+.form-group:last-child { margin-bottom: 0; }
+.form-group label { display: block; font-weight: 500; margin-bottom: 0.4rem; color: #495057; font-size: 0.9rem; }
+.form-group label.checkbox-label { display: flex; align-items: center; gap: 0.5rem; font-weight: normal; cursor: pointer;}
+.form-group input[type="checkbox"] { width: 1rem; height: 1rem; accent-color: #0d6efd; margin: 0; }
+.form-group small, .info-text { display: block; color: #6c757d; margin-top: 0.3rem; font-size: 0.8rem; }
+.info-text { margin-bottom: 1rem; font-style: italic;}
+.form-control { width: 100%; padding: 0.5rem 0.75rem; font-size: 0.95rem; border: 1px solid #ced4da; border-radius: 0.25rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; box-sizing: border-box; background-color: #fff; }
+.short-input { max-width: 200px; }
+.inline-group { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+.inline-group > div { flex: 1; min-width: 150px; }
+select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 16px 12px; padding-right: 2.5rem; }
+.form-control:focus, .tag-input:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+.matching-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem 1.5rem; }
+.tag-group { grid-column: span 1; }
+@media (min-width: 600px) {
+    .matching-grid > .tag-group:nth-child(3), .matching-grid > .tag-group:nth-child(4) { grid-column: span 2; }
 }
-.rule-explanation {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 15px;
-}
-.rule-box {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
-.rule-box h4 {
-    color: #007bff;
-    margin-top: 0;
-}
-.example {
-  font-style: italic;
-  color: #666;
-  font-size: 0.9em;
+.tag-input-container { background: #ffffff; border: 1px solid #ced4da; border-radius: 0.25rem; padding: 0.75rem; margin-top: 0.5rem; }
+.tag-input { margin-bottom: 0.6rem; width: 100%; padding: 0.5rem 0.75rem; font-size: 0.95rem; border: 1px solid #ced4da; border-radius: 0.25rem; box-sizing: border-box; }
+.tag-container { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.compact-tags { min-height: 30px; }
+.tag { display: inline-flex; align-items: center; background: #e9ecef; padding: 0.25rem 0.6rem; border-radius: 0.2rem; font-size: 0.85em; gap: 0.3rem; border: 1px solid #ced4da; }
+.tag .remove { color: #dc3545; cursor: pointer; font-weight: bold; font-size: 1.1em; line-height: 1; }
+.tag .remove:hover { color: #a71d2a; }
+.button-group { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
+.primary-btn, .secondary-btn { padding: 0.5rem 1rem; font-size: 0.95em; font-weight: 500; border-radius: 0.25rem; cursor: pointer; border: none; transition: all 0.15s ease-in-out; }
+.primary-btn { background: #0d6efd; color: white; }
+.primary-btn:hover { background: #0b5ed7; }
+.secondary-btn { background: #6c757d; color: white; }
+.secondary-btn:hover { background: #5c636a; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-content { width: 95%; padding: 1.25rem 1.5rem; margin: 1.5rem auto; }
+    .form-section { padding: 1rem; }
+    .inline-group { flex-direction: column; gap: 1rem; }
+    .short-input { max-width: none; }
+    .matching-grid { grid-template-columns: 1fr; }
+     .matching-grid > .tag-group:nth-child(3), .matching-grid > .tag-group:nth-child(4) { grid-column: span 1; }
+    .button-group { flex-direction: column; gap: 0.5rem; }
+    .primary-btn, .secondary-btn { width: 100%; }
 }
 
-/* Modal Styling */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 1000;
-}
-.modal-content {
-  background: white;
-  margin: 5% auto;
-  padding: 20px;
-  width: 80%;
-  max-width: 800px;
-  border-radius: 8px;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-
-/* Form Controls */
-.form-group {
-  margin-bottom: 25px;
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-}
-.form-group h4 {
-  margin-top: 0;
-  margin-bottom: 15px;
-  color: #2c3e50;
-  border-bottom: 2px solid #e9ecef;
-  padding-bottom: 10px;
-}
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #2c3e50;
-}
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group input[type="date"],
-.select,
-.tag-input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-.form-group small {
-  display: block;
-  color: #666;
-  margin-top: 5px;
-  font-size: 0.9em;
-}
-.size-constraints label {
-  display: inline-block;
-  margin-right: 20px;
-}
-
-/* Tag Containers */
-.tag-input-container {
-  margin-top: 10px;
-}
-.tag-container {
-  min-height: 44px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 8px;
-  margin-top: 8px;
-  background: white;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.tag {
-  display: inline-flex;
-  align-items: center;
-  background: #e9ecef;
-  border-radius: 4px;
-  padding: 6px 12px;
-  margin: 4px;
-  font-size: 14px;
-}
-.tag .remove {
-  margin-left: 8px;
-  cursor: pointer;
-  color: #666;
-  font-size: 18px;
-}
-.tag .remove:hover {
-  color: #dc3545;
-}
-
-/* Button Styles */
-.add-btn,
-.edit-btn,
-.delete-btn,
-.save-btn,
-.cancel-btn {
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.2s;
-  color: #fff;
-}
-.add-btn { background: #28a745; }
-.edit-btn { background: #007bff; }
-.delete-btn { background: #dc3545; }
-.save-btn { background: #28a745; }
-.cancel-btn { background: #6c757d; }
-.add-btn:hover { background: #218838; }
-.edit-btn:hover { background: #0056b3; }
-.delete-btn:hover { background: #c82333; }
-.save-btn:hover { background: #218838; }
-.cancel-btn:hover { background: #5a6268; }
 </style>
 
 <script>
-// Add filter functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const filterInputs = document.querySelectorAll('.column-filter');
-    
-    filterInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            filterTable();
-        });
-    });
-});
+  // Global variable to store rules from Jinja
+  let currentRules = {{ rules | tojson }};
 
-function filterTable() {
+  // --- DOMContentLoaded ---
+  document.addEventListener('DOMContentLoaded', function() {
+    // Attach filter listeners
+    document.querySelectorAll('.column-filter').forEach(input => {
+        input.addEventListener('input', filterTable);
+    });
+    filterTable(); // Initial filter
+
+    // Attach table button listeners (Edit/Delete) using delegation
+    const rulesContainer = document.getElementById('rulesContainer');
+    if(rulesContainer) {
+        rulesContainer.addEventListener('click', function(event) {
+            const target = event.target;
+            const ruleId = target.closest('tr')?.querySelector('[data-rule-id]')?.getAttribute('data-rule-id');
+
+            if (!ruleId) return; // Ignore clicks not on buttons with rule ID
+
+            if (target.classList.contains('edit-btn')) {
+                editHubRuleWrapper(ruleId); // Wrapper to get full rule data
+            } else if (target.classList.contains('delete-btn')) {
+                deleteRule(ruleId);
+            }
+        });
+    }
+
+    // Setup tag inputs in the modal
+    initializeTagInputs();
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeEditor();
+        }
+    });
+  });
+
+   // --- Table Filtering ---
+  function filterTable() {
     const filters = Array.from(document.querySelectorAll('.column-filter')).map(input => ({
         column: parseInt(input.dataset.column),
         value: input.value.toLowerCase()
     }));
-    
-    const rows = document.querySelectorAll('tbody tr');
-    
-    rows.forEach(row => {
+
+    const tbody = document.getElementById('hubRulesBody'); // Ensure correct tbody ID
+    if (!tbody) return;
+    const rows = tbody.getElementsByTagName('tr');
+
+    for (let row of rows) {
         let showRow = true;
-        
         filters.forEach(filter => {
-            if (!filter.value) return; // Skip empty filters
-            
-            const cellText = row.cells[filter.column].textContent.toLowerCase();
-            if (!cellText.includes(filter.value)) {
-                showRow = false;
+            if (filter.value && row.cells[filter.column]) { // Check cell exists
+                const cellText = row.cells[filter.column].textContent.toLowerCase();
+                if (!cellText.includes(filter.value)) {
+                    showRow = false;
+                }
             }
         });
-        
         row.style.display = showRow ? '' : 'none';
-    });
-}
+    }
+  }
 
-  // Show modal in "Add" mode
+  // --- Modal Show/Hide/Reset ---
   function showAddForm() {
     resetForm();
     document.getElementById('modalTitle').textContent = 'Add New Hub Rule';
+    document.getElementById('ruleId').value = ''; // Clear ID for adding
     document.getElementById('ruleEditor').style.display = 'block';
-    initializeTagInputs();
+    initializeTagInputs(); // Ensure listeners are attached
+     document.getElementById('description').focus();
   }
 
-  // Close modal
   function closeEditor() {
     document.getElementById('ruleEditor').style.display = 'none';
-    resetForm();
   }
 
-  // Reset all form fields in the modal
   function resetForm() {
     document.getElementById('ruleId').value = '';
     document.getElementById('description').value = '';
-    document.getElementById('hubId').value = 'vic';
+    document.getElementById('hubId').value = ''; // Default to empty or a specific value like 'vic'
     document.getElementById('priority').value = 0;
     document.getElementById('enabled').checked = true;
-    document.getElementById('maxWidth').value = '';
-    document.getElementById('maxHeight').value = '';
-    document.getElementById('maxQuantity').value = '';
-    document.getElementById('keywordTags').innerHTML = '';
-    document.getElementById('excludeKeywordTags').innerHTML = '';
-    document.getElementById('productIdTags').innerHTML = '';
-    document.getElementById('printTypeTags').innerHTML = '';
     document.getElementById('startDate').value = '';
     document.getElementById('endDate').value = '';
+    document.getElementById('maxWidth').value = '';
+    document.getElementById('maxHeight').value = '';
+    document.getElementById('minQuantity').value = ''; // Added minQuantity reset
+    document.getElementById('maxQuantity').value = '';
+
+    // Clear all tag inputs and containers
+    const tagInputs = [
+        'keywordInput', 'excludeKeywordInput', 'productIdInput',
+        'excludeProductIdInput', 'productGroupInput', 'excludeProductGroupInput', 'printTypeInput'
+    ];
+    const tagContainers = [
+        'keywordTags', 'excludeKeywordTags', 'productIdTags',
+        'excludeProductIdTags', 'productGroupTags', 'excludeProductGroupTags', 'printTypeTags'
+    ];
+
+    tagInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    tagContainers.forEach(id => {
+         const el = document.getElementById(id);
+         if (el) el.innerHTML = '';
+    });
   }
 
-  // Populate modal with existing rule
-  function editHubRule(rule) {
+  // --- Populate Modal for Editing ---
+  // Wrapper function to find the rule data before calling editHubRule
+  function editHubRuleWrapper(ruleId) {
+       const ruleData = currentRules.find(r => r.id === ruleId);
+       if (ruleData) {
+           editHubRule(ruleData); // Call the original edit function with the data
+       } else {
+           console.error('Rule data not found for ID:', ruleId);
+           alert('Error: Could not find rule data to edit.');
+       }
+   }
+
+  function editHubRule(rule) { // Now accepts the full rule object
     if (!rule || !rule.id) {
-      alert('Invalid rule data');
+      alert('Invalid rule data provided for editing.');
       return;
     }
-    resetForm();
+    resetForm(); // Start fresh
 
-    document.getElementById('ruleId').value = rule.id;
+    document.getElementById('ruleId').value = rule.id; // Populate hidden ID field
+    document.getElementById('modalTitle').textContent = 'Edit Hub Rule';
+
+    // Basic Info
     document.getElementById('description').value = rule.description || '';
-    document.getElementById('hubId').value = rule.hubId || 'vic';
+    document.getElementById('hubId').value = rule.hubId || ''; // Set hub dropdown
     document.getElementById('priority').value = rule.priority || 0;
-    document.getElementById('enabled').checked = (rule.enabled !== false);
+    document.getElementById('enabled').checked = (rule.enabled !== false); // Default true
 
-    // Time restrictions
-    if (rule.startDate) document.getElementById('startDate').value = rule.startDate;
-    if (rule.endDate) document.getElementById('endDate').value = rule.endDate;
+    // Time Restrictions
+    document.getElementById('startDate').value = rule.startDate || '';
+    document.getElementById('endDate').value = rule.endDate || '';
 
-    // Size constraints
+    // Size Constraints
     if (rule.sizeConstraints) {
-      if (rule.sizeConstraints.maxWidth != null) {
-        document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth;
-      }
-      if (rule.sizeConstraints.maxHeight != null) {
-        document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight;
-      }
+      document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth ?? '';
+      document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight ?? '';
     }
 
     // Order Criteria
     if (rule.orderCriteria) {
-      if (rule.orderCriteria.maxQuantity != null) {
-        document.getElementById('maxQuantity').value = rule.orderCriteria.maxQuantity;
-      }
-      if (rule.orderCriteria.keywords && Array.isArray(rule.orderCriteria.keywords)) {
-        rule.orderCriteria.keywords.forEach(kw => addTag(kw, 'keywordTags'));
-      }
-      if (rule.orderCriteria.excludeKeywords && Array.isArray(rule.orderCriteria.excludeKeywords)) {
-        rule.orderCriteria.excludeKeywords.forEach(kw => addTag(kw, 'excludeKeywordTags'));
-      }
-      if (rule.orderCriteria.productIds && Array.isArray(rule.orderCriteria.productIds)) {
-        rule.orderCriteria.productIds.forEach(pid => addTag(String(pid), 'productIdTags'));
-      }
-      // Load Print Types
-      if (rule.orderCriteria.printTypes && Array.isArray(rule.orderCriteria.printTypes)) {
-        rule.orderCriteria.printTypes.forEach(pt => addTag(String(pt), 'printTypeTags'));
-      }
+      const criteria = rule.orderCriteria;
+      document.getElementById('minQuantity').value = criteria.minQuantity ?? ''; // Added minQuantity
+      document.getElementById('maxQuantity').value = criteria.maxQuantity ?? '';
+
+      (criteria.keywords || []).forEach(kw => addTag(kw, 'keywordTags'));
+      (criteria.excludeKeywords || []).forEach(kw => addTag(kw, 'excludeKeywordTags'));
+      (criteria.productIds || []).forEach(pid => addTag(String(pid), 'productIdTags'));
+      (criteria.excludeProductIds || []).forEach(pid => addTag(String(pid), 'excludeProductIdTags')); // Populate new field
+      (criteria.productGroups || []).forEach(pg => addTag(pg, 'productGroupTags'));
+      (criteria.excludeProductGroups || []).forEach(pg => addTag(pg, 'excludeProductGroupTags'));
+      (criteria.printTypes || []).forEach(pt => addTag(String(pt), 'printTypeTags'));
     }
 
-    document.getElementById('modalTitle').textContent = 'Edit Hub Rule';
     document.getElementById('ruleEditor').style.display = 'block';
-    initializeTagInputs();
+    initializeTagInputs(); // Re-attach listeners if necessary
+    document.getElementById('description').focus();
   }
 
-  // Save rule to server
-  async function saveRule() {
-    const description = document.getElementById('description').value.trim();
-    const hubId = document.getElementById('hubId').value.trim();
-    if (!description || !hubId) {
-      alert('Description and Production Hub are required.');
-      return;
-    }
 
-    // ID: either existing or generate a new one
-    const ruleIdField = document.getElementById('ruleId').value.trim();
-    const ruleId = ruleIdField || ('rule_' + Date.now());
-
-    // Build the rule object
-    const rule = {
-      id: ruleId,
-      description: description,
-      hubId: hubId,
-      priority: parseInt(document.getElementById('priority').value || '0'),
-      enabled: document.getElementById('enabled').checked
-    };
-
-    // Time restrictions
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    if (startDate) rule.startDate = startDate;
-    if (endDate) rule.endDate = endDate;
-
-    // Size Constraints
-    const maxWidth = document.getElementById('maxWidth').value;
-    const maxHeight = document.getElementById('maxHeight').value;
-    if (maxWidth || maxHeight) {
-      rule.sizeConstraints = {
-        maxWidth: maxWidth ? parseFloat(maxWidth) : null,
-        maxHeight: maxHeight ? parseFloat(maxHeight) : null
-      };
-    }
-
-    // Order Criteria
-    const maxQuantity = document.getElementById('maxQuantity').value;
-    const keywords = getTagsArray('keywordTags');
-    const excludeKeywords = getTagsArray('excludeKeywordTags');
-    const productIds = getTagsArray('productIdTags')
-      .map(val => parseInt(val))
-      .filter(num => !isNaN(num));
-    const printTypes = getTagsArray('printTypeTags')
-      .map(val => parseInt(val))
-      .filter(num => !isNaN(num) && [1,2,3,4].includes(num));
-
-    let orderCriteria = null;
-    if (maxQuantity || keywords.length || excludeKeywords.length || productIds.length || printTypes.length) {
-      orderCriteria = {};
-      if (maxQuantity) {
-        orderCriteria.maxQuantity = parseInt(maxQuantity);
-      }
-      if (keywords.length) {
-        orderCriteria.keywords = keywords;
-      }
-      if (excludeKeywords.length) {
-        orderCriteria.excludeKeywords = excludeKeywords;
-      }
-      if (productIds.length) {
-        orderCriteria.productIds = productIds;
-      }
-      if (printTypes.length) {
-        orderCriteria.printTypes = printTypes;
-      }
-      rule.orderCriteria = orderCriteria;
-    }
-
-    try {
-      const response = await fetch('/hub-rules/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(rule)
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
-      }
-      const result = await response.json();
-      if (result.success) {
-        // Reload the page to see new/updated rule
-        window.location.reload();
-      } else {
-        alert('Error saving rule: ' + (result.message || 'Unknown error'));
-      }
-    } catch (err) {
-      console.error('Error in saveRule:', err);
-      alert('Error saving rule: ' + err.message);
-    }
-  }
-
-  // Delete a rule by ID
-  async function deleteRule(ruleId) {
-    ruleId = ruleId.replace(/['"]+/g, '');
-    if (!confirm('Are you sure you want to delete this rule?')) return;
-    try {
-      const response = await fetch(`/hub-rules/delete/${ruleId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP Error: ${response.status}`);
-      }
-      const result = await response.json();
-      if (result.success) {
-        window.location.reload();
-      } else {
-        throw new Error(result.message || 'Unknown error');
-      }
-    } catch (err) {
-      console.error('Error deleting rule:', err);
-      alert('Error deleting rule: ' + err.message);
-    }
-  }
-
-  // Returns an array of tag texts from a tag container
-  function getTagsArray(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return [];
-    return Array.from(container.children).map(tag => {
-      const textContent = tag.firstChild ? tag.firstChild.textContent : null;
-      return textContent ? textContent.trim() : null;
-    }).filter(t => t);
-  }
-
-  // Add a tag to the specified container
+  // --- Tag Management (Helper functions: addTag, handleTagInputKeypress, initializeTagInputs, getTagsArray, getNumericTagsArray) ---
+  // These functions can be copied directly from imposing_rules.html or preflight_rules.html as they are identical
   function addTag(value, containerId) {
     const container = document.getElementById(containerId);
-    if (!container || !value) return;
+    if (!container || !value || !value.trim()) return;
+    const tagValue = value.trim();
+    const existingTags = Array.from(container.children).map(tag => tag.firstChild.textContent.trim());
+    if (existingTags.includes(tagValue)) return;
+
     const tag = document.createElement('span');
     tag.className = 'tag';
-    tag.textContent = value;
+    tag.textContent = tagValue;
     const removeBtn = document.createElement('span');
     removeBtn.className = 'remove';
-    removeBtn.innerHTML = '&times;';
+    removeBtn.innerHTML = '×';
     removeBtn.onclick = () => tag.remove();
     tag.appendChild(removeBtn);
     container.appendChild(tag);
   }
 
-  // Handle "Enter" on tag inputs
-  function handleTagInputKeypress(e, inputId) {
-    if (e.key === 'Enter' && e.target.value.trim()) {
-      const containerMap = {
-        'keywordInput': 'keywordTags',
-        'excludeKeywordInput': 'excludeKeywordTags',
-        'productIdInput': 'productIdTags',
-        'printTypeInput': 'printTypeTags'
-      };
-      addTag(e.target.value.trim(), containerMap[inputId]);
-      e.target.value = '';
-      e.preventDefault();
+  function handleTagInputKeypress(event, inputId, containerId) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const inputElement = document.getElementById(inputId);
+      const value = inputElement.value.trim();
+      if (value) {
+        addTag(value, containerId);
+        inputElement.value = '';
+      }
     }
   }
 
-  // Initialize tag input events
   function initializeTagInputs() {
-    ['keywordInput', 'excludeKeywordInput', 'productIdInput', 'printTypeInput'].forEach(inputId => {
+    const tagInputs = [
+      { inputId: 'keywordInput', containerId: 'keywordTags' },
+      { inputId: 'excludeKeywordInput', containerId: 'excludeKeywordTags' },
+      { inputId: 'productIdInput', containerId: 'productIdTags' },
+      { inputId: 'excludeProductIdInput', containerId: 'excludeProductIdTags' }, // Added exclude ID input
+      { inputId: 'productGroupInput', containerId: 'productGroupTags' },
+      { inputId: 'excludeProductGroupInput', containerId: 'excludeProductGroupTags' },
+      { inputId: 'printTypeInput', containerId: 'printTypeTags' },
+    ];
+
+    tagInputs.forEach(({ inputId, containerId }) => {
       const inputElem = document.getElementById(inputId);
       if (inputElem) {
-        // Remove any existing listener to avoid duplication
-        inputElem.onkeypress = null;
-        // Add new listener
-        inputElem.addEventListener('keypress', (e) => handleTagInputKeypress(e, inputId));
+        const listener = (e) => handleTagInputKeypress(e, inputId, containerId);
+         if (!inputElem.hasAttribute('data-listener-attached')) {
+            inputElem.addEventListener('keypress', listener);
+            inputElem.setAttribute('data-listener-attached', 'true');
+        }
+      } else {
+          console.warn(`Tag input element not found: ${inputId}`);
       }
     });
   }
 
-  // Attach edit/delete handlers after DOM loaded
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        try {
-          const ruleDataStr = this.getAttribute('data-rule-data');
-          if (!ruleDataStr) {
-            console.error('No rule data found for rule:', this.getAttribute('data-rule-id'));
-            return;
-          }
-          const ruleData = JSON.parse(ruleDataStr);
-          editHubRule(ruleData);
-        } catch (err) {
-          console.error('Error in edit button click:', err);
-          alert('Error editing rule. Please check console.');
-        }
-      });
-    });
+  function getTagsArray(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return [];
+    return Array.from(container.children)
+           .map(tag => tag.firstChild?.textContent?.trim())
+           .filter(text => text);
+  }
 
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const ruleId = this.getAttribute('data-rule-id');
-        if (!ruleId) {
-          console.error('No rule ID found for deletion.');
-          return;
+  function getNumericTagsArray(containerId) {
+      return getTagsArray(containerId)
+            .map(val => parseInt(val))
+            .filter(num => !isNaN(num));
+  }
+
+
+    // --- Save Rule ---
+    async function saveRule() {
+    const description = document.getElementById('description').value.trim();
+    const hubIdValue = document.getElementById('hubId').value; // Get selected hub
+
+    if (!description || !hubIdValue) {
+      alert('Description and Production Hub are required.');
+      return;
+    }
+
+    // ID: Use existing if editing, generate if adding
+    const ruleIdField = document.getElementById('ruleId').value.trim();
+    // Use hidden field value if editing, otherwise generate
+    const ruleId = ruleIdField || ('hub_rule_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7));
+
+
+    // --- Build Size Constraints ---
+    let sizeConstraints = null;
+    const maxWidth = document.getElementById('maxWidth').value.trim();
+    const maxHeight = document.getElementById('maxHeight').value.trim();
+    if (maxWidth || maxHeight) {
+        sizeConstraints = {
+            maxWidth: maxWidth ? parseFloat(maxWidth) : null,
+            maxHeight: maxHeight ? parseFloat(maxHeight) : null
+        };
+    }
+
+     // --- Build Order Criteria ---
+    let orderCriteria = null;
+    const criteriaFields = {};
+    const minQty = document.getElementById('minQuantity').value.trim(); // Corrected ID
+    const maxQty = document.getElementById('maxQuantity').value.trim();
+    const keywords = getTagsArray('keywordTags');
+    const excludeKeywords = getTagsArray('excludeKeywordTags');
+    const productIds = getNumericTagsArray('productIdTags');
+    const excludeProductIds = getNumericTagsArray('excludeProductIdTags'); // Collect excluded IDs
+    const productGroups = getTagsArray('productGroupTags');
+    const excludeProductGroups = getTagsArray('excludeProductGroupTags');
+    const printTypes = getNumericTagsArray('printTypeTags').filter(num => [1,2,3,4].includes(num));
+
+    if (minQty) criteriaFields.minQuantity = parseInt(minQty); // Ensure correct ID is used
+    if (maxQty) criteriaFields.maxQuantity = parseInt(maxQty);
+    if (keywords.length > 0) criteriaFields.keywords = keywords;
+    if (excludeKeywords.length > 0) criteriaFields.excludeKeywords = excludeKeywords;
+    if (productIds.length > 0) criteriaFields.productIds = productIds;
+    if (excludeProductIds.length > 0) criteriaFields.excludeProductIds = excludeProductIds; // Add to criteria object
+    if (productGroups.length > 0) criteriaFields.productGroups = productGroups;
+    if (excludeProductGroups.length > 0) criteriaFields.excludeProductGroups = excludeProductGroups;
+    if (printTypes.length > 0) criteriaFields.printTypes = printTypes;
+
+    if (Object.keys(criteriaFields).length > 0) {
+        orderCriteria = criteriaFields;
+    }
+
+    // --- Build the Full Rule Object ---
+    const rule = { // This is the single rule object
+      id: ruleId,
+      description: description,
+      hubId: hubIdValue, // Use the selected value
+      priority: parseInt(document.getElementById('priority').value || '0'),
+      enabled: document.getElementById('enabled').checked,
+      startDate: document.getElementById('startDate').value || null,
+      endDate: document.getElementById('endDate').value || null,
+      sizeConstraints: sizeConstraints, // Assign potentially null object
+      orderCriteria: orderCriteria      // Assign potentially null object
+    };
+
+    console.log("Saving hub rule:", JSON.stringify(rule, null, 2));
+
+     // --- Send to Backend ---
+    try {
+        // ****** THIS IS THE KEY CHANGE ******
+        // Send only the single 'rule' object, not the 'currentRules' array
+        const response = await fetch('/hub-rules/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(rule) // <-- SEND THE SINGLE RULE OBJECT
+        });
+        // ************************************
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(`HTTP Error ${response.status}: ${errorData.message}`);
         }
-        deleteRule(ruleId);
-      });
-    });
-  });
+        const result = await response.json();
+        if (result.success) {
+            window.location.reload(); // Reload to show changes
+        } else {
+            alert('Error saving rule: ' + (result.message || 'Unknown error'));
+        }
+    } catch (err) {
+        console.error('Error saving hub rule:', err);
+        alert('Error saving hub rule: ' + err.message);
+    }
+  }
+
+  // --- Delete Rule (Keep as is - it sends the ID in the URL) ---
+  async function deleteRule(ruleId) {
+      // ... deleteRule logic remains the same ...
+        if (!ruleId) return;
+        if (!confirm(`Are you sure you want to delete hub rule ID: ${ruleId}?`)) return;
+
+        try {
+        const response = await fetch(`/hub-rules/delete/${ruleId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(`HTTP Error ${response.status}: ${errorData.message}`);
+        }
+        const result = await response.json();
+        if (result.success) {
+            window.location.reload();
+        } else {
+            alert('Error deleting rule: ' + (result.message || 'Unknown error'));
+        }
+        } catch (err) {
+        console.error('Error deleting rule:', err);
+        alert('Error deleting rule: ' + err.message);
+        }
+  }
+
 </script>
 {% endblock %}
