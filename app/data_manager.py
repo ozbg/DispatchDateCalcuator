@@ -194,7 +194,96 @@ def save_imposing_rules_data(rules: List[Dict]):
     save_json_file(DATA_DIR / "imposing_rules.json", data_to_save, "imposing rules")
 
 
+# ---------- NEW: Preflight Profiles ----------
+def get_preflight_profiles_data() -> List[Dict]:
+    """Load preflight profiles from preflight_profiles.json"""
+    required_fields = ["id", "description"]
+    filepath = DATA_DIR / "preflight_profiles.json"
+    context = "preflight profiles"
 
+    # Create the file with default structure if it doesn't exist
+    if not filepath.exists():
+        logger.warning(f"{context} file not found at {filepath}. Creating default profiles.")
+        default_data = [
+            {"id": 0, "description": "Do Not Preflight"},
+            {"id": 1, "description": "Preflight Flatsheet"},
+            {"id": 2, "description": "Preflight Wideformat"},
+            {"id": 3, "description": "Preflight Booklets"}
+        ]
+        try:
+            save_json_file(filepath, default_data, context)
+            return default_data
+        except Exception as e:
+            logger.error(f"Failed to create default {context} file: {e}")
+            raise
+
+    # Load data if file exists
+    data = load_json_file(filepath, context)
+
+    # Ensure data is a list
+    if not isinstance(data, list):
+         logger.error(f"Invalid structure in {context} file: Expected a list of profiles.")
+         raise ValueError(f"Invalid structure in {context} file.")
+
+    # Validate the structure of each profile in the list
+    try:
+        for profile in data:
+             validate_json_structure(profile, required_fields, f"{context} profile {profile.get('id', 'UNKNOWN')}")
+             if not isinstance(profile.get("id"), int):
+                 raise ValueError(f"Profile ID must be an integer in {profile}")
+        return data
+    except Exception as e:
+        logger.error(f"Invalid {context} data structure: {str(e)}")
+        raise
+
+def save_preflight_profiles_data(profiles: List[Dict]):
+    """Save preflight profiles to preflight_profiles.json"""
+    save_json_file(DATA_DIR / "preflight_profiles.json", profiles, "preflight profiles")
+
+
+# ---------- NEW: Preflight Rules ----------
+def get_preflight_rules_data() -> List[Dict]:
+    """Load preflight rules from preflight_rules.json"""
+    required_fields = ["id", "description", "priority", "enabled", "orderCriteria", "preflightProfileId"]
+    filepath = DATA_DIR / "preflight_rules.json"
+    context = "preflight rules"
+
+    # Create the file with default structure if it doesn't exist
+    if not filepath.exists():
+        logger.warning(f"{context} file not found at {filepath}. Creating a default empty file.")
+        default_data = {"rules": []}
+        try:
+            save_json_file(filepath, default_data, context)
+            return default_data["rules"]
+        except Exception as e:
+            logger.error(f"Failed to create default {context} file: {e}")
+            raise
+
+    # Load data if file exists
+    data = load_json_file(filepath, context)
+
+    # Ensure data is in the expected format (dict with 'rules' key)
+    if not isinstance(data, dict) or "rules" not in data:
+         logger.error(f"Invalid structure in {context} file: Expected a dictionary with a 'rules' key.")
+         raise ValueError(f"Invalid structure in {context} file.")
+
+    rules_list = data.get("rules", [])
+
+    # Validate the structure of each rule in the list
+    try:
+        for rule in rules_list:
+             validate_json_structure(rule, required_fields, f"{context} rule {rule.get('id', 'UNKNOWN')}")
+             if not isinstance(rule.get("preflightProfileId"), int):
+                 raise ValueError(f"preflightProfileId must be an integer in rule {rule.get('id')}")
+        return rules_list
+    except Exception as e:
+        logger.error(f"Invalid {context} data structure: {str(e)}")
+        raise
+
+def save_preflight_rules_data(rules: List[Dict]):
+    """Save preflight rules to preflight_rules.json"""
+    data_to_save = {"rules": rules}
+    save_json_file(DATA_DIR / "preflight_rules.json", data_to_save, "preflight rules")
 
 
 # ---------- Production Groups ----------

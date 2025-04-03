@@ -91,6 +91,23 @@ class ImposingRule(BaseModel):
     startDate: Optional[str] = Field(None, description="Date (YYYY-MM-DD) from which the rule becomes active.")
     endDate: Optional[str] = Field(None, description="Date (YYYY-MM-DD) after which the rule is no longer active.")
 
+class PreflightProfile(BaseModel):
+    """Represents a preflight profile definition."""
+    id: int = Field(..., description="Unique numeric identifier for the profile.")
+    description: str = Field(..., description="Human-readable description of the profile.")
+
+# --- PREFLIGHT RULE ---
+class PreflightRule(BaseModel):
+    """Defines a rule used to determine the SynergyPreflight profile ID."""
+    id: str = Field(..., description="Unique identifier for the preflight rule.")
+    description: str = Field(..., description="Human-readable description of the rule's purpose.")
+    priority: int = Field(0, description="Execution priority (higher numbers run first). The first matching rule determines the action.")
+    enabled: bool = Field(True, description="Whether this rule is currently active.")
+    orderCriteria: OrderMatchingCriteria = Field(..., description="The order must match *all* defined criteria for the rule to apply.")
+    preflightProfileId: int = Field(..., description="The ID of the Preflight Profile to apply if the rule matches.")
+    startDate: Optional[str] = Field(None, description="Date (YYYY-MM-DD) from which the rule becomes active.")
+    endDate: Optional[str] = Field(None, description="Date (YYYY-MM-DD) after which the rule is no longer active.")
+
 class HubSizeConstraint(BaseModel):
     """Defines maximum dimensions (width/height) constraints for a hub selection rule."""
     maxWidth: Optional[float] = Field(None, description="Maximum allowable width (mm) for the product (considers orientation).")

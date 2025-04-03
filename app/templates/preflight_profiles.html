@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Preflight Profiles</h2>
+<p><a href="/" class="btn">Back to Admin</a></p>
+
+<div class="help-section">
+  <h3>Understanding Preflight Profiles</h3>
+  <div class="rule-explanation">
+      <div class="rule-box">
+          <h4>Purpose</h4>
+          <p>These profiles define the available preflight settings that can be assigned by Preflight Rules.</p>
+          <p class="example">Profile ID 0 is reserved for "Do Not Preflight". You can add, edit, or delete other profiles as needed.</p>
+      </div>
+       <div class="rule-box">
+          <h4>ID & Description</h4>
+          <p>Each profile needs a unique numeric ID and a clear description.</p>
+          <p class="example">ID: 1, Description: Preflight Flatsheet</p>
+       </div>
+       <div class="rule-box">
+            <h4>Usage</h4>
+            <p>The descriptions will appear in the dropdown when creating/editing Preflight Rules.</p>
+            <p class="example">Deleting a profile currently in use by a rule might cause unexpected behavior (rule might default to 0). Update rules first if necessary.</p>
+        </div>
+  </div>
+</div>
+
+<button onclick="showAddForm()" class="add-btn">Add New Profile</button>
+
+<div id="profilesContainer">
+    <table class="rules-table">
+        <thead>
+            <tr>
+                <th>Profile ID</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="profilesBody">
+            <!-- Rows populated by JS -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Profile Editor Modal -->
+<div id="profileEditor" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <h3 id="modalTitle">Add/Edit Profile</h3>
+        <input type="hidden" id="originalProfileId"> <!-- Store original ID for editing -->
+
+        <div class="form-section">
+             <div class="form-group">
+                <label for="profileId">Profile ID:</label>
+                <input type="number" id="profileId" required class="form-control">
+                <small>Unique numeric identifier (e.g., 1, 2, 3). ID 0 is reserved.</small>
+            </div>
+            <div class="form-group">
+                <label for="profileDescription">Description:</label>
+                <input type="text" id="profileDescription" required class="form-control">
+                <small>Human-readable name (e.g., "Preflight Flatsheet").</small>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="saveProfile()" class="primary-btn save-btn">Save Profile</button>
+            <button type="button" onclick="closeEditor()" class="secondary-btn cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Reusing some styles from other rule pages */
+    .help-section { background: #f8f9fa; padding: 1.25rem; margin-bottom: 1.5rem; border-radius: 0.3rem; border: 1px solid #dee2e6;}
+    .rule-explanation { display: flex; gap: 1.25rem; margin-top: 1rem; flex-wrap: wrap; }
+    .rule-box { flex: 1 1 220px; background: white; padding: 1rem; border-radius: 0.3rem; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); border: 1px solid #eee; }
+    .rule-box h4 { color: #0d6efd; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em; }
+    .example { font-style: italic; color: #6c757d; font-size: 0.875em; margin-top: 0.5rem;}
+    .add-btn { background: #198754; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 1rem; transition: background-color 0.15s ease-in-out; margin-bottom: 1.25rem; }
+    .add-btn:hover { background: #157347; }
+    .rules-table { width: 100%; margin-bottom: 2rem; border-collapse: collapse; font-size: 0.9rem; }
+    .rules-table th, .rules-table td { padding: 0.75rem; text-align: left; border: 1px solid #dee2e6; vertical-align: top; }
+    .rules-table thead th { background: #e9ecef; font-weight: 600; border-bottom-width: 2px;}
+    .rules-table .edit-btn { background: #0d6efd; margin-right: 0.3rem; padding: 0.25rem 0.5rem; font-size: 0.8em; color:white; border:none; border-radius: 0.2rem; cursor: pointer; }
+    .rules-table .edit-btn:hover { background: #0b5ed7; }
+    .rules-table .delete-btn { background: #dc3545; padding: 0.25rem 0.5rem; font-size: 0.8em; color:white; border:none; border-radius: 0.2rem; cursor: pointer; }
+    .rules-table .delete-btn:hover { background: #c82333; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); overflow-y: auto; z-index: 1000; }
+    .modal-content { background: #ffffff; border-radius: 0.5rem; padding: 1.5rem 2rem; width: 90%; max-width: 800px; margin: 2.5rem auto; box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); max-height: 90vh; overflow-y: auto; position: relative; }
+    .modal-content h3 { color: #0a58ca; margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-weight: 500; }
+    .form-section { background: #f8f9fa; border-radius: 0.3rem; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; border: 1px solid #dee2e6; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-weight: 500; margin-bottom: 0.4rem; color: #495057; font-size: 0.9rem; }
+    .form-group small { display: block; color: #6c757d; margin-top: 0.3rem; font-size: 0.8rem; }
+    .form-control { width: 100%; padding: 0.5rem 0.75rem; font-size: 0.95rem; border: 1px solid #ced4da; border-radius: 0.25rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; box-sizing: border-box; background-color: #fff; }
+    .form-control:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+    .button-group { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
+    .primary-btn, .secondary-btn { padding: 0.5rem 1rem; font-size: 0.95em; font-weight: 500; border-radius: 0.25rem; cursor: pointer; border: none; transition: all 0.15s ease-in-out; }
+    .primary-btn { background: #0d6efd; color: white; }
+    .primary-btn:hover { background: #0b5ed7; }
+    .secondary-btn { background: #6c757d; color: white; }
+    .secondary-btn:hover { background: #5c636a; }
+</style>
+
+<script>
+let profiles = {{ profiles | tojson }};
+let editingProfileOriginalId = null; // Track original ID during edit
+
+document.addEventListener('DOMContentLoaded', function() {
+    renderProfilesTable();
+});
+
+function renderProfilesTable() {
+    const tbody = document.getElementById('profilesBody');
+    tbody.innerHTML = ''; // Clear existing
+
+    // Sort profiles by ID for consistent display
+    profiles.sort((a, b) => a.id - b.id);
+
+    profiles.forEach(profile => {
+        const row = tbody.insertRow();
+        row.insertCell().textContent = profile.id;
+        row.insertCell().textContent = profile.description;
+
+        const actionCell = row.insertCell();
+        // ID 0 is reserved and shouldn't be edited/deleted easily
+        if (profile.id !== 0) {
+            const editBtn = document.createElement('button');
+            editBtn.textContent = 'Edit';
+            editBtn.className = 'edit-btn';
+            editBtn.onclick = () => editProfile(profile.id);
+            actionCell.appendChild(editBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.onclick = () => deleteProfile(profile.id);
+            actionCell.appendChild(deleteBtn);
+        } else {
+            actionCell.textContent = 'Reserved';
+        }
+    });
+}
+
+function showAddForm() {
+    editingProfileOriginalId = null;
+    document.getElementById('modalTitle').textContent = 'Add New Profile';
+    document.getElementById('profileId').value = '';
+    document.getElementById('profileId').disabled = false; // Allow editing ID for new profiles
+    document.getElementById('profileDescription').value = '';
+    document.getElementById('originalProfileId').value = ''; // Clear hidden field
+    document.getElementById('profileEditor').style.display = 'block';
+    document.getElementById('profileId').focus();
+}
+
+function editProfile(id) {
+    const profile = profiles.find(p => p.id === id);
+    if (!profile) return;
+
+    editingProfileOriginalId = profile.id; // Store the original ID
+    document.getElementById('modalTitle').textContent = 'Edit Profile';
+    document.getElementById('profileId').value = profile.id;
+    document.getElementById('profileId').disabled = false; // Allow editing ID, but need validation
+    document.getElementById('profileDescription').value = profile.description;
+    document.getElementById('originalProfileId').value = profile.id; // Store in hidden field
+    document.getElementById('profileEditor').style.display = 'block';
+    document.getElementById('profileDescription').focus();
+}
+
+function closeEditor() {
+    document.getElementById('profileEditor').style.display = 'none';
+}
+
+async function saveProfile() {
+    const profileIdInput = document.getElementById('profileId');
+    const descriptionInput = document.getElementById('profileDescription');
+    const originalId = editingProfileOriginalId; // Get original ID if editing
+
+    const newIdStr = profileIdInput.value.trim();
+    const newDescription = descriptionInput.value.trim();
+
+    if (!newIdStr || !newDescription) {
+        alert('Profile ID and Description are required.');
+        return;
+    }
+
+    let newId;
+    try {
+        newId = parseInt(newIdStr);
+        if (isNaN(newId) || newId < 0) { // Ensure positive integer (0 is allowed but special)
+             throw new Error();
+        }
+    } catch (e) {
+        alert('Profile ID must be a non-negative number.');
+        return;
+    }
+
+    // Prevent editing ID 0
+    if (originalId === 0 && newId !== 0) {
+        alert("Profile ID 0 is reserved and cannot be changed.");
+        profileIdInput.value = 0; // Reset input
+        return;
+    }
+     if (newId === 0 && originalId !== null && originalId !== 0) {
+         alert("Cannot change an existing profile ID to 0.");
+         profileIdInput.value = originalId; // Reset input
+         return;
+     }
+
+    // Check for ID collision (if changing ID or adding new)
+    const idExists = profiles.some(p => p.id === newId && p.id !== originalId);
+    if (idExists) {
+        alert(`Profile ID ${newId} already exists. Please choose a unique ID.`);
+        return;
+    }
+
+    const profileData = { id: newId, description: newDescription };
+
+    // Find index of profile being edited (if any)
+    const profileIndex = profiles.findIndex(p => p.id === originalId);
+
+    if (profileIndex >= 0) {
+        // Update existing profile
+        profiles[profileIndex] = profileData;
+    } else {
+        // Add new profile
+        profiles.push(profileData);
+    }
+
+    // --- Send to Backend ---
+    try {
+        const response = await fetch('/preflight-profiles/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profiles) // Send the entire list
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: response.statusText }));
+            throw new Error(`HTTP Error ${response.status}: ${errorData.message}`);
+        }
+
+        const result = await response.json();
+        if (result.success) {
+            profiles = result.profiles; // Update local data with potentially sorted/validated data from backend
+            renderProfilesTable();
+            closeEditor();
+        } else {
+            alert('Error saving profile: ' + (result.message || 'Unknown error'));
+            // Revert local changes if save failed? Optional.
+             // fetchProfiles(); // Re-fetch might be safer
+        }
+    } catch (err) {
+        console.error('Error saving profile:', err);
+        alert('Error saving profile: ' + err.message);
+    }
+}
+
+
+async function deleteProfile(id) {
+    if (id === 0) {
+        alert("Profile ID 0 is reserved and cannot be deleted.");
+        return;
+    }
+    if (confirm(`Are you sure you want to delete profile ID ${id}? This might affect existing rules.`)) {
+         // Optimistically remove from local list
+        const originalProfiles = [...profiles]; // Keep a copy
+        profiles = profiles.filter(p => p.id !== id);
+        renderProfilesTable(); // Update UI immediately
+
+        try {
+            const response = await fetch(`/preflight-profiles/save`, { // Send updated list to save endpoint
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(profiles)
+            });
+
+             if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ message: response.statusText }));
+                throw new Error(`HTTP Error ${response.status}: ${errorData.message}`);
+            }
+             const result = await response.json();
+             if (!result.success) {
+                 // Revert UI changes if save failed
+                 alert('Error deleting profile on server: ' + (result.message || 'Unknown error'));
+                 profiles = originalProfiles;
+                 renderProfilesTable();
+             }
+            // If successful, UI is already updated
+        } catch (err) {
+            console.error('Error deleting profile:', err);
+            alert('Error deleting profile: ' + err.message);
+            // Revert UI changes on error
+            profiles = originalProfiles;
+            renderProfilesTable();
+        }
+    }
+}
+
+// Initial load function (optional, if needed)
+async function fetchProfiles() {
+     try {
+        // Assuming an endpoint exists to fetch profiles - if not, use the initially passed data
+        // const response = await fetch('/get-preflight-profiles'); // Example endpoint
+        // if (!response.ok) throw new Error('Failed to fetch');
+        // profiles = await response.json();
+        renderProfilesTable();
+     } catch(err) {
+         console.error("Failed to load profiles:", err);
+         // Handle error - maybe show message to user
+     }
+}
+
+// Initial render on load
+document.addEventListener('DOMContentLoaded', renderProfilesTable);
+
+</script>
+{% endblock %}

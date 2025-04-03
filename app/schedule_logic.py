@@ -10,6 +10,7 @@ from pathlib import Path
 from app.data_manager import get_production_groups_data
 from app.production_group_mapper import match_production_groups
 from app.imposing_logic import determine_imposing_action
+from app.preflight_logic import determine_preflight_action 
 
 from app.models import (
     ScheduleRequest,
@@ -268,15 +269,20 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     )
     logger.debug("SCHEDULE LOG: " + debug_log)
     
-    # 10) Determine Synergy Impose ---
-    # Get the default value from the matched product first
-    default_synergy_impose = product_obj.get("SynergyImpose", 0) # Default to 0 if not present in product_info
+    # 10) Determine Default Synergy Impose and Preflight ---
+    # Get default values from the matched product first
+    default_synergy_impose = product_obj.get("SynergyImpose", 0)
+    default_synergy_preflight = product_obj.get("SynergyPreflight", 0) # Default to 0
     logger.debug(f"Default SynergyImpose from product {found_product_id}: {default_synergy_impose}")
+    logger.debug(f"Default SynergyPreflight from product {found_product_id}: {default_synergy_preflight}")
 
     # --- Apply Imposing Rules ---
-    # Call the new logic to potentially override the default SynergyImpose
     final_synergy_impose = determine_imposing_action(req, found_product_id)
     logger.debug(f"SynergyImpose after applying rules: {final_synergy_impose}")
+
+    # --- Apply Preflight Rules --- # <<< NEW BLOCK
+    final_synergy_preflight = determine_preflight_action(req, found_product_id)
+    logger.debug(f"SynergyPreflight after applying rules: {final_synergy_preflight}")
     
 
     # Return comprehensive response
@@ -319,7 +325,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         totalQuantity=req.misOrderQTY * req.kinds,
         
         # Configuration
-        synergyPreflight=product_obj.get("SynergyPreflight"),
+        synergyPreflight=final_synergy_preflight, 
         synergyImpose=final_synergy_impose, 
         enableAutoHubTransfer=enable_auto_hub_transfer
     )

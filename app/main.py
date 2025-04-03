@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 import pytz
 
 # >>> NEW IMPORTS FOR AUTH <<<
@@ -26,7 +26,10 @@ from app.data_manager import (
     get_cmyk_hubs_data, save_cmyk_hubs_data,
     get_product_keywords_data, save_product_keywords_data,
     get_hub_data, save_hub_data,
-    get_imposing_rules_data, save_imposing_rules_data 
+    get_imposing_rules_data, save_imposing_rules_data,
+    get_preflight_profiles_data, save_preflight_profiles_data,
+    get_preflight_rules_data, save_preflight_rules_data
+    
 )
 from app.models import ScheduleRequest, ScheduleResponse
 from app.schedule_logic import process_order
@@ -556,7 +559,129 @@ async def delete_imposing_rule_endpoint(rule_id: str):
         logger.error(f"Error deleting imposing rule {rule_id}: {e}", exc_info=True)
         return JSONResponse({"success": False, "message": f"Error deleting rule: {str(e)}"}, status_code=500)
 
+# --- NEW: Preflight Profiles ---
+@app.get("/preflight-profiles", response_class=HTMLResponse, tags=["UI", "Configuration"])
+async def preflight_profiles_page(request: Request):
+    """Serves the HTML page for managing preflight profiles."""
+    try:
+        profiles = get_preflight_profiles_data()
+        logger.debug(f"Loaded {len(profiles)} preflight profiles for UI.")
+        return templates.TemplateResponse(
+            "preflight_profiles.html",
+            {
+                "request": request,
+                "profiles": profiles,
+            }
+        )
+    except FileNotFoundError as e:
+        logger.error(f"Preflight profiles file not found: {e}")
+        raise HTTPException(status_code=500, detail="Preflight profiles configuration file not found.")
+    except Exception as e:
+        logger.exception("Error loading preflight profiles page")
+        raise HTTPException(status_code=500, detail=f"Error loading page: {e}")
 
+@app.post("/preflight-profiles/save", tags=["Configuration"])
+async def save_preflight_profiles_endpoint(request: Request):
+    """Saves the entire list of preflight profiles."""
+    try:
+        profiles_list = await request.json()
+        if not isinstance(profiles_list, list):
+             raise ValueError("Invalid data format: Expected a list of profiles.")
+
+        # Basic validation for each profile
+        seen_ids = set()
+        for profile in profiles_list:
+             if not isinstance(profile, dict) or "id" not in profile or "description" not in profile:
+                 raise ValueError("Each profile must be a dictionary with 'id' and 'description'.")
+             if not isinstance(profile["id"], int) or profile["id"] < 0:
+                 raise ValueError(f"Profile ID must be a non-negative integer: {profile}")
+             if not isinstance(profile["description"], str) or not profile["description"].strip():
+                  raise ValueError(f"Profile description cannot be empty: {profile}")
+             if profile["id"] in seen_ids:
+                 raise ValueError(f"Duplicate Profile ID found: {profile['id']}")
+             seen_ids.add(profile["id"])
+             if profile["id"] == 0 and profile["description"] != "Do Not Preflight":
+                 logger.warning("Overwriting description for reserved Profile ID 0.")
+                 # Optionally force description for ID 0: profile['description'] = "Do Not Preflight"
+
+
+        save_preflight_profiles_data(profiles_list)
+        logger.info(f"Saved {len(profiles_list)} preflight profiles.")
+        # Return the saved list so JS can update if needed (e.g., sorting)
+        return JSONResponse({"success": True, "message": "Preflight profiles saved successfully", "profiles": profiles_list})
+    except ValueError as ve:
+         logger.error(f"Validation error saving preflight profiles: {ve}")
+         return JSONResponse({"success": False, "message": str(ve)}, status_code=400)
+    except Exception as e:
+        logger.exception("Error saving preflight profiles")
+        return JSONResponse({"success": False, "message": f"Error saving profiles: {str(e)}"}, status_code=500)
+
+# --- NEW: Preflight Rules ---
+@app.get("/preflight-rules", response_class=HTMLResponse, tags=["UI", "Configuration"])
+async def preflight_rules_page(request: Request):
+    """Serves the HTML page for managing preflight rules."""
+    try:
+        rules = get_preflight_rules_data() # Get list of rules
+        profiles = get_preflight_profiles_data() # Get profiles for dropdown
+        logger.debug(f"Loaded {len(rules)} preflight rules and {len(profiles)} profiles for UI.")
+        return templates.TemplateResponse(
+            "preflight_rules.html",
+            {
+                "request": request,
+                "rules": rules,
+                "preflight_profiles": profiles # Pass profiles to template
+            }
+        )
+    except FileNotFoundError as e:
+        logger.error(f"Data file not found for /preflight-rules: {e}")
+        raise HTTPException(status_code=500, detail=f"Configuration file not found: {e.filename}")
+    except Exception as e:
+        logger.exception("Error loading preflight rules page")
+        raise HTTPException(status_code=500, detail=f"Error loading page: {e}")
+
+@app.post("/preflight-rules/save", tags=["Configuration"])
+async def save_preflight_rules_endpoint(request: Request):
+    """Saves the entire list of preflight rules."""
+    try:
+        rules_list = await request.json()
+        if not isinstance(rules_list, list):
+             raise ValueError("Invalid data format: Expected a list of rules.")
+
+        # Optional: Validate using Pydantic model [PreflightRule(**r) for r in rules_list]
+        # Ensure all required fields exist, profile IDs are valid ints etc.
+
+        save_preflight_rules_data(rules_list) # Save the list
+        logger.info(f"Saved {len(rules_list)} preflight rules.")
+        return JSONResponse({"success": True, "message": "Preflight rules saved successfully"})
+    except ValueError as ve:
+         logger.error(f"Validation error saving preflight rules: {ve}")
+         return JSONResponse({"success": False, "message": str(ve)}, status_code=400)
+    except Exception as e:
+        logger.exception("Error saving preflight rules")
+        return JSONResponse({"success": False, "message": f"Error saving rules: {str(e)}"}, status_code=500)
+
+@app.post("/preflight-rules/delete/{rule_id}", tags=["Configuration"])
+async def delete_preflight_rule_endpoint(rule_id: str):
+    """Deletes a specific preflight rule by its ID."""
+    try:
+        current_rules = get_preflight_rules_data() # Get list of rules
+        original_length = len(current_rules)
+
+        updated_rules = [r for r in current_rules if r.get("id") != rule_id]
+
+        if len(updated_rules) == original_length:
+            logger.warning(f"Preflight rule ID {rule_id} not found for deletion.")
+            raise HTTPException(status_code=404, detail=f"Rule with ID {rule_id} not found.")
+
+        save_preflight_rules_data(updated_rules) # Save the updated list
+
+        logger.info(f"Successfully deleted preflight rule with ID: {rule_id}")
+        return JSONResponse({"success": True, "message": "Rule deleted successfully"})
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        logger.exception(f"Error deleting preflight rule {rule_id}")
+        return JSONResponse({"success": False, "message": f"Error deleting rule: {str(e)}"}, status_code=500)
 
 @app.post("/schedule", response_model=ScheduleResponse)
 def schedule_order(request_data: ScheduleRequest, request: Request):
@@ -606,16 +731,38 @@ async def get_products():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/products", response_class=HTMLResponse)
+# --- Product Schedule ---
+@app.get("/products", response_class=HTMLResponse, tags=["UI"])
 async def products_html(request: Request):
-    logger.debug("Fetching product info and CMYK hubs data.")
-    data = get_product_info_data()
-    cmyk_hubs = get_cmyk_hubs_data()
-    return templates.TemplateResponse("products.html", {
-        "request": request,
-        "product_data": data,
-        "cmyk_hubs": cmyk_hubs
-    })
+    logger.debug("Fetching product info and CMYK hubs data for /products page.")
+    try:
+        product_data = get_product_info_data()
+        cmyk_hubs = get_cmyk_hubs_data()
+
+        # --- Create Mappings ---
+        hub_id_to_name = {hub["CMHKhubID"]: hub["Hub"] for hub in cmyk_hubs}
+        # Define print type mapping directly here or load from a config if it changes
+        print_type_id_to_name = {
+            1: "Offset",
+            2: "Digital",
+            3: "Offset+Digital",
+            4: "Wideformat"
+        }
+        # ----------------------
+
+        return templates.TemplateResponse("products.html", {
+            "request": request,
+            "product_data": product_data,
+            "cmyk_hubs": cmyk_hubs, # Keep sending this if needed elsewhere in template
+            "hub_id_to_name": hub_id_to_name,         # Pass the mapping
+            "print_type_id_to_name": print_type_id_to_name # Pass the mapping
+        })
+    except FileNotFoundError as e:
+        logger.error(f"Data file not found for /products: {e}")
+        raise HTTPException(status_code=500, detail=f"Configuration file not found: {e.filename}")
+    except Exception as e:
+        logger.exception("Error loading /products page")
+        raise HTTPException(status_code=500, detail="Internal server error loading product data.")
 
 @app.post("/products/edit/{product_id}")
 async def update_product(request: Request, product_id: str):

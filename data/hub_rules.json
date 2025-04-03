@@ -5,7 +5,7 @@
       "description": "QLD Digital Only",
       "hubId": "nqld",
       "priority": 1,
-      "enabled": true,
+      "enabled": false,
       "orderCriteria": {
         "printTypes": [
           1
