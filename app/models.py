@@ -3,6 +3,11 @@
 from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Union
 from datetime import date
+import logging # Add logging import
+
+logger = logging.getLogger(__name__) # Get a logger instance
+logger.warning(">>>>>>>>>> LOADING models.py containing ScheduleRequest with centerId <<<<<<<<<<") # Use warning level
+
 
 class RuleConditions(BaseModel):
     """Defines conditions under which a finishing rule applies."""
@@ -13,6 +18,7 @@ class RuleConditions(BaseModel):
     productIdNotEqual: Optional[int] = Field(None, description="Rule applies if the product ID does *not* match this value.")
     productIdIn: Optional[List[int]] = Field(None, description="Rule applies if the product ID is in this list.")
     productGroupNotContains: Optional[str] = Field(None, description="Rule applies if the product group name (case-insensitive) does *not* contain this string.")
+    productionHubIs: Optional[List[str]] = Field(None, description="Rule applies if the chosen production hub is in this list (lowercase names).") 
     hubOverrides: Optional[Dict[str, int]] = Field(None, description="Dictionary mapping hub names (lowercase) to specific day adjustments, overriding the rule's default `addDays`.")
 
 class FinishingRule(BaseModel):
@@ -66,6 +72,7 @@ class ScheduleRequest(BaseModel):
     misCurrentHubID: Optional[int] = Field(None, description="The ID of the hub where the order currently resides.", example=1)
     misDeliversToState: str = Field(..., description="The state the order delivers to (lowercase, used for hub selection).", example="vic")
     orderNotes: Optional[List[OrderNote]] = Field(None, description="Optional list of notes associated with the order.")
+    centerId: Optional[int] = Field(None, description="Optional specific Center ID for evaluating Center Rules in finishing_rules.json.")
     additionalProductionDays: Optional[int] = Field(0, description="Manually specified additional days to add to production time.", example=0)
 
 class OrderMatchingCriteria(BaseModel):
@@ -185,153 +192,4 @@ class ScheduleResponse(BaseModel):
     synergyPreflight: Optional[int] = Field(None, description="Synergy preflight setting from the matched product.")
     synergyImpose: Optional[int] = Field(None, description="Synergy impose setting from the matched product.")
     enableAutoHubTransfer: Optional[int] = Field(None, description="Indicates if automatic hub transfer should be enabled (1 if chosen hub differs from current hub, 0 otherwise).")
-    quantityGreaterOrEqual: Optional[int] = None
-    productIdEqual: Optional[int] = None
-    productIdNotEqual: Optional[int] = None
-    productIdIn: Optional[List[int]] = None
-    productGroupNotContains: Optional[str] = None
-    hubOverrides: Optional[Dict[str, int]] = None
-
-class FinishingRule(BaseModel):
-    """Individual finishing rule definition"""
-    id: str
-    description: str
-    keywords: Optional[List[str]] = None
-    excludeKeywords: Optional[List[str]] = None
-    matchType: Optional[str] = "any"  # "any" or "all"
-    caseSensitive: bool = False
-    addDays: int
-    conditions: Optional[RuleConditions] = None
-    enabled: bool = True
-
-class CenterRule(BaseModel):
-    """Special rules for specific centers"""
-    id: str
-    description: str
-    centerId: int
-    excludeKeywords: Optional[List[str]] = None
-    matchType: Optional[str] = "any"
-    caseSensitive: bool = False
-    addDays: int
-    enabled: bool = True
-
-class FinishingRules(BaseModel):
-    """Container for all finishing rules"""
-    keywordRules: List[FinishingRule]
-    centerRules: List[CenterRule]
-
-class OrderNote(BaseModel):
-    noteText: str
-    dateCreated: str
-    userID: int
-    userName: str
-    type: str
-
-class ScheduleRequest(BaseModel):
-    orderId: Optional[str] = None
-    misDeliversToPostcode: str
-    misOrderQTY: int
-    orientation: str
-    description: str
-    printType: int
-    kinds: int
-    preflightedWidth: float
-    preflightedHeight: float
-    misCurrentHub: str
-    misCurrentHubID: Optional[int] = None
-    misDeliversToState: str
-    orderNotes: Optional[List[OrderNote]] = None
-    additionalProductionDays: Optional[int] = 0
-
-class OrderMatchingCriteria(BaseModel):
-    """Criteria for matching orders based on quantity, keywords, and product details"""
-    maxQuantity: Optional[int] = None
-    minQuantity: Optional[int] = None
-    keywords: Optional[List[str]] = None
-    excludeKeywords: Optional[List[str]] = None
-    productIds: Optional[List[int]] = None
-    excludeProductIds: Optional[List[int]] = None
-    productGroups: Optional[List[str]] = None
-    excludeProductGroups: Optional[List[str]] = None
-    printTypes: Optional[List[int]] = Field(None, description="Rule applies if the order's printType is in this list.")
-
-
-class HubSizeConstraint(BaseModel):
-    """Size constraints for hub production capabilities"""
-    maxWidth: Optional[float] = None
-    maxHeight: Optional[float] = None
-
-class HubEquipmentRule(BaseModel):
-    """Equipment/process availability at a hub"""
-
-class HubSelectionRule(BaseModel):
-    """Rules for selecting production hubs"""
-    id: str
-    description: str
-    hubId: str
-    priority: int = 0
-    enabled: bool = True
-    timezone: str = "Australia/Melbourne"  # Default timezone if not specified
-    sizeConstraints: Optional[HubSizeConstraint] = None
-    orderCriteria: Optional[OrderMatchingCriteria] = None
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
-    
-    # Conditions
-    keywords: Optional[List[str]] = None
-    excludeKeywords: Optional[List[str]] = None
-    productIds: Optional[List[int]] = None
-    maxQuantity: Optional[int] = None    
-    # Size constraints
-    sizeConstraints: Optional[HubSizeConstraint] = None
-    
-    # State/region restrictions
-    allowedStates: Optional[List[str]] = None
-    excludedStates: Optional[List[str]] = None
-    
-    # Temporary exclusions
-    startDate: Optional[str] = None
-    endDate: Optional[str] = None
-
-class ScheduleResponse(BaseModel):
-    # Core Product Info
-    orderId: Optional[str] = None
-    orderDescription: Optional[str] = None
-    currentHub: str
-    currentHubId: int
-    productId: int
-    productGroup: str
-    productCategory: str
-    productionHubs: List[str]
-    productionGroups: Optional[List[str]] = None
-    preflightedWidth: Optional[float] = None
-    preflightedHeight: Optional[float] = None
-        
-    # Production Details
-    cutoffStatus: str
-    productStartDays: List[str]
-    productCutoff: str
-    daysToProduceBase: int
-    finishingDays: int
-    totalProductionDays: int
-    
-    # Location Info
-    orderPostcode: str
-    chosenProductionHub: str
-    hubTransferTo: int
-    
-    # Dates
-    startDate: str
-    adjustedStartDate: str
-    dispatchDate: str
-    
-    # Processing Info
-    grainDirection: str
-    orderQuantity: int
-    orderKinds: int
-    totalQuantity: int
-    
-    # Configuration
-    synergyPreflight: Optional[int] = None
-    synergyImpose: Optional[int] = None
-    enableAutoHubTransfer: Optional[int] = None
+   

@@ -17,7 +17,9 @@ from app.models import (
     ScheduleResponse,
     FinishingRules,
     FinishingRule,
-    CenterRule
+    CenterRule,
+    RuleConditions
+
 )
 from typing import Union
 from app.data_manager import (
@@ -41,6 +43,13 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
       4) Imposing rule application. # <<< ADDED STEP
 
     """
+    # --- ADD THIS LOGGING ---
+    try:
+        logger.info(f"--- Received /schedule request ---")
+        logger.debug(f"Request Payload Data: {req.dict()}") # Log the entire parsed request
+    except Exception as log_e:
+        logger.error(f"Error logging request data: {log_e}")
+    # --- END ADDED LOGGING ---
     
     # Set default postcode if it's null or empty
     if not req.misDeliversToPostcode:
@@ -199,9 +208,9 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     start_date = get_next_valid_start_day(start_date, allowed_start_days)
 
     # 6) Calculate finishing days
-    finishing_days = calculate_finishing_days(req, product_obj)
-    base_prod_days = int(product_obj["Days_to_produce"])
-    total_prod_days = base_prod_days + finishing_days
+   #finishing_days = calculate_finishing_days(req, product_obj, chosen_hub)
+    #base_prod_days = int(product_obj["Days_to_produce"])
+    #total_prod_days = base_prod_days + finishing_days
 
     # 7) Choose final production hub with hub rules validation
     product_hubs = product_obj.get("Production_Hub", [])
@@ -242,6 +251,14 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
 
     # Find the actual cmykHubID for that chosen hub
     chosen_hub_id = find_cmyk_hub_id(chosen_hub, cmyk_hubs)
+    
+     # Step 6: Finishing Days Calculation ---
+    base_prod_days = int(product_obj.get("Days_to_produce", 1)) # Default 1 day if missing
+    finishing_days = calculate_finishing_days(req, product_obj, chosen_hub) # Pass the final chosen_hub
+    total_prod_days = base_prod_days + finishing_days
+    logger.debug(f"Production Days: Base={base_prod_days}, Finishing={finishing_days}, Total={total_prod_days}")
+    
+    
     
     # 8) add business days for final dispatch
     closed_dates = get_closed_dates_for_state(chosen_hub, cmyk_hubs)
@@ -550,152 +567,20 @@ def load_finishing_rules() -> FinishingRules:
         raise
 
 
-
-
-
-def calculate_finishing_days(req: ScheduleRequest, product_obj: dict) -> int:
-    """Calculate finishing days based on rules"""
-    finishing_days = 0
-    total_qty = req.misOrderQTY * req.kinds
-    
-    try:
-        rules = load_finishing_rules()
-    except Exception as e:
-        logger.error(f"Failed to load finishing rules, using fallback logic: {e}")
-        return calculate_finishing_days_fallback(req)
-        
-    # Process keyword rules
-    for rule in rules.keywordRules:
-        if not rule.enabled:
-            continue
-            
-        # Check conditions and keywords
-        if check_rule_conditions(rule, req, product_obj, total_qty) and check_keywords(rule, req.description):
-            base_days = rule.addDays
-            
-            # Check for hub-specific overrides
-            if rule.conditions and rule.conditions.hubOverrides:
-                hub_days = rule.conditions.hubOverrides.get(req.misCurrentHub.lower())
-                if hub_days is not None:
-                    base_days = hub_days
-                    
-            finishing_days += base_days
-            logger.debug(f"Rule '{rule.id}' applied: {rule.description} (+{base_days} days)")
-            
-    # Process center rules
-    for rule in rules.centerRules:
-        if not rule.enabled:
-            continue
-            
-        # Check center ID and keywords
-        if req.misCurrentHubID == rule.centerId and check_keywords(rule, req.description):
-            finishing_days += rule.addDays
-            logger.debug(f"Center rule '{rule.id}' applied: {rule.description} ({rule.addDays} days)")
-            
-    # Add any additional production days
-    if req.additionalProductionDays > 0:
-        finishing_days += req.additionalProductionDays
-        logger.debug(f"Added {req.additionalProductionDays} additional production days")
-        
-    return finishing_days
-    """Calculate finishing days based on rules"""
-    total_qty = req.misOrderQTY * req.kinds
-    
-    try:
-        rules = load_finishing_rules()
-    except Exception as e:
-        logger.error(f"Failed to load finishing rules, using fallback logic: {e}")
-        return calculate_finishing_days_fallback(req)
-        
-    finishing_days = 0
-    
-    # Process keyword rules
-    for rule in rules.keywordRules:
-        if not rule.enabled:
-            continue
-            
-        # Check conditions and keywords
-        if check_rule_conditions(rule, req, product_obj, total_qty) and check_keywords(rule, req.description):
-            base_days = rule.addDays
-            
-            # Check for hub-specific overrides
-            if rule.conditions and rule.conditions.hubOverrides:
-                hub_days = rule.conditions.hubOverrides.get(req.misCurrentHub.lower())
-                if hub_days is not None:
-                    base_days = hub_days
-                    
-            finishing_days += base_days
-            logger.debug(f"Rule '{rule.id}' applied: {rule.description} (+{base_days} days)")
-            
-    # Process center rules
-    for rule in rules.centerRules:
-        if not rule.enabled:
-            continue
-            
-        # Check center ID and keywords
-        if req.misCurrentHubID == rule.centerId and check_keywords(rule, req.description):
-            finishing_days += rule.addDays
-            logger.debug(f"Center rule '{rule.id}' applied: {rule.description} ({rule.addDays} days)")
-            
-    # Add any additional production days
-    if req.additionalProductionDays > 0:
-        finishing_days += req.additionalProductionDays
-        logger.debug(f"Added {req.additionalProductionDays} additional production days")
-        
-    return finishing_days
-
-def calculate_finishing_days(req: ScheduleRequest, product_obj: dict) -> int:
-    """Calculate finishing days based on rules"""
-    finishing_days = 0
-    total_qty = req.misOrderQTY * req.kinds
-    
-    try:
-        rules = load_finishing_rules()
-    except Exception as e:
-        logger.error(f"Failed to load finishing rules, using fallback logic: {e}")
-        return calculate_finishing_days_fallback(req)
-        
-    # Process keyword rules
-    for rule in rules.keywordRules:
-        if not rule.enabled:
-            continue
-            
-        # Check conditions and keywords
-        if check_rule_conditions(rule, req, product_obj, total_qty) and check_keywords(rule, req.description):
-            base_days = rule.addDays
-            
-            # Check for hub-specific overrides
-            if rule.conditions and rule.conditions.hubOverrides:
-                hub_days = rule.conditions.hubOverrides.get(req.misCurrentHub.lower())
-                if hub_days is not None:
-                    base_days = hub_days
-                    
-            finishing_days += base_days
-            logger.debug(f"Rule '{rule.id}' applied: {rule.description} (+{base_days} days)")
-            
-    # Process center rules
-    for rule in rules.centerRules:
-        if not rule.enabled:
-            continue
-            
-        # Check center ID and keywords
-        if req.misCurrentHubID == rule.centerId and check_keywords(rule, req.description):
-            finishing_days += rule.addDays
-            logger.debug(f"Center rule '{rule.id}' applied: {rule.description} ({rule.addDays} days)")
-            
-    # Add any additional production days
-    if req.additionalProductionDays > 0:
-        finishing_days += req.additionalProductionDays
-        logger.debug(f"Added {req.additionalProductionDays} additional production days")
-        
-    return finishing_days
-
-def check_rule_conditions(rule: FinishingRule, req: ScheduleRequest, product_obj: dict, total_qty: int) -> bool:
+def check_rule_conditions(rule: FinishingRule, req: ScheduleRequest, product_obj: dict, total_qty: int, chosen_production_hub: str) -> bool:
     """Check if conditions for a rule are met"""
     if not rule.conditions:
         return True
         
-    conditions = rule.conditions
+    conditions = rule.conditions # type: RuleConditions # Add type hint for clarity
+
+    # Production Hub Check 
+    if conditions.productionHubIs:
+        # Ensure comparison is case-insensitive
+        if chosen_production_hub.lower() not in [h.lower() for h in conditions.productionHubIs]:
+            logger.debug(f"Condition Check Failed: Chosen hub '{chosen_production_hub}' not in {conditions.productionHubIs}")
+            return False
+    
     
     # Quantity checks
     if conditions.quantityLessThan and total_qty >= conditions.quantityLessThan:
@@ -744,29 +629,84 @@ def check_keywords(rule: Union[FinishingRule, CenterRule], description: str) -> 
     else:  # "any"
         return any(k in desc for k in keywords)
 
-def calculate_finishing_days_fallback(req: ScheduleRequest) -> int:
-    """Fallback calculation if rules fail to load"""
+def calculate_finishing_days(req: ScheduleRequest, product_obj: dict, chosen_hub: str) -> int:
+    """Calculate finishing days based on rules"""
     finishing_days = 0
-    desc_lower = req.description.lower()
     total_qty = req.misOrderQTY * req.kinds
+    logger.debug(f"[calculate_finishing_days] Starting calculation for Order: {req.orderId}, ChosenHub: {chosen_hub}") # Log entry point
 
-    if any(k in desc_lower for k in ["fold", "crease", "perf", "score"]):
-        finishing_days += 1
-        logger.debug("Fallback: +1 for fold/crease/perf/score")
+    try:
+        rules = load_finishing_rules()
+    except Exception as e:
+        logger.error(f"Failed to load finishing rules, using fallback logic: {e}")
+        return calculate_finishing_days_fallback(req)
 
-    if any(k in desc_lower for k in ["round corner", "dril"]):
-        finishing_days += 1
-        logger.debug("Fallback: +1 for round corner/drill")
+    # --- Process keyword rules (No change here) ---
+    logger.debug("[calculate_finishing_days] Processing Keyword Rules...")
+    for rule in rules.keywordRules:
+        if not rule.enabled:
+            continue
 
-    if total_qty > 10000:
-        finishing_days += 1
-        logger.debug("Fallback: +1 for qty>10k")
+        if check_rule_conditions(rule, req, product_obj, total_qty, chosen_hub) and check_keywords(rule, req.description):
+            base_days = rule.addDays
+            if rule.conditions and rule.conditions.hubOverrides:
+                hub_days = rule.conditions.hubOverrides.get(req.misCurrentHub.lower())
+                if hub_days is not None:
+                    logger.debug(f"Applying hubOverride for rule '{rule.id}' in hub '{req.misCurrentHub.lower()}': {hub_days} days instead of {base_days}")
+                    base_days = hub_days
+            finishing_days += base_days
+            logger.debug(f"Rule '{rule.id}' applied: {rule.description} (+{base_days} days)")
 
-    finishing_days += req.additionalProductionDays
-    if req.additionalProductionDays > 0:
-        logger.debug("Fallback: +%d from additionalProductionDays", req.additionalProductionDays)
+    # --- Process center rules ---
+    logger.debug("[calculate_finishing_days] Processing Center Rules...")
+# --- Process center rules ---
+    logger.debug("[calculate_finishing_days] Processing Center Rules...")
+    logger.debug(f"[calculate_finishing_days] Value of req.centerId before check: {req.centerId}, Type: {type(req.centerId)}")
 
+    if req.centerId is not None:
+        logger.debug(f"[calculate_finishing_days] Evaluating Center Rules against provided centerId: {req.centerId}")
+        for rule in rules.centerRules: # rule is now guaranteed to be a CenterRule
+            if not rule.enabled:
+                logger.debug(f"[calculate_finishing_days] Center rule '{rule.id}' skipped (disabled).")
+                continue
+
+            logger.debug(f"[calculate_finishing_days] Comparing Request centerId ({req.centerId}, type={type(req.centerId)}) with Rule centerId ({rule.centerId}, type={type(rule.centerId)})")
+
+            # Check if the centerId matches
+            if req.centerId == rule.centerId:
+                # --- Start Inline Exclusion Check (Replaces check_keywords for CenterRule) ---
+                exclude_match_found = False
+                if rule.excludeKeywords: # Check if the rule has exclusion keywords
+                    desc_check = req.description if rule.caseSensitive else req.description.lower()
+                    exclude_kws = rule.excludeKeywords
+                    if not rule.caseSensitive:
+                        exclude_kws = [k.lower() for k in exclude_kws]
+
+                    # Check if ANY excluded keyword is present
+                    if any(k in desc_check for k in exclude_kws):
+                        exclude_match_found = True
+                        logger.debug(f"[calculate_finishing_days] Center rule '{rule.id}' skipped: Found excluded keyword.")
+
+                # If no excluded keywords were found (or none defined), the rule passes this check
+                if not exclude_match_found:
+                    finishing_days += rule.addDays
+                    logger.debug(f"[calculate_finishing_days] Center rule '{rule.id}' matched request centerId {req.centerId} and passed exclusion check: {rule.description} ({rule.addDays} days)")
+                # --- End Inline Exclusion Check ---
+            else:
+                 logger.debug(f"[calculate_finishing_days] Center rule '{rule.id}' skipped: Rule centerId ({rule.centerId}) != Request centerId ({req.centerId})")
+
+    else:
+        logger.debug("[calculate_finishing_days] No centerId provided in request (or value is None), skipping Center Rules evaluation.")
+
+
+    # Add any additional production days (no change needed here)
+    if req.additionalProductionDays is not None and req.additionalProductionDays > 0:
+        finishing_days += req.additionalProductionDays
+        logger.debug(f"[calculate_finishing_days] Added {req.additionalProductionDays} additional production days (manual)")
+
+    logger.info(f"[calculate_finishing_days] Total Calculated Finishing Days: {finishing_days}")
     return finishing_days
+
 
 def load_finishing_rules() -> FinishingRules:
     """Load finishing rules from JSON configuration"""

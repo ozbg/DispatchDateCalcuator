@@ -32,20 +32,18 @@
     {
       "id": "tape_magnet_small",
       "description": "Double sided tape or Patch magnet (QTY < 500)",
+      "addDays": 1,
+      "enabled": true,
       "keywords": [
         "double sided tape",
         "patch magnet"
       ],
+      "excludeKeywords": [],
       "matchType": "any",
-      "caseSensitive": false,
-      "addDays": 1,
       "conditions": {
-        "quantityLessThan": 500,
-        "hubOverrides": {
-          "wa": 2
-        }
+        "quantityLessThan": 500
       },
-      "enabled": true
+      "caseSensitive": false
     },
     {
       "id": "tape_magnet_large",
@@ -121,12 +119,16 @@
       "excludeKeywords": [],
       "matchType": "any",
       "conditions": {
-        "productIdEqual": 29
-      }
+        "productIdIn": [
+          29,
+          30
+        ]
+      },
+      "caseSensitive": false
     },
     {
       "id": "presentation_new_forme",
-      "description": "Presentation Folder New/Custom Forme",
+      "description": "Presentation Folder New or Custom Forme",
       "addDays": 1,
       "enabled": true,
       "keywords": [
@@ -136,8 +138,12 @@
       "excludeKeywords": [],
       "matchType": "any",
       "conditions": {
-        "productIdEqual": 29
-      }
+        "productIdIn": [
+          29,
+          30
+        ]
+      },
+      "caseSensitive": false
     },
     {
       "id": "laminating",
@@ -155,8 +161,9 @@
       ],
       "matchType": "any",
       "conditions": {
-        "productIdNotEqual": 29
-      }
+        "productGroupNotContains": "lamin"
+      },
+      "caseSensitive": false
     },
     {
       "id": "large_quantity",
@@ -182,19 +189,34 @@
       "id": "presentation_large",
       "description": "Presentation Folder Large Quantity",
       "addDays": 2,
-      "enabled": false,
+      "enabled": true,
       "keywords": [],
       "excludeKeywords": [],
-      "matchType": "any"
+      "matchType": "any",
+      "conditions": {
+        "productIdIn": [
+          29,
+          30
+        ],
+        "quantityGreaterOrEqual": 500
+      },
+      "caseSensitive": false
     },
     {
       "id": "strut_large",
       "description": "Mounted Strut Large Quantity",
       "addDays": 1,
-      "enabled": false,
+      "enabled": true,
       "keywords": [],
       "excludeKeywords": [],
-      "matchType": "any"
+      "matchType": "any",
+      "conditions": {
+        "productIdIn": [
+          44
+        ],
+        "quantityGreaterOrEqual": 250
+      },
+      "caseSensitive": false
     },
     {
       "id": "SST",
@@ -208,13 +230,50 @@
         "quantityGreaterThan": 10,
         "quantityLessThan": 20
       }
+    },
+    {
+      "id": "wa_tape_magnet_extra",
+      "description": "Extra day for tape or magnet in WA",
+      "addDays": 1,
+      "enabled": true,
+      "keywords": [
+        "patch magnet",
+        "double sided tape"
+      ],
+      "excludeKeywords": [],
+      "matchType": "any",
+      "conditions": null,
+      "caseSensitive": false
+    },
+    {
+      "id": "presentation_glue_wa",
+      "description": "Presentation Folder with Glue Extra 2 days for WA",
+      "addDays": 2,
+      "enabled": true,
+      "keywords": [
+        "glue"
+      ],
+      "excludeKeywords": [],
+      "matchType": "any",
+      "conditions": {
+        "productionHubIs": [
+          "wa"
+        ],
+        "productIdIn": [
+          29,
+          30
+        ]
+      },
+      "caseSensitive": false
     }
   ],
   "centerRules": [
     {
       "id": "paperlust_no_embellish",
       "description": "Paperlust orders without embellishments",
-      "centerId": 7785,
+      "addDays": -1,
+      "enabled": true,
+      "keywords": null,
       "excludeKeywords": [
         "scodix",
         "spot uv",
@@ -225,10 +284,10 @@
         "metal - rose",
         "metal - silver"
       ],
-      "matchType": "any",
-      "caseSensitive": false,
-      "addDays": -1,
-      "enabled": true
+      "matchType": null,
+      "conditions": null,
+      "centerId": 7785,
+      "caseSensitive": false
     }
   ]
 }

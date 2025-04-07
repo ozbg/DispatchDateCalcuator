@@ -687,6 +687,15 @@ async def delete_preflight_rule_endpoint(rule_id: str):
 def schedule_order(request_data: ScheduleRequest, request: Request):
     """Process a scheduling request"""
     try:
+        
+        # --- TRY ACCESSING HERE ---
+        logger.debug(f"Attempting to access centerId directly on request_data object...")
+        cid = getattr(request_data, 'centerId', 'ATTRIBUTE_NOT_FOUND') # Use getattr for safety
+        logger.info(f"Value of request_data.centerId via getattr: {cid} (Type: {type(cid)})")
+        # You could even try a direct access here and let it raise the error if it occurs
+        # logger.info(f"Direct access request_data.centerId: {request_data.centerId}")
+        # --- END TRY ACCESSING HERE ---
+        
         result = process_order(request_data)
         if not result:
             logger.error("Unable to schedule order.")

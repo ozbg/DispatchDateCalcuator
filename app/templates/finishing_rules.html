@@ -79,13 +79,16 @@
                     {% if rule.conditions %}
                     <ul class="conditions-list">
                         {% for key, value in rule.conditions.items() %}
-                            {% if key != 'hubOverrides' %}
+                            {% if key == 'hubOverrides' %}
+                                <li>Hub Overrides: <pre style="margin: 0; display: inline;">{{ value|tojson|indent(4) }}</pre></li>
+                            {% elif key == 'productionHubIs' %}
+                                <li>Production Hub Is: {{ value|join(", ") }}</li> {# Display hub list #}
+                            {% elif key == 'productIdIn' %}
+                                <li>Product ID In: {{ value|join(", ") }}</li> {# Display product ID list #}
+                            {% elif key != 'hubOverrides' %} {# Generic display for others #}
                                 <li>{{ key }}: {{ value }}</li>
                             {% endif %}
                         {% endfor %}
-                        {% if rule.conditions.hubOverrides %}
-                            <li>Hub Overrides: <pre style="margin: 0; display: inline;">{{ rule.conditions.hubOverrides|tojson|indent(4) }}</pre></li>
-                        {% endif %}
                     </ul>
                     {% else %}
                     None
@@ -371,7 +374,10 @@
         if(rulesContainer){
             rulesContainer.addEventListener('click', function(event) {
                 const target = event.target;
-                const ruleId = target.closest('tr')?.querySelector('[data-rule-id]')?.getAttribute('data-rule-id'); // Get ID from button or row context
+                // Find the closest row, then the button with data-rule-id within that row
+                const row = target.closest('tr');
+                const buttonWithId = row ? row.querySelector('[data-rule-id]') : null;
+                const ruleId = buttonWithId ? buttonWithId.getAttribute('data-rule-id') : null;
 
                 if (!ruleId) return; // Ignore clicks not on buttons within a rule row
 
@@ -458,7 +464,6 @@
          if (modal) {
             modal.style.display = 'none';
          }
-        // Reset form might be desired here too, depending on preference
          resetForm();
     }
 
@@ -514,7 +519,6 @@
             loadConditionsToModal(rule.conditions); // Load conditions
         } else { // Center Rule
             document.getElementById('centerId').value = rule.centerId || '';
-            // Use the specific container for center exclude keywords
             (rule.excludeKeywords || []).forEach(kw => addTagElement(kw, 'centerExcludeKeywordTags'));
         }
 
@@ -558,7 +562,8 @@
                 <option value="productIdNotEqual">Product ID Not Equals (!=)</option>
                 <option value="productIdIn">Product ID In List (comma-sep)</option>
                 <option value="productGroupNotContains">Product Group Not Contains</option>
-                <!-- Add more simple conditions as needed -->
+                <option value="productionHubIs">Production Hub Is (comma-sep)</option> {# <<< ADDED OPTION #}
+                <!-- Add hubOverrides editing later if needed -->
             </select>
             <input type="text" class="condition-value form-control" placeholder="Value">
             <button type="button" onclick="this.closest('.condition-row').remove()" class="delete-btn">Remove</button>
@@ -573,28 +578,36 @@
         if (!conditions || typeof conditions !== 'object') return;
 
         for (const [key, value] of Object.entries(conditions)) {
-             if (key === 'hubOverrides') continue; // Skip displaying hubOverrides in simple rows
+             if (key === 'hubOverrides') continue; // Skip hubOverrides for now
 
             const row = document.createElement('div');
             row.className = 'condition-row';
 
             let valueString = value;
+            let typeValue = key; // Default type value is the key
+
+            // Adjust valueString for array types
             if (key === 'productIdIn' && Array.isArray(value)) {
-                valueString = value.join(','); // Convert array back to comma-separated string for input
+                valueString = value.join(',');
+            } else if (key === 'productionHubIs' && Array.isArray(value)) { // <<< ADDED BLOCK
+                valueString = value.join(',');
             }
 
+            // Build the select options dynamically, selecting the correct one
+            const selectOptions = `
+                 <option value="">-- Select Condition --</option>
+                 <option value="quantityLessThan" ${key === 'quantityLessThan' ? 'selected' : ''}>Quantity Less Than (<)</option>
+                 <option value="quantityGreaterThan" ${key === 'quantityGreaterThan' ? 'selected' : ''}>Quantity Greater Than (>)</option>
+                 <option value="quantityGreaterOrEqual" ${key === 'quantityGreaterOrEqual' ? 'selected' : ''}>Quantity Greater/Equal (>=)</option>
+                 <option value="productIdEqual" ${key === 'productIdEqual' ? 'selected' : ''}>Product ID Equals (=)</option>
+                 <option value="productIdNotEqual" ${key === 'productIdNotEqual' ? 'selected' : ''}>Product ID Not Equals (!=)</option>
+                 <option value="productIdIn" ${key === 'productIdIn' ? 'selected' : ''}>Product ID In List (comma-sep)</option>
+                 <option value="productGroupNotContains" ${key === 'productGroupNotContains' ? 'selected' : ''}>Product Group Not Contains</option>
+                 <option value="productionHubIs" ${key === 'productionHubIs' ? 'selected' : ''}>Production Hub Is (comma-sep)</option> {# <<< ADDED OPTION #}
+            `;
+
             row.innerHTML = `
-                <select class="condition-type form-control">
-                     <option value="">-- Select Condition --</option>
-                     <option value="quantityLessThan" ${key === 'quantityLessThan' ? 'selected' : ''}>Quantity Less Than (<)</option>
-                     <option value="quantityGreaterThan" ${key === 'quantityGreaterThan' ? 'selected' : ''}>Quantity Greater Than (>)</option>
-                     <option value="quantityGreaterOrEqual" ${key === 'quantityGreaterOrEqual' ? 'selected' : ''}>Quantity Greater/Equal (>=)</option>
-                     <option value="productIdEqual" ${key === 'productIdEqual' ? 'selected' : ''}>Product ID Equals (=)</option>
-                     <option value="productIdNotEqual" ${key === 'productIdNotEqual' ? 'selected' : ''}>Product ID Not Equals (!=)</option>
-                     <option value="productIdIn" ${key === 'productIdIn' ? 'selected' : ''}>Product ID In List (comma-sep)</option>
-                     <option value="productGroupNotContains" ${key === 'productGroupNotContains' ? 'selected' : ''}>Product Group Not Contains</option>
-                     <!-- Ensure all relevant options are here -->
-                </select>
+                <select class="condition-type form-control">${selectOptions}</select>
                 <input type="text" class="condition-value form-control" placeholder="Value" value="${valueString}">
                 <button type="button" onclick="this.closest('.condition-row').remove()" class="delete-btn">Remove</button>
             `;
@@ -614,23 +627,21 @@
                  hasConditions = true;
                  if (type.includes('quantity') || type === 'productIdEqual' || type === 'productIdNotEqual') {
                     const numValue = parseInt(value, 10);
-                    conditions[type] = isNaN(numValue) ? value : numValue; // Keep original value if not a number, maybe log warning?
+                    conditions[type] = isNaN(numValue) ? value : numValue; // Keep original value if not a number
                 } else if (type === 'productIdIn') {
                     conditions[type] = value.split(',')
                                             .map(id => parseInt(id.trim(), 10))
                                             .filter(id => !isNaN(id)); // Filter out invalid numbers
+                } else if (type === 'productionHubIs') { // <<< ADDED BLOCK
+                     conditions[type] = value.split(',')
+                                             .map(hub => hub.trim().toLowerCase()) // Trim and lowercase
+                                             .filter(hub => hub); // Filter out empty strings
                 } else {
-                    conditions[type] = value; // Store as string
+                    conditions[type] = value; // Store as string (e.g., productGroupNotContains)
                 }
             }
         });
-        // Consider adding hubOverrides back if there's a dedicated input for it, e.g., a textarea
-        // if (document.getElementById('hubOverridesInput') && document.getElementById('hubOverridesInput').value) {
-        //     try {
-        //         conditions['hubOverrides'] = JSON.parse(document.getElementById('hubOverridesInput').value);
-        //         hasConditions = true;
-        //     } catch (e) { console.error("Invalid Hub Overrides JSON"); }
-        // }
+        // Add back hubOverrides handling if you implement an editor for it
         return hasConditions ? conditions : null; // Return null if no conditions were added
     }
 
@@ -639,7 +650,10 @@
     function setupTagInput(inputId, containerId) {
         const inputElement = document.getElementById(inputId);
         if (!inputElement) return;
-        inputElement.addEventListener('keypress', function(e) {
+        // Prevent adding multiple listeners if modal is reopened
+        if (inputElement.dataset.listenerAttached) return;
+
+        const listener = function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const value = this.value.trim();
@@ -648,12 +662,18 @@
                     this.value = '';
                 }
             }
-        });
+        };
+        inputElement.addEventListener('keypress', listener);
+        inputElement.dataset.listenerAttached = 'true'; // Mark as attached
     }
 
     function addTagElement(value, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
+        // Optional: Check for duplicates before adding
+        const existingTags = Array.from(container.children).map(tag => tag.firstChild.textContent.trim());
+        if (existingTags.includes(value.trim())) return;
+
         const tag = document.createElement('span');
         tag.className = 'tag';
         const textNode = document.createTextNode(value.trim() + ' ');
@@ -679,23 +699,43 @@
     // --- Save and Delete Logic ---
     async function saveRule() {
         const type = document.getElementById('ruleType').value;
-        const ruleId = document.getElementById('ruleId').value.trim();
+        const ruleIdInput = document.getElementById('ruleId');
+        const ruleId = ruleIdInput.value.trim();
         const description = document.getElementById('description').value.trim();
         const addDaysVal = document.getElementById('addDays').value;
 
         // Basic Validation
-        if (!ruleId || !description) {
-            alert('Rule ID and Description are required.'); return;
+        if (!ruleId) {
+            alert('Rule ID is required.'); ruleIdInput.focus(); return;
+        }
+        if (editingRuleId === null) { // Only check for duplicates when adding
+             const idExists = currentRules.keywordRules.some(r => r.id === ruleId) ||
+                              currentRules.centerRules.some(r => r.id === ruleId);
+             if (idExists) {
+                alert(`Rule ID "${ruleId}" already exists. Please choose a unique ID.`);
+                ruleIdInput.focus();
+                return;
+             }
+        }
+        if (!description) {
+            alert('Description is required.'); document.getElementById('description').focus(); return;
         }
         if (addDaysVal === '' || isNaN(parseInt(addDaysVal, 10))) {
-             alert('Days to Add must be a valid number.'); return;
-         }
+             alert('Days to Add must be a valid number.'); document.getElementById('addDays').focus(); return;
+        }
 
         const rule = {
             id: ruleId,
             description: description,
             addDays: parseInt(addDaysVal, 10),
             enabled: document.getElementById('enabled').checked,
+            // Initialize fields common to both but populated differently
+            keywords: null,
+            excludeKeywords: null,
+            matchType: null,
+            conditions: null,
+            centerId: null,
+            caseSensitive: false // Assuming default, add UI element if needed
         };
 
         if (type === 'keyword') {
@@ -703,16 +743,23 @@
             rule.excludeKeywords = getTagsFromContainer('excludeKeywordTags');
             rule.matchType = document.getElementById('matchType').value;
             rule.conditions = collectConditionsFromModal();
+            // Remove center-specific keys if they somehow got added
+            delete rule.centerId;
         } else { // Center rule
             const centerIdVal = document.getElementById('centerId').value;
              if (centerIdVal === '' || isNaN(parseInt(centerIdVal, 10))) {
-                 alert('Center ID must be a valid number for Center Rules.'); return;
+                 alert('Center ID must be a valid number for Center Rules.'); document.getElementById('centerId').focus(); return;
              }
             rule.centerId = parseInt(centerIdVal, 10);
             rule.excludeKeywords = getTagsFromContainer('centerExcludeKeywordTags');
-            // Ensure conditions are null for center rules if the model expects it
+            // Ensure keyword-specific keys are null or removed for center rules
+            rule.keywords = null;
+            rule.matchType = null;
             rule.conditions = null;
         }
+
+        // Clean up null fields before sending if desired by backend (Pydantic handles Optional)
+        // Object.keys(rule).forEach(key => rule[key] === null && delete rule[key]);
 
         console.log('Attempting to save rule:', JSON.stringify({ type, rule }, null, 2));
 
@@ -728,16 +775,10 @@
                  console.log("Save successful, reloading...");
                 window.location.reload();
             } else {
-                // Try to parse error message from backend
                 let errorMsg = `HTTP Error: ${response.status} ${response.statusText}`;
-                try {
-                    const errorData = await response.json();
-                    errorMsg = `Error saving rule: ${errorData.message || errorData.detail || response.statusText}`;
-                } catch(e) {
-                    // If response is not JSON, use the status text
-                }
+                try { const errorData = await response.json(); errorMsg = `Error saving rule: ${errorData.message || errorData.detail || response.statusText}`; } catch(e) {}
                  console.error("Save failed:", errorMsg);
-                alert(errorMsg);
+                 alert(errorMsg);
             }
         } catch (error) {
             console.error('Network or other error saving rule:', error);
@@ -748,13 +789,12 @@
     async function deleteRule(ruleId) {
         if (!ruleId) return;
         if (confirm(`Are you sure you want to delete Keyword Rule: ${ruleId}?`)) {
-             await performDelete(`/finishing-rules/delete/${ruleId}`, "rule");
+             await performDelete(`/finishing-rules/delete/${ruleId}`, "keyword rule");
         }
     }
      async function deleteCenterRule(ruleId) {
          if (!ruleId) return;
          if (confirm(`Are you sure you want to delete Center Rule: ${ruleId}?`)) {
-             // Assuming the same delete endpoint works for both by ID
              await performDelete(`/finishing-rules/delete/${ruleId}`, "center rule");
          }
      }
@@ -762,16 +802,13 @@
      // Helper for delete fetch
      async function performDelete(url, itemType) {
          try {
-            const response = await fetch(url, { method: 'POST' });
+            const response = await fetch(url, { method: 'POST' }); // Using POST based on your endpoint
             if (response.ok) {
                  console.log(`${itemType} deleted successfully, reloading...`);
                 window.location.reload();
             } else {
                 let errorMsg = `HTTP Error: ${response.status} ${response.statusText}`;
-                 try {
-                     const errorData = await response.json();
-                     errorMsg = `Error deleting ${itemType}: ${errorData.message || errorData.detail || response.statusText}`;
-                 } catch(e) {}
+                 try { const errorData = await response.json(); errorMsg = `Error deleting ${itemType}: ${errorData.message || errorData.detail || response.statusText}`; } catch(e) {}
                  console.error("Delete failed:", errorMsg);
                  alert(errorMsg);
             }
