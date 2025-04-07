@@ -118,7 +118,7 @@
       "Eco",
       "Knight",
       "Natural",
-      "PremiumUncoated",
+      "Premium Uncoated",
       "Presentation"
     ],
     "Match_All": [],
@@ -136,7 +136,7 @@
   },
   {
     "Exclude_All": [
-      "PremiumUncoated"
+      "Premium Uncoated"
     ],
     "Match_All": [
       "EcoStar",
@@ -156,15 +156,15 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard"
+      "Coated 1 Side Board"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "MattLaminate1S",
-        "MattLaminating1S",
-        "Laminating-Matt1Side",
-        "MattLaminate1Side"
+        "Matt Laminate 1S",
+        "Matt Laminating 1S",
+        "Laminating Matt 1 Side",
+        "Matt Laminate 1 Side"
       ],
       [
         "350gsm",
@@ -182,14 +182,14 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard"
+      "Coated 1 Side Board"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "MattLaminate2S",
-        "MattLaminating2S",
-        "2sidesLaminating-Matt2Side"
+        "Matt Laminate 2S",
+        "Matt Laminating 2S",
+        "2 sides Laminating Matt 2 Side"
       ],
       [
         "350gsm",
@@ -207,13 +207,13 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard"
+      "Coated 1 Side Board"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "GlossLaminate1S",
-        "GlossLaminating1S",
+        "Gloss Laminate 1 S",
+        "Gloss Laminating 1 S",
         "Laminating - Gloss 1 Side"
       ],
       [
@@ -286,15 +286,15 @@
     "Product_ID": 12
   },
   {
-    "Exclude_All": [],
+    "Product_ID": 13,
     "Match_All": [],
+    "Exclude_All": [],
     "Match_Any": [
       [
-        "Knight2SidedLinen",
-        "Premium2SidedLinen"
+        "Premium 2 Sided Linen",
+        "Knight 2 Sided Linen"
       ]
-    ],
-    "Product_ID": 13
+    ]
   },
   {
     "Exclude_All": [],
@@ -502,7 +502,7 @@
       ],
       [
         "120gsm",
-        "PremiumUncoated"
+        "Premium Uncoated"
       ]
     ],
     "Product_ID": 25
@@ -767,7 +767,8 @@
     "Match_Any": [
       [
         "Knight",
-        "Board"
+        "Board",
+        "EcoStar"
       ],
       [
         "BC",
@@ -839,8 +840,8 @@
     "Match_All": [],
     "Match_Any": [
       [
-        "Knight2SidedLinen",
-        "Premium2SidedLinen"
+        "Knight 2 Sided Linen",
+        "Premium 2 Sided Linen"
       ]
     ],
     "Product_ID": 50
@@ -1137,7 +1138,7 @@
       "Eco",
       "Knight",
       "Natural",
-      "PremiumUncoated",
+      "Premium Uncoated",
       "Presentation"
     ],
     "Match_All": [],
@@ -1155,7 +1156,7 @@
   },
   {
     "Exclude_All": [
-      "PremiumUncoated"
+      "Premium Uncoated"
     ],
     "Match_All": [
       "EcoStar",
@@ -1175,15 +1176,15 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard"
+      "Coated 1 Side Board"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "MattLaminate1S",
-        "MattLaminating1S",
-        "Laminating-Matt1Side",
-        "MattLaminate1Side"
+        "Matt Laminate 1S",
+        "Matt Laminating 1S",
+        "Laminating Matt 1 Side",
+        "Matt Laminate 1 Side"
       ],
       [
         "350gsm",
@@ -1201,14 +1202,14 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard"
+      "Coated 1 Side Board"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "MattLaminate2S",
-        "MattLaminating2S",
-        "2sidesLaminating-Matt2Side"
+        "Matt Laminate 2S",
+        "Matt Laminating 2S",
+        "2 sides Laminating Matt 2 Side"
       ],
       [
         "350gsm",
@@ -1226,13 +1227,13 @@
       "Eco",
       "Knight",
       "Natural",
-      "Coated1SideBoard"
+      "Coated 1 Side Board"
     ],
     "Match_All": [],
     "Match_Any": [
       [
-        "GlossLaminate1S",
-        "GlossLaminating1S",
+        "Gloss Laminate 1 S",
+        "Gloss Laminating 1 S",
         "Laminating - Gloss 1 Side"
       ],
       [
