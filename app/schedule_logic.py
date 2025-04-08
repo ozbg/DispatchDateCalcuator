@@ -157,6 +157,17 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # Step 1: State/Postcode Overrides & Initial Setup
     # ----------------------------------------------------------------
     original_delivers_to_state = req.misDeliversToState
+
+    # --- NEW: Handle missing/invalid misDeliversToState ---
+    # Check for None, or string "null"/"undefined" (case-insensitive)
+    if req.misDeliversToState is None or \
+       (isinstance(req.misDeliversToState, str) and req.misDeliversToState.lower() in ["null", "undefined"]):
+        logger.warning(f"misDeliversToState is missing or invalid ('{original_delivers_to_state}'). Using currentHub ('{current_hub}') as fallback.")
+        req.misDeliversToState = current_hub # Use the resolved current_hub name
+        original_delivers_to_state = req.misDeliversToState # Update original_delivers_to_state for logging consistency if needed later
+    # --- END NEW ---
+
+    # Existing state overrides (now checks the potentially updated misDeliversToState)
     if req.misDeliversToState.lower() in ["sa", "tas"]:
         logger.debug(f"State Override: {original_delivers_to_state} -> vic")
         req.misDeliversToState = "vic"

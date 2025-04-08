@@ -279,6 +279,20 @@
       "matchType": "any",
       "conditions": null,
       "caseSensitive": false
+    },
+    {
+      "id": "perfect_bind",
+      "description": "Perfect Binding",
+      "addDays": 2,
+      "enabled": true,
+      "keywords": [
+        "Perfect Bind",
+        "Perfect Bound"
+      ],
+      "excludeKeywords": [],
+      "matchType": "any",
+      "conditions": null,
+      "caseSensitive": false
     }
   ],
   "centerRules": [
