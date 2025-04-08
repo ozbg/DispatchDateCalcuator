@@ -284,7 +284,15 @@
       "Monday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-14",
+        "2025-04-16",
+        [
+          "vic"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -643,7 +651,15 @@
       "Friday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-08",
+        "2025-04-09",
+        [
+          "qld"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]

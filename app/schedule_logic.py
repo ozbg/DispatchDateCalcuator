@@ -2,7 +2,7 @@
 #This module contains the main scheduling logic for processing an order request. It includes steps such as state overrides, hub selection, product matching, finishing days calculation, and date adjustments.
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone 
 from typing import Optional
 import pytz
 from pathlib import Path
@@ -43,21 +43,26 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
       4) Imposing rule application. # <<< ADDED STEP
 
     """
-    # --- ADD THIS LOGGING ---
+    # --- GET ACTUAL PROCESSING TIME (UTC first) ---
+    actual_now_utc = datetime.now(timezone.utc)
+
     try:
         logger.info(f"--- Received /schedule request ---")
-        logger.debug(f"Request Payload Data: {req.dict()}") # Log the entire parsed request
+        # Log the offset if provided
+        log_payload = req.dict()
+        if req.timeOffsetHours != 0:
+            logger.info(f"Time Offset Hours specified: {req.timeOffsetHours}")
+        logger.debug(f"Request Payload Data: {log_payload}")
     except Exception as log_e:
         logger.error(f"Error logging request data: {log_e}")
-    # --- END ADDED LOGGING ---
-    
+
     # Set default postcode if it's null or empty
     if not req.misDeliversToPostcode:
         req.misDeliversToPostcode = "0000"
-        
+
     # Load CMYK hubs data
     cmyk_hubs = get_cmyk_hubs_data()
-    
+
     # Resolve current hub details
     from app.hub_utils import resolve_hub_details
     current_hub, current_hub_id = resolve_hub_details(
@@ -65,13 +70,13 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         current_hub_id=req.misCurrentHubID,
         cmyk_hubs=cmyk_hubs
     )
-    
+
     logger.debug(f"Resolved hub details: hub={current_hub}, id={current_hub_id}")
-    
+
     # Update request with resolved values
     req.misCurrentHub = current_hub
     req.misCurrentHubID = current_hub_id
-    
+
 
     # ----------------------------------------------------------------
     # Step 1a) State override for SA, TAS, ACT, and NQLD
@@ -104,15 +109,15 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # ----------------------------------------------------------------
     #if req.misCurrentHub.lower() == "wa":
     #    logger.debug("Current hub is WA => appending #wa tag to description")
-    #    req.description = f"{req.description} #wa"    
-    
+    #    req.description = f"{req.description} #wa"
+
     # ----------------------------------------------------------------
     # Step 1d) Assign production groups based on order description
     # ----------------------------------------------------------------
     production_groups_data = get_production_groups_data()
     assigned_groups = match_production_groups(req.description, production_groups_data)
     logger.debug(f"Assigned production groups: {assigned_groups}")
-    
+
     # ----------------------------------------------------------------
     # Step 1e) Append additional tags to order description before product matching
     #         - If product is BC size, append " BC" to the description.
@@ -121,17 +126,17 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # Check for BC size using dimensions similar to determine_grain_direction
     BC_LONG = 100
     BC_SHORT = 65
-    if (max(req.preflightedWidth, req.preflightedHeight) <= BC_LONG and 
-        min(req.preflightedWidth, req.preflightedHeight) <= BC_SHORT and 
+    if (max(req.preflightedWidth, req.preflightedHeight) <= BC_LONG and
+        min(req.preflightedWidth, req.preflightedHeight) <= BC_SHORT and
         "bc" not in req.description.lower()):
         req.description += " BC"
         logger.debug("Appended ' BC' to description based on BC size criteria.")
-    
+
     # Check for "premium uncoated" in description and add " Digital" if needed
     if "premium uncoated" in req.description.lower() and "digital" not in req.description.lower():
         req.description += " Digital"
         logger.debug("Appended ' Digital' to description based on premium uncoated condition.")
-        
+
 
     # 2) Product matching
     product_keywords = get_product_keywords_data()
@@ -173,64 +178,75 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     )
 
     # 4) Get timezone from hub config
-    cmyk_hubs = get_cmyk_hubs_data()
+    # cmyk_hubs = get_cmyk_hubs_data() # Already loaded above
     hub_timezone = None
     for hub in cmyk_hubs:
-        if hub["Hub"].lower() == req.misCurrentHub.lower():
-            hub_timezone = pytz.timezone(hub["Timezone"])
-            logger.debug(f"Found timezone {hub['Timezone']} for hub {req.misCurrentHub}")
-            break
-    
+        # Use resolved current_hub here
+        if hub["Hub"].lower() == current_hub.lower():
+            try:
+                hub_timezone = pytz.timezone(hub["Timezone"])
+                logger.debug(f"Found timezone {hub['Timezone']} for resolved hub {current_hub}")
+                break
+            except pytz.UnknownTimeZoneError:
+                 logger.error(f"Invalid timezone string '{hub['Timezone']}' for hub {current_hub}. Falling back.")
+                 hub_timezone = None # Explicitly set to None so fallback triggers
+
     if not hub_timezone:
-        # Fallback to Melbourne time if hub not found
-        logger.warning(f"No timezone found for hub {req.misCurrentHub}, falling back to Melbourne time")
+        # Fallback to Melbourne time if hub not found or timezone invalid
+        logger.warning(f"No valid timezone found for hub {current_hub}, falling back to Melbourne time")
         hub_timezone = pytz.timezone('Australia/Melbourne')
-    
-    # Get current time in hub's timezone
-    current_time = datetime.now(hub_timezone)
-    logger.debug(f"Current time in {hub_timezone}: {current_time}")
+
+    # --- CALCULATE ACTUAL AND SIMULATED TIME ---
+    actual_time_hub_tz = actual_now_utc.astimezone(hub_timezone)
+    offset_hours = req.timeOffsetHours or 0
+    simulated_time = actual_time_hub_tz + timedelta(hours=offset_hours)
+
+    logger.info(f"Actual Processing Time ({hub_timezone}): {actual_time_hub_tz.strftime('%Y-%m-%d %H:%M:%S %Z%z')}")
+    if offset_hours != 0:
+        logger.info(f"Simulated Time ({hub_timezone}, Offset: {offset_hours} hrs): {simulated_time.strftime('%Y-%m-%d %H:%M:%S %Z%z')}")
+    else:
+         logger.debug("No time offset applied.")
+
+    # Use the SIMULATED time for cutoff check
+    current_time = simulated_time
+    # --- END TIME CALCULATION ---
 
     # 5) Cutoff check
     cutoff_hour = int(product_obj["Cutoff"])
-    logger.debug(f"Checking cutoff: current hour={current_time.hour} ({hub_timezone}), cutoff hour={cutoff_hour}")
-    
+    logger.debug(f"Checking cutoff: SIMULATED current hour={current_time.hour} ({hub_timezone}), cutoff hour={cutoff_hour}")
+
     if current_time.hour >= cutoff_hour:
         start_date = (current_time + timedelta(days=1)).date()
         cutoff_status = "After Cutoff"
-        logger.debug(f"After cutoff: current_time={current_time} ({hub_timezone}), moving start date to next day={start_date}")
+        logger.debug(f"After cutoff: simulated_time={current_time} ({hub_timezone}), moving start date to next day={start_date}")
     else:
         start_date = current_time.date()
         cutoff_status = "Before Cutoff"
-        logger.debug(f"Before cutoff: current_time={current_time} ({hub_timezone}), keeping start date as today={start_date}")
+        logger.debug(f"Before cutoff: simulated_time={current_time} ({hub_timezone}), keeping start date as today={start_date}")
 
     # Adjust start_date to next valid start day
     allowed_start_days = product_obj["Start_days"]
     start_date = get_next_valid_start_day(start_date, allowed_start_days)
 
-    # 6) Calculate finishing days
-   #finishing_days = calculate_finishing_days(req, product_obj, chosen_hub)
-    #base_prod_days = int(product_obj["Days_to_produce"])
-    #total_prod_days = base_prod_days + finishing_days
-
     # 7) Choose final production hub with hub rules validation
     product_hubs = product_obj.get("Production_Hub", [])
-    cmyk_hubs = get_cmyk_hubs_data()
+    # cmyk_hubs = get_cmyk_hubs_data() # Already loaded
 
     # First get optimal hub based on standard rules
     initial_hub = choose_production_hub(
         product_hubs,
         req.misDeliversToState.lower(),
-        req.misCurrentHub.lower(),
+        req.misCurrentHub.lower(), # Use original hub from request for QLD override check context
         found_product_id,
         cmyk_hubs
     )
-    
+
     # Then validate against hub rules and get final hub
     chosen_hub = validate_hub_rules(
         initial_hub=initial_hub,
         available_hubs=product_hubs,
         delivers_to_state=req.misDeliversToState.lower(),
-        current_hub=req.misCurrentHub.lower(),
+        current_hub=current_hub.lower(), # Pass the resolved current hub
         description=req.description,
         width=req.preflightedWidth,
         height=req.preflightedHeight,
@@ -240,26 +256,24 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         cmyk_hubs=cmyk_hubs,
         print_type=req.printType
     )
-    
-    logger.debug(f"Initial hub selection: {initial_hub}, Final hub after rules: {chosen_hub}")
-    
-    # Enable or disable hub transfer
-    enable_auto_hub_transfer = 1 if chosen_hub.lower() != current_hub.lower() else 0
-    logger.debug(f"Setting enableAutoHubTransfer={enable_auto_hub_transfer} (chosen_hub={chosen_hub}, current_hub={current_hub})")
 
-    
+    logger.debug(f"Initial hub selection: {initial_hub}, Final hub after rules: {chosen_hub}")
+
+    # Enable or disable hub transfer based on *resolved* current hub vs chosen hub
+    enable_auto_hub_transfer = 1 if chosen_hub.lower() != current_hub.lower() else 0
+    logger.debug(f"Setting enableAutoHubTransfer={enable_auto_hub_transfer} (chosen_hub={chosen_hub}, resolved_current_hub={current_hub})")
+
 
     # Find the actual cmykHubID for that chosen hub
     chosen_hub_id = find_cmyk_hub_id(chosen_hub, cmyk_hubs)
-    
+
      # Step 6: Finishing Days Calculation ---
     base_prod_days = int(product_obj.get("Days_to_produce", 1)) # Default 1 day if missing
     finishing_days = calculate_finishing_days(req, product_obj, chosen_hub) # Pass the final chosen_hub
     total_prod_days = base_prod_days + finishing_days
     logger.debug(f"Production Days: Base={base_prod_days}, Finishing={finishing_days}, Total={total_prod_days}")
-    
-    
-    
+
+
     # 8) add business days for final dispatch
     closed_dates = get_closed_dates_for_state(chosen_hub, cmyk_hubs)
     adjusted_start_date, dispatch_date = add_business_days(start_date, total_prod_days, closed_dates)
@@ -270,7 +284,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         product_obj,
         chosen_hub
     )
-    
+
     if modified_start:
         logger.debug(f"Using modified start date: {modified_start}")
         adjusted_start_date = modified_start
@@ -285,7 +299,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         f"ChosenHub={chosen_hub}, DispatchDate={dispatch_date}"
     )
     logger.debug("SCHEDULE LOG: " + debug_log)
-    
+
     # 10) Determine Default Synergy Impose and Preflight ---
     # Get default values from the matched product first
     default_synergy_impose = product_obj.get("SynergyImpose", 0)
@@ -300,7 +314,13 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # --- Apply Preflight Rules --- # <<< NEW BLOCK
     final_synergy_preflight = determine_preflight_action(req, found_product_id)
     logger.debug(f"SynergyPreflight after applying rules: {final_synergy_preflight}")
-    
+
+
+    # --- Human-readable time format ---
+    time_format = '%A, %Y-%m-%d %H:%M:%S %Z (%z)'
+    actual_processing_time_str = actual_time_hub_tz.strftime(time_format)
+    simulated_processing_time_str = simulated_time.strftime(time_format) if offset_hours != 0 else None
+
 
     # Return comprehensive response
     return ScheduleResponse(
@@ -316,7 +336,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         productionGroups=assigned_groups,
         preflightedWidth=req.preflightedWidth,
         preflightedHeight=req.preflightedHeight,
-        
+
         # Production Details
         cutoffStatus=cutoff_status,
         productStartDays=product_obj["Start_days"],
@@ -324,27 +344,31 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         daysToProduceBase=base_prod_days,
         finishingDays=finishing_days,
         totalProductionDays=total_prod_days,
-        
+
         # Location Info
         orderPostcode=req.misDeliversToPostcode,
         chosenProductionHub=chosen_hub,
         hubTransferTo=chosen_hub_id,
-        
+
         # Dates
         startDate=str(start_date),
         adjustedStartDate=str(adjusted_start_date),
         dispatchDate=str(dispatch_date),
-        
+
         # Processing Info
         grainDirection=grain_str,
         orderQuantity=req.misOrderQTY,
         orderKinds=req.kinds,
         totalQuantity=req.misOrderQTY * req.kinds,
-        
+
         # Configuration
-        synergyPreflight=final_synergy_preflight, 
-        synergyImpose=final_synergy_impose, 
-        enableAutoHubTransfer=enable_auto_hub_transfer
+        synergyPreflight=final_synergy_preflight,
+        synergyImpose=final_synergy_impose,
+        enableAutoHubTransfer=enable_auto_hub_transfer,
+
+        # Time Info <<< ADDED BLOCK
+        actualProcessingTime=actual_processing_time_str,
+        simulatedProcessingTime=simulated_processing_time_str
     )
 
 # --------------------------------------------------------------------

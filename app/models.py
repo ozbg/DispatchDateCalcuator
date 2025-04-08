@@ -74,6 +74,7 @@ class ScheduleRequest(BaseModel):
     orderNotes: Optional[List[OrderNote]] = Field(None, description="Optional list of notes associated with the order.")
     centerId: Optional[int] = Field(None, description="Optional specific Center ID for evaluating Center Rules in finishing_rules.json.")
     additionalProductionDays: Optional[int] = Field(0, description="Manually specified additional days to add to production time.", example=0)
+    timeOffsetHours: Optional[int] = Field(0, description="Simulate running the request N hours forward (+) or backward (-) from the actual processing time.", example=0)
 
 class OrderMatchingCriteria(BaseModel):
     """Defines criteria used in HubSelectionRules and ImposingRules to match specific orders."""
@@ -193,3 +194,6 @@ class ScheduleResponse(BaseModel):
     synergyImpose: Optional[int] = Field(None, description="Synergy impose setting from the matched product.")
     enableAutoHubTransfer: Optional[int] = Field(None, description="Indicates if automatic hub transfer should be enabled (1 if chosen hub differs from current hub, 0 otherwise).")
    
+    # Time Info <<< ADDED BLOCK
+    actualProcessingTime: str = Field(..., description="Actual server time (incl. timezone) when the request was processed.")
+    simulatedProcessingTime: Optional[str] = Field(None, description="Simulated time (incl. timezone) used for calculation if timeOffsetHours was non-zero.")

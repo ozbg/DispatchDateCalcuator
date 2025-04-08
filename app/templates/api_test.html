@@ -1,3 +1,4 @@
+{# File: app/templates/api_test.html #}
 {% extends "base.html" %}
 {% block content %}
 <h2>Schedule API Test</h2>
@@ -8,6 +9,11 @@
         <div class="left-panel">
             <div class="input-section">
                 <h3>Request Payload</h3>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="timeOffset" style="display: block; margin-bottom: 5px; font-weight: bold;">Time Offset (Hours):</label>
+                    <input type="number" id="timeOffset" value="0" class="form-control" style="width: 150px; padding: 8px; font-size: 1.1em;">
+                    <small style="display: block; margin-top: 5px; color: #666;">Enter +/- hours to simulate past/future time for cutoff check.</small>
+                </div>
                 <textarea id="requestPayload" rows="15">{
     "orderId": "TEST123",
     "misDeliversToPostcode": "4780",
@@ -22,7 +28,8 @@
     "misCurrentHubID": 2,
     "misDeliversToState": "qld",
     "orderNotes": [],
-    "additionalProductionDays": 0
+    "additionalProductionDays": 0,
+    "timeOffsetHours": 0
 }</textarea>
             </div>
             <div class="button-group">
@@ -50,7 +57,6 @@
                         <td>Order ID</td>
                         <td id="orderId"></td>
                     </tr>
-                    <!-- Removed line setting orderQty from payload -->
                     <tr>
                         <td>Order Description</td>
                         <td id="orderDescription"></td>
@@ -69,7 +75,7 @@
                     </tr>
                     <tr>
                         <td>Product ID</td>
-                        <td id="productId"></td> <!-- Cell exists, was not populated -->
+                        <td id="productId"></td>
                     </tr>
                     <tr>
                         <td>Product Group</td>
@@ -104,7 +110,7 @@
                     </tr>
                     <tr>
                         <td>Finishing Days</td>
-                        <td id="finishingDays"></td> <!-- Cell exists, was not populated -->
+                        <td id="finishingDays"></td>
                     </tr>
                     <tr>
                         <td>Total Production Days</td>
@@ -112,7 +118,7 @@
                     </tr>
                     <tr>
                         <td>Production Groups</td>
-                        <td id="productionGroups"></td> <!-- Cell exists, was not populated -->
+                        <td id="productionGroups"></td>
                     </tr>
 
                     <!-- Location Info -->
@@ -127,17 +133,25 @@
                     </tr>
                     <tr>
                         <td>Hub Transfer To</td>
-                        <td id="hubTransferTo"></td> <!-- Cell exists, was not populated -->
+                        <td id="hubTransferTo"></td>
                     </tr>
 
                     <!-- Dates -->
                     <tr><td colspan="2" class="section-header">Production Dates</td></tr>
+                     <tr>
+                        <td>Actual Processing Time</td> {# <<< ADDED #}
+                        <td id="actualProcessingTime"></td> {# <<< ADDED #}
+                    </tr>
+                     <tr>
+                        <td>Simulated Processing Time</td> {# <<< ADDED #}
+                        <td id="simulatedProcessingTime"></td> {# <<< ADDED #}
+                    </tr>
                     <tr>
-                        <td>Start Date</td>
+                        <td>Start Date (Initial Calc)</td> {# Renamed for clarity #}
                         <td id="startDate"></td>
                     </tr>
                     <tr>
-                        <td>Adjusted Start Date</td>
+                        <td>Adjusted Start Date (Actual)</td> {# Renamed for clarity #}
                         <td id="adjustedStartDate"></td>
                     </tr>
                     <tr>
@@ -153,7 +167,7 @@
                     </tr>
                     <tr>
                         <td>Order Quantity</td>
-                        <td id="orderQuantity"></td> <!-- Was populated from payload, now from response -->
+                        <td id="orderQuantity"></td>
                     </tr>
                     <tr>
                         <td>Order Kinds</td>
@@ -206,6 +220,7 @@
 
 <!-- Styles remain the same -->
 <style>
+/* --- Styles from original file --- */
 .debug-filter {
     margin-bottom: 15px;
     padding: 10px;
@@ -380,7 +395,7 @@ pre {
 
 .response-table td:first-child {
     font-weight: bold;
-    width: 200px;
+    width: 200px; /* Increased width for longer labels */
 }
 
 .response-table .section-header {
@@ -437,6 +452,11 @@ pre {
 h3 {
     font-size: 1.75em;
     margin-bottom: 15px;
+}
+
+.form-control { /* Added style for offset input */
+     border: 1px solid #ccc;
+     border-radius: 4px;
 }
 
 /* Responsive Adjustments */
@@ -534,11 +554,13 @@ function clearPayload() {
     const responseOutput = document.getElementById('responseOutput');
     const formattedResponse = document.getElementById('formattedResponse');
     const debugOutput = document.getElementById('debugOutput');
+    const timeOffsetInput = document.getElementById('timeOffset');
 
     if (requestPayload) requestPayload.value = '{}'; // Set to empty JSON object
     if (responseOutput) responseOutput.textContent = '';
     if (formattedResponse) formattedResponse.style.display = 'none';
     if (debugOutput) debugOutput.innerHTML = '<p class="placeholder-text">Debug messages will appear here after running the API test...</p>';
+    if (timeOffsetInput) timeOffsetInput.value = 0; // Reset offset input
 }
 
 // Helper function to safely set content in the formatted table
@@ -547,34 +569,41 @@ const setContent = (id, value, isHubValue = false) => {
     if (element) {
         let displayValue = value ?? 'N/A'; // Use 'N/A' for null or undefined
         if (Array.isArray(value)) {
-            displayValue = value.join(', '); // Join arrays with comma
+            displayValue = value.join(', ') || 'N/A'; // Join arrays, handle empty array
         }
         if (isHubValue) {
             element.innerHTML = `<span class="hub-value">${displayValue}</span>`;
         } else {
-            element.textContent = displayValue;
+            // Basic HTML escaping for safety, while allowing potential formatting from backend
+            element.innerHTML = String(displayValue).replace(/</g, "<").replace(/>/g, ">");
         }
     } else {
         console.warn(`Element with ID '${id}' not found.`);
     }
 };
 
+
 async function runTest() {
     const responseOutput = document.getElementById('responseOutput');
     const formattedDiv = document.getElementById('formattedResponse');
     const requestPayloadEl = document.getElementById('requestPayload');
+    const timeOffsetInput = document.getElementById('timeOffset'); // <<< Get offset input
 
     // Clear previous results
     if(responseOutput) responseOutput.textContent = 'Running test...';
     if(formattedDiv) formattedDiv.style.display = 'none';
 
     try {
+        // --- Read offset and modify payload ---
+        const offsetValue = parseInt(timeOffsetInput.value) || 0; // Get offset value, default 0
         const payload = JSON.parse(requestPayloadEl.value);
+        payload.timeOffsetHours = offsetValue; // Add/update offset in payload
+        // --- End payload modification ---
 
         const response = await fetch('/schedule', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload) // Send modified payload
         });
 
         const result = await response.json();
@@ -583,8 +612,15 @@ async function runTest() {
         if(responseOutput) responseOutput.textContent = formattedResult;
 
         if (!response.ok) {
-            throw new Error(`API Error ${response.status}: ${result.detail || response.statusText}`);
+            // Try to parse detail from JSON response, otherwise use status text
+            let detail = result.detail || response.statusText;
+            // If detail is an object (like validation errors), stringify it
+            if (typeof detail === 'object') {
+                detail = JSON.stringify(detail);
+            }
+            throw new Error(`API Error ${response.status}: ${detail}`);
         }
+
 
         // Update formatted table only on success
         if(formattedDiv) formattedDiv.style.display = 'block';
@@ -594,36 +630,38 @@ async function runTest() {
         setContent('orderId', result.orderId);
         setContent('orderDescription', result.orderDescription);
         setContent('currentHub', result.currentHub, true);
-        setContent('currentHubId', result.currentHubId); // *** ADDED ***
+        setContent('currentHubId', result.currentHubId);
         setContent('preflightedWidth', result.preflightedWidth);
         setContent('preflightedHeight', result.preflightedHeight);
-        setContent('productId', result.productId, true); // *** ADDED *** (marked as hubValue for emphasis)
+        setContent('productId', result.productId, true);
         setContent('productGroup', result.productGroup, true);
         setContent('productCategory', result.productCategory);
-        setContent('productionHubs', result.productionHubs); // Will be joined by setContent
+        setContent('productionHubs', result.productionHubs);
 
         // Production Details
         setContent('cutoffStatus', result.cutoffStatus);
-        setContent('productStartDays', result.productStartDays); // Will be joined
+        setContent('productStartDays', result.productStartDays);
         setContent('productCutoff', result.productCutoff);
         setContent('daysToProduceBase', result.daysToProduceBase);
-        setContent('finishingDays', result.finishingDays); // *** ADDED ***
-        setContent('totalProductionDays', result.totalProductionDays, true); // Emphasize total
-        setContent('productionGroups', result.productionGroups); // *** ADDED *** (Will be joined)
+        setContent('finishingDays', result.finishingDays);
+        setContent('totalProductionDays', result.totalProductionDays, true);
+        setContent('productionGroups', result.productionGroups);
 
         // Location Info
         setContent('orderPostcode', result.orderPostcode);
-        setContent('chosenProductionHub', result.chosenProductionHub, true); // Emphasize chosen
-        setContent('hubTransferTo', result.hubTransferTo); // *** ADDED ***
+        setContent('chosenProductionHub', result.chosenProductionHub, true);
+        setContent('hubTransferTo', result.hubTransferTo);
 
         // Dates
+        setContent('actualProcessingTime', result.actualProcessingTime); // <<< ADDED
+        setContent('simulatedProcessingTime', result.simulatedProcessingTime); // <<< ADDED
         setContent('startDate', result.startDate);
         setContent('adjustedStartDate', result.adjustedStartDate);
-        setContent('dispatchDate', result.dispatchDate, true); // Emphasize final date
+        setContent('dispatchDate', result.dispatchDate, true);
 
         // Processing Info
         setContent('grainDirection', result.grainDirection);
-        setContent('orderQuantity', result.orderQuantity); // *** Now from response ***
+        setContent('orderQuantity', result.orderQuantity);
         setContent('orderKinds', result.orderKinds);
         setContent('totalQuantity', result.totalQuantity);
 
@@ -635,6 +673,7 @@ async function runTest() {
 
     } catch (error) {
         console.error('API Test Error:', error);
+        // Display the error message more prominently
         if(responseOutput) responseOutput.textContent = 'Error: ' + error.message;
         if(formattedDiv) formattedDiv.style.display = 'none'; // Hide table on error
     } finally {
