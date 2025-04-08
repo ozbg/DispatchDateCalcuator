@@ -2,8 +2,8 @@
 #This module contains the main scheduling logic for processing an order request. It includes steps such as state overrides, hub selection, product matching, finishing days calculation, and date adjustments.
 import json
 import logging
-from datetime import datetime, timedelta, timezone 
-from typing import Optional
+from datetime import datetime, timedelta, timezone, date
+from typing import Optional, Tuple
 import pytz
 from pathlib import Path
 from pathlib import Path
@@ -11,6 +11,8 @@ from app.data_manager import get_production_groups_data
 from app.production_group_mapper import match_production_groups
 from app.imposing_logic import determine_imposing_action
 from app.preflight_logic import determine_preflight_action 
+from app.hub_utils import resolve_hub_details
+
 
 from app.models import (
     ScheduleRequest,
@@ -34,342 +36,387 @@ from app.hub_selection import validate_hub_rules, choose_production_hub
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+# --- NEW HELPER FUNCTION ---
+def find_last_natural_run_date(target_date: date, allowed_start_days: list[str]) -> date:
+    """
+    Find the most recent past or current allowed start day relative to the target_date.
+    """
+    day_map = {
+        0: "Monday", 1: "Tuesday", 2: "Wednesday",
+        3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"
+    }
+    current_date = target_date
+    # Iterate backwards up to 7 days (guarantees finding the last run day in the cycle)
+    for _ in range(7):
+        current_day_name = day_map[current_date.weekday()]
+        if current_day_name in allowed_start_days:
+            logger.debug(f"[find_last_natural_run_date] Found last natural run date relative to {target_date}: {current_date}")
+            return current_date
+        current_date -= timedelta(days=1)
+    # Should ideally not be reached if allowed_start_days is valid, but return original date as fallback
+    logger.warning(f"[find_last_natural_run_date] Could not find a recent run day for {target_date} and {allowed_start_days}. Returning original date.")
+    return target_date
+
+# --- NEW HELPER FUNCTION ---
+def find_next_natural_run_date(target_date: datetime.date, allowed_start_days: list[str]) -> datetime.date:
+    """
+    Find the next allowed start day on or after the target_date.
+    Similar to get_next_valid_start_day but finds the *next occurrence*.
+    """
+    day_map = {
+        0: "Monday", 1: "Tuesday", 2: "Wednesday",
+        3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"
+    }
+    current_date = target_date
+    while True:
+        current_day_name = day_map[current_date.weekday()]
+        if current_day_name in allowed_start_days:
+            logger.debug(f"[find_next_natural_run_date] Found next natural run date: {current_date} (Allowed: {allowed_start_days})")
+            return current_date
+        current_date += timedelta(days=1)
+
+# --- MODIFIED HELPER FUNCTION ---
+def check_and_apply_override(
+    potential_run_date: datetime.date,
+    product_obj: dict,
+    chosen_hub: str
+) -> Optional[datetime.date]:
+    """
+    Checks if an override applies to the potential_run_date for the chosen_hub.
+    Returns the *new* print date if an override exists, otherwise None.
+    """
+    modified_dates = product_obj.get("Modified_run_date", [])
+    logger.debug(f"[check_and_apply_override] Checking overrides for Product {product_obj.get('Product_ID', 'N/A')} on potential date {potential_run_date} for Hub {chosen_hub}")
+
+    for override_entry in modified_dates:
+        if not isinstance(override_entry, list) or len(override_entry) < 3:
+            logger.warning(f"Skipping malformed override entry: {override_entry}")
+            continue
+
+        try:
+            orig_print_str = override_entry[0]
+            new_print_str = override_entry[1]
+            affected_hubs_raw = override_entry[2]
+
+            if not orig_print_str or not new_print_str or not isinstance(affected_hubs_raw, list):
+                logger.warning(f"Skipping override due to missing/invalid data: {override_entry}")
+                continue
+
+            orig_print_date = datetime.strptime(orig_print_str, "%Y-%m-%d").date()
+            new_print_date = datetime.strptime(new_print_str, "%Y-%m-%d").date()
+            affected_hubs = [h.lower() for h in affected_hubs_raw if isinstance(h, str)]
+
+        except (ValueError, TypeError, IndexError) as e:
+            logger.warning(f"Skipping override due to parsing error ({e}): {override_entry}")
+            continue
+
+        # Check if the override matches the potential run date and the chosen hub
+        if potential_run_date == orig_print_date and chosen_hub.lower() in affected_hubs:
+            logger.info(f"Override MATCHED: Product {product_obj.get('Product_ID', 'N/A')} run on {orig_print_date} for hub {chosen_hub} moved to {new_print_date}.")
+            return new_print_date # Return the NEW date
+
+    logger.debug(f"No applicable override found for {potential_run_date} in hub {chosen_hub}.")
+    return None # No override applies to this specific date/hub
+
+
+# --- process_order Function ---
 def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     """
-    Main function to schedule an order, including:
-      1) State overrides for SA/TAS => VIC, ACT => NSW, and NQLD override.
-      2) Postcode -> Hub override (if any).
-      3) Product matching, finishing days, final production hub selection.
-      4) Imposing rule application. # <<< ADDED STEP
-
+    Main function to schedule an order... (docstring unchanged)
     """
+    # ... (Steps 1-4: Initial setup, Product Matching, Hub Selection, Timezone/Sim Time remain the same) ...
     # --- GET ACTUAL PROCESSING TIME (UTC first) ---
     actual_now_utc = datetime.now(timezone.utc)
-
-    try:
-        logger.info(f"--- Received /schedule request ---")
-        # Log the offset if provided
-        log_payload = req.dict()
-        if req.timeOffsetHours != 0:
-            logger.info(f"Time Offset Hours specified: {req.timeOffsetHours}")
-        logger.debug(f"Request Payload Data: {log_payload}")
-    except Exception as log_e:
-        logger.error(f"Error logging request data: {log_e}")
+    log_payload = req.dict()
+    logger.info(f"--- Received /schedule request (OrderID: {req.orderId or 'N/A'}) ---")
+    if req.timeOffsetHours != 0:
+        logger.info(f"Time Offset Hours specified: {req.timeOffsetHours}")
+    logger.debug(f"Request Payload Data: {log_payload}")
 
     # Set default postcode if it's null or empty
     if not req.misDeliversToPostcode:
         req.misDeliversToPostcode = "0000"
 
-    # Load CMYK hubs data
+    # Load core data
     cmyk_hubs = get_cmyk_hubs_data()
+    hub_data = get_hub_data()
+    product_info = get_product_info_data()
+    product_keywords = get_product_keywords_data()
 
     # Resolve current hub details
-    from app.hub_utils import resolve_hub_details
     current_hub, current_hub_id = resolve_hub_details(
         current_hub=req.misCurrentHub,
         current_hub_id=req.misCurrentHubID,
         cmyk_hubs=cmyk_hubs
     )
-
-    logger.debug(f"Resolved hub details: hub={current_hub}, id={current_hub_id}")
-
-    # Update request with resolved values
+    logger.info(f"Resolved Current Hub: Name='{current_hub}', ID={current_hub_id}")
     req.misCurrentHub = current_hub
     req.misCurrentHubID = current_hub_id
 
-
     # ----------------------------------------------------------------
-    # Step 1a) State override for SA, TAS, ACT, and NQLD
+    # Step 1: State/Postcode Overrides & Initial Setup
     # ----------------------------------------------------------------
+    original_delivers_to_state = req.misDeliversToState
     if req.misDeliversToState.lower() in ["sa", "tas"]:
-        logger.debug("MIS Delivers to: %s => treating as 'vic'", req.misDeliversToState)
+        logger.debug(f"State Override: {original_delivers_to_state} -> vic")
         req.misDeliversToState = "vic"
-
-    if req.misDeliversToState.lower() == "act":
-        logger.debug("MIS Delivers to: %s => treating as 'nsw'", req.misDeliversToState)
+    elif req.misDeliversToState.lower() == "act":
+        logger.debug(f"State Override: {original_delivers_to_state} -> nsw")
         req.misDeliversToState = "nsw"
+    if current_hub.lower() == "nqld" and req.misDeliversToState.lower() == "qld":
+         logger.debug("NQLD Override: Current Hub is NQLD delivering to QLD -> Treating misDeliversToState as 'nqld' for hub selection.")
+         req.misDeliversToState = "nqld"
 
-    if req.misCurrentHub.lower() == "nqld" and req.misDeliversToState.lower() == "qld":
-        logger.debug("MIS Current hub is 'nqld' and delivers to QLD => setting misDeliversToState = 'nqld'")
-        req.misDeliversToState = "nqld"
-
-    # ----------------------------------------------------------------
-    # Step 1b) Postcode-based Hub override (lookupHUB)
-    # ----------------------------------------------------------------
-    override_info = lookup_hub_by_postcode(req.misDeliversToPostcode, get_hub_data())
+    override_info = lookup_hub_by_postcode(req.misDeliversToPostcode, hub_data)
     if override_info:
-        logger.debug("Postcode-based production override => %s", override_info)
+        logger.debug(f"Postcode Override: {req.misDeliversToPostcode} -> {override_info['hubName']}")
         req.misDeliversToState = override_info["hubName"]
-    else:
-        logger.debug("No postcode override for postcode=%s => continuing with misDeliversToState=%s",
-                     req.misDeliversToPostcode, req.misDeliversToState)
 
-    # ----------------------------------------------------------------
-    # Step 1c) Add #wa tag to WA orders for special product matching
-    # ----------------------------------------------------------------
-    #if req.misCurrentHub.lower() == "wa":
-    #    logger.debug("Current hub is WA => appending #wa tag to description")
-    #    req.description = f"{req.description} #wa"
-
-    # ----------------------------------------------------------------
-    # Step 1d) Assign production groups based on order description
-    # ----------------------------------------------------------------
-    production_groups_data = get_production_groups_data()
-    assigned_groups = match_production_groups(req.description, production_groups_data)
-    logger.debug(f"Assigned production groups: {assigned_groups}")
-
-    # ----------------------------------------------------------------
-    # Step 1e) Append additional tags to order description before product matching
-    #         - If product is BC size, append " BC" to the description.
-    #         - If description contains "premium uncoated", append " Digital" to the description.
-    # ----------------------------------------------------------------
-    # Check for BC size using dimensions similar to determine_grain_direction
+    original_description = req.description
     BC_LONG = 100
     BC_SHORT = 65
     if (max(req.preflightedWidth, req.preflightedHeight) <= BC_LONG and
         min(req.preflightedWidth, req.preflightedHeight) <= BC_SHORT and
         "bc" not in req.description.lower()):
         req.description += " BC"
-        logger.debug("Appended ' BC' to description based on BC size criteria.")
-
-    # Check for "premium uncoated" in description and add " Digital" if needed
+        logger.debug("Appended ' BC' to description based on size.")
     if "premium uncoated" in req.description.lower() and "digital" not in req.description.lower():
         req.description += " Digital"
-        logger.debug("Appended ' Digital' to description based on premium uncoated condition.")
+        logger.debug("Appended ' Digital' to description based on 'premium uncoated'.")
 
 
-    # 2) Product matching
-    product_keywords = get_product_keywords_data()
-
-    logger.debug(f"Calling match_product_id with description='{req.description[:50]}...', "
-             f"printType={req.printType}, hubID={req.misCurrentHubID}")
-    found_product_id = match_product_id(req.description, product_keywords, req.printType, req.misCurrentHubID)
-
+    # ----------------------------------------------------------------
+    # Step 2: Product Matching & Production Group Assignment
+    # ----------------------------------------------------------------
+    logger.debug(f"Matching Product: Desc='{req.description[:50]}...', PrintType={req.printType}, HubID={current_hub_id}")
+    found_product_id = match_product_id(req.description, product_keywords, req.printType, current_hub_id)
     if found_product_id is None:
-        logger.debug("No matching product found => using fallback product_id=99")
+        logger.warning("No matching product found => using fallback product_id=99")
         found_product_id = 99
 
-    product_info = get_product_info_data()
-    product_obj = product_info.get(str(found_product_id), None)
+    product_obj = product_info.get(str(found_product_id))
     if not product_obj:
-        logger.debug("product_id=%s not found in product_info => fallback schedule, using product 99", found_product_id)
-        # fallback product with all required fields
+        logger.error(f"Product ID {found_product_id} not found in product_info.json! Using hardcoded fallback.")
         product_obj = {
-            "Product_Group": "No Group Found",
-            "Product_Category": "Unmatched Product",
-            "Product_ID": 99,
-            "Cutoff": "12",
-            "Days_to_produce": "2",
-            "Production_Hub": ["vic"],
-            "Start_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            "SynergyPreflight": 0,
-            "SynergyImpose": 0,
-            "EnableAutoHubTransfer": 1,
-            "Modified_run_date": [],
-            "Production_Hub": ["vic"]
+            "Product_Category": "Default Fallback Product", "Product_Group": "Unknown", "Product_ID": 99,
+            "Production_Hub": ["vic", "nsw", "qld", "wa", "nqld"], "Cutoff": "12", "SynergyPreflight": 0, "SynergyImpose": 0,
+            "EnableAutoHubTransfer": 1, "scheduleAppliesTo": [1, 2, 3, 5, 24], "Start_days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "Days_to_produce": "3", "Modified_run_date": [], "printTypes": [1, 2, 3]
         }
+    logger.info(f"Matched Product: ID={found_product_id}, Group='{product_obj.get('Product_Group')}', Category='{product_obj.get('Product_Category')}'")
 
-    # 3) Determine grain direction
+    production_groups_data = get_production_groups_data()
+    assigned_groups = match_production_groups(original_description, production_groups_data)
+    logger.debug(f"Assigned Production Groups: {assigned_groups}")
+
     grain_str, grain_id = determine_grain_direction(
-        orientation=req.orientation,
-        width=req.preflightedWidth,
-        height=req.preflightedHeight,
-        description=req.description
+        orientation=req.orientation, width=req.preflightedWidth, height=req.preflightedHeight, description=original_description
     )
+    logger.debug(f"Determined Grain: {grain_str} (ID: {grain_id})")
 
-    # 4) Get timezone from hub config
-    # cmyk_hubs = get_cmyk_hubs_data() # Already loaded above
-    hub_timezone = None
-    for hub in cmyk_hubs:
-        # Use resolved current_hub here
-        if hub["Hub"].lower() == current_hub.lower():
-            try:
-                hub_timezone = pytz.timezone(hub["Timezone"])
-                logger.debug(f"Found timezone {hub['Timezone']} for resolved hub {current_hub}")
-                break
-            except pytz.UnknownTimeZoneError:
-                 logger.error(f"Invalid timezone string '{hub['Timezone']}' for hub {current_hub}. Falling back.")
-                 hub_timezone = None # Explicitly set to None so fallback triggers
+    # ----------------------------------------------------------------
+    # Step 3: Choose Final Production Hub
+    # ----------------------------------------------------------------
+    product_hubs = product_obj.get("Production_Hub", [])
+    initial_hub = choose_production_hub(
+        product_hubs, req.misDeliversToState.lower(), current_hub.lower(), found_product_id, cmyk_hubs
+    )
+    logger.debug(f"Initial Hub Choice (based on state/next best): {initial_hub}")
+    chosen_hub = validate_hub_rules(
+        initial_hub=initial_hub, available_hubs=product_hubs, delivers_to_state=req.misDeliversToState.lower(),
+        current_hub=current_hub.lower(), description=req.description, width=req.preflightedWidth, height=req.preflightedHeight,
+        quantity=req.misOrderQTY * req.kinds, product_id=found_product_id,
+        product_group=product_obj.get("Product_Group", "Unknown"), print_type=req.printType, cmyk_hubs=cmyk_hubs,
+    )
+    logger.info(f"Final Chosen Production Hub (after rules validation): {chosen_hub}")
+    chosen_hub_id = find_cmyk_hub_id(chosen_hub, cmyk_hubs)
+    logger.debug(f"Chosen Hub ID: {chosen_hub_id}")
+    enable_auto_hub_transfer = 1 if chosen_hub.lower() != current_hub.lower() else 0
+    logger.debug(f"EnableAutoHubTransfer: {enable_auto_hub_transfer} (Chosen: {chosen_hub}, Current: {current_hub})")
 
-    if not hub_timezone:
-        # Fallback to Melbourne time if hub not found or timezone invalid
-        logger.warning(f"No valid timezone found for hub {current_hub}, falling back to Melbourne time")
+    # ----------------------------------------------------------------
+    # Step 4: Determine Hub Timezone and Simulated Time
+    # ----------------------------------------------------------------
+    hub_timezone_str = 'Australia/Melbourne'
+    for hub_config in cmyk_hubs:
+        if hub_config["Hub"].lower() == chosen_hub.lower():
+            hub_timezone_str = hub_config.get("Timezone", hub_timezone_str)
+            break
+    try: hub_timezone = pytz.timezone(hub_timezone_str)
+    except pytz.UnknownTimeZoneError:
+        logger.error(f"Invalid timezone '{hub_timezone_str}' for hub {chosen_hub}. Falling back to Melbourne.")
         hub_timezone = pytz.timezone('Australia/Melbourne')
 
-    # --- CALCULATE ACTUAL AND SIMULATED TIME ---
     actual_time_hub_tz = actual_now_utc.astimezone(hub_timezone)
     offset_hours = req.timeOffsetHours or 0
     simulated_time = actual_time_hub_tz + timedelta(hours=offset_hours)
+    logger.info(f"Actual Time ({hub_timezone.zone}): {actual_time_hub_tz.strftime('%Y-%m-%d %H:%M:%S %Z%z')}")
+    if offset_hours != 0: logger.info(f"Simulated Time ({hub_timezone.zone}, Offset: {offset_hours}h): {simulated_time.strftime('%Y-%m-%d %H:%M:%S %Z%z')}")
+    else: logger.debug("No time offset applied. Using actual hub time for calculations.")
 
-    logger.info(f"Actual Processing Time ({hub_timezone}): {actual_time_hub_tz.strftime('%Y-%m-%d %H:%M:%S %Z%z')}")
-    if offset_hours != 0:
-        logger.info(f"Simulated Time ({hub_timezone}, Offset: {offset_hours} hrs): {simulated_time.strftime('%Y-%m-%d %H:%M:%S %Z%z')}")
+    current_processing_time = simulated_time
+
+    # ----------------------------------------------------------------
+   # ----------------------------------------------------------------
+    # Step 5: Determine Effective Run Date & Apply Cutoff (REVISED LOGIC)
+    # ----------------------------------------------------------------
+    allowed_start_days = product_obj.get("Start_days", ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"])
+    cutoff_hour = int(product_obj.get("Cutoff", "12"))
+    today_date = current_processing_time.date()
+
+    # 5a. Find the natural run dates surrounding today
+    last_natural_run_date = find_last_natural_run_date(today_date, allowed_start_days)
+    next_natural_run_date = find_next_natural_run_date(today_date, allowed_start_days)
+    logger.debug(f"Relevant Natural Run Dates: Last/Current Cycle = {last_natural_run_date}, Next Cycle = {next_natural_run_date}")
+
+    # 5b. Check for overrides affecting these dates
+    overridden_last_to_future_date = None
+    override_from_last_run = check_and_apply_override(last_natural_run_date, product_obj, chosen_hub)
+    if override_from_last_run and override_from_last_run >= today_date:
+        overridden_last_to_future_date = override_from_last_run
+        logger.debug(f"Last natural run ({last_natural_run_date}) was overridden to a relevant future date: {overridden_last_to_future_date}")
+
+    overridden_next_run_date = check_and_apply_override(next_natural_run_date, product_obj, chosen_hub)
+    if overridden_next_run_date:
+         logger.debug(f"Next natural run ({next_natural_run_date}) is overridden to: {overridden_next_run_date}")
+
+    # 5c. Determine the date to check cutoff against AND the corresponding natural date
+    effective_run_date_for_cutoff = None
+    natural_date_for_this_cycle = None # Track which natural date this effective date corresponds to
+
+    if overridden_last_to_future_date:
+        effective_run_date_for_cutoff = overridden_last_to_future_date
+        natural_date_for_this_cycle = last_natural_run_date # This effective date came from the last cycle
+        logger.info(f"Using overridden last run ({natural_date_for_this_cycle}) as effective date for cutoff: {effective_run_date_for_cutoff}")
+    elif overridden_next_run_date:
+        effective_run_date_for_cutoff = overridden_next_run_date
+        natural_date_for_this_cycle = next_natural_run_date # This effective date came from the next cycle
+        logger.info(f"Using overridden next run ({natural_date_for_this_cycle}) as effective date for cutoff: {effective_run_date_for_cutoff}")
     else:
-         logger.debug("No time offset applied.")
+        effective_run_date_for_cutoff = next_natural_run_date
+        natural_date_for_this_cycle = next_natural_run_date # This effective date IS the next natural date
+        logger.info(f"Using next natural run ({natural_date_for_this_cycle}) as effective date for cutoff: {effective_run_date_for_cutoff}")
 
-    # Use the SIMULATED time for cutoff check
-    current_time = simulated_time
-    # --- END TIME CALCULATION ---
+    # 5d. Apply cutoff logic using the effective_run_date_for_cutoff
+    cutoff_status = "Unknown"
+    calculated_start_date = None # This will be the date production *starts*
 
-    # 5) Cutoff check
-    cutoff_hour = int(product_obj["Cutoff"])
-    logger.debug(f"Checking cutoff: SIMULATED current hour={current_time.hour} ({hub_timezone}), cutoff hour={cutoff_hour}")
-
-    if current_time.hour >= cutoff_hour:
-        start_date = (current_time + timedelta(days=1)).date()
-        cutoff_status = "After Cutoff"
-        logger.debug(f"After cutoff: simulated_time={current_time} ({hub_timezone}), moving start date to next day={start_date}")
-    else:
-        start_date = current_time.date()
-        cutoff_status = "Before Cutoff"
-        logger.debug(f"Before cutoff: simulated_time={current_time} ({hub_timezone}), keeping start date as today={start_date}")
-
-    # Adjust start_date to next valid start day
-    allowed_start_days = product_obj["Start_days"]
-    start_date = get_next_valid_start_day(start_date, allowed_start_days)
-
-    # 7) Choose final production hub with hub rules validation
-    product_hubs = product_obj.get("Production_Hub", [])
-    # cmyk_hubs = get_cmyk_hubs_data() # Already loaded
-
-    # First get optimal hub based on standard rules
-    initial_hub = choose_production_hub(
-        product_hubs,
-        req.misDeliversToState.lower(),
-        req.misCurrentHub.lower(), # Use original hub from request for QLD override check context
-        found_product_id,
-        cmyk_hubs
-    )
-
-    # Then validate against hub rules and get final hub
-    chosen_hub = validate_hub_rules(
-        initial_hub=initial_hub,
-        available_hubs=product_hubs,
-        delivers_to_state=req.misDeliversToState.lower(),
-        current_hub=current_hub.lower(), # Pass the resolved current hub
-        description=req.description,
-        width=req.preflightedWidth,
-        height=req.preflightedHeight,
-        quantity=req.misOrderQTY,
-        product_id=found_product_id,
-        product_group=product_obj["Product_Group"],
-        cmyk_hubs=cmyk_hubs,
-        print_type=req.printType
-    )
-
-    logger.debug(f"Initial hub selection: {initial_hub}, Final hub after rules: {chosen_hub}")
-
-    # Enable or disable hub transfer based on *resolved* current hub vs chosen hub
-    enable_auto_hub_transfer = 1 if chosen_hub.lower() != current_hub.lower() else 0
-    logger.debug(f"Setting enableAutoHubTransfer={enable_auto_hub_transfer} (chosen_hub={chosen_hub}, resolved_current_hub={current_hub})")
+    if today_date < effective_run_date_for_cutoff:
+        cutoff_status = "Before Cutoff (Scheduled for Effective Run)"
+        calculated_start_date = effective_run_date_for_cutoff
+        logger.debug(f"Cutoff Check: Today ({today_date}) is before effective run {effective_run_date_for_cutoff}. Scheduling for {calculated_start_date}.")
+    elif today_date == effective_run_date_for_cutoff:
+        if current_processing_time.hour < cutoff_hour:
+            cutoff_status = "Before Cutoff"
+            calculated_start_date = effective_run_date_for_cutoff
+            logger.debug(f"Cutoff Check: Order time ({current_processing_time.strftime('%H:%M')}) on effective run date ({effective_run_date_for_cutoff}) is BEFORE cutoff ({cutoff_hour}:00). Scheduling for {calculated_start_date}.")
+        else:
+            # --- AFTER CUTOFF on Effective Day ---
+            cutoff_status = "After Cutoff"
+            # Find the *next* natural run date STRICTLY AFTER the natural date corresponding to the missed run
+            next_cycle_natural_run_date = find_next_natural_run_date(natural_date_for_this_cycle + timedelta(days=1), allowed_start_days)
+            # Check if THAT subsequent run is also overridden
+            overridden_next_cycle_run = check_and_apply_override(next_cycle_natural_run_date, product_obj, chosen_hub)
+            calculated_start_date = overridden_next_cycle_run if overridden_next_cycle_run else next_cycle_natural_run_date
+            logger.debug(f"Cutoff Check: Order time ({current_processing_time.strftime('%H:%M')}) on effective run date ({effective_run_date_for_cutoff}) is AFTER cutoff ({cutoff_hour}:00). Scheduling for next cycle starting {calculated_start_date} (Based on natural date {next_cycle_natural_run_date}, Overridden: {overridden_next_cycle_run})")
+            # --- End After Cutoff on Effective Day ---
+    else: # today_date > effective_run_date_for_cutoff
+        # --- AFTER CUTOFF because Effective Day Passed ---
+        cutoff_status = "After Cutoff (Effective Run Date Passed)"
+        # Find the *next* natural run date STRICTLY AFTER the natural date corresponding to the missed run
+        next_cycle_natural_run_date = find_next_natural_run_date(natural_date_for_this_cycle + timedelta(days=1), allowed_start_days)
+        # Check if THAT subsequent run is overridden
+        overridden_next_cycle_run = check_and_apply_override(next_cycle_natural_run_date, product_obj, chosen_hub)
+        calculated_start_date = overridden_next_cycle_run if overridden_next_cycle_run else next_cycle_natural_run_date
+        logger.debug(f"Cutoff Check: Today ({today_date}) is AFTER the effective run date ({effective_run_date_for_cutoff}). Scheduling for next cycle starting {calculated_start_date} (Based on natural date {next_cycle_natural_run_date}, Overridden: {overridden_next_cycle_run})")
+        # --- End After Cutoff Effective Day Passed ---
 
 
-    # Find the actual cmykHubID for that chosen hub
-    chosen_hub_id = find_cmyk_hub_id(chosen_hub, cmyk_hubs)
-
-     # Step 6: Finishing Days Calculation ---
-    base_prod_days = int(product_obj.get("Days_to_produce", 1)) # Default 1 day if missing
-    finishing_days = calculate_finishing_days(req, product_obj, chosen_hub) # Pass the final chosen_hub
+    # ----------------------------------------------------------------
+    # Step 6: Calculate Finishing Days & Total Production Days
+    # ----------------------------------------------------------------
+    base_prod_days = int(product_obj.get("Days_to_produce", 1))
+    finishing_days = calculate_finishing_days(req, product_obj, chosen_hub) # Pass final chosen_hub
     total_prod_days = base_prod_days + finishing_days
-    logger.debug(f"Production Days: Base={base_prod_days}, Finishing={finishing_days}, Total={total_prod_days}")
+    logger.info(f"Production Days: Base={base_prod_days}, Finishing={finishing_days}, Total={total_prod_days}")
 
-
-    # 8) add business days for final dispatch
+    # ----------------------------------------------------------------
+    # Step 7: Calculate Final Adjusted Start and Dispatch Dates
+    # ----------------------------------------------------------------
     closed_dates = get_closed_dates_for_state(chosen_hub, cmyk_hubs)
-    adjusted_start_date, dispatch_date = add_business_days(start_date, total_prod_days, closed_dates)
+    logger.debug(f"Closed dates for Hub {chosen_hub}: {closed_dates}")
 
-    # 9) Check for modified run dates
-    modified_start = check_modified_run_dates(
-        adjusted_start_date,
-        product_obj,
-        chosen_hub
-    )
+    # Adjust the calculated_start_date for weekends/closed dates, and calculate dispatch date
+    adjusted_start_date, dispatch_date = add_business_days(calculated_start_date, total_prod_days, closed_dates)
+    logger.info(f"Final Schedule: Adjusted Start Date={adjusted_start_date}, Dispatch Date={dispatch_date}")
 
-    if modified_start:
-        logger.debug(f"Using modified start date: {modified_start}")
-        adjusted_start_date = modified_start
-        # Recalculate dispatch date from modified start
-        _, dispatch_date = add_business_days(adjusted_start_date, total_prod_days, closed_dates)
 
-    # Build a debug log
+    # Build debug log (updated)
     debug_log = (
-        f"CutoffStatus={cutoff_status}, StartDate={start_date}, "
-        f"AdjustedStartDate={adjusted_start_date}, "  # Include the adjusted start date in the log
-        f"ProdDays={base_prod_days}, FinishingDays={finishing_days}, "
+        f"CutoffStatus='{cutoff_status}' (EffectiveRunDate={effective_run_date_for_cutoff}, CutoffHour={cutoff_hour}), "
+        f"CalculatedStartDate={calculated_start_date}, AdjustedStartDate={adjusted_start_date}, "
+        f"ProdDaysBase={base_prod_days}, FinishingDays={finishing_days}, TotalProdDays={total_prod_days}, "
         f"ChosenHub={chosen_hub}, DispatchDate={dispatch_date}"
     )
     logger.debug("SCHEDULE LOG: " + debug_log)
 
-    # 10) Determine Default Synergy Impose and Preflight ---
-    # Get default values from the matched product first
-    default_synergy_impose = product_obj.get("SynergyImpose", 0)
-    default_synergy_preflight = product_obj.get("SynergyPreflight", 0) # Default to 0
-    logger.debug(f"Default SynergyImpose from product {found_product_id}: {default_synergy_impose}")
-    logger.debug(f"Default SynergyPreflight from product {found_product_id}: {default_synergy_preflight}")
-
-    # --- Apply Imposing Rules ---
+    # ----------------------------------------------------------------
+    # Step 8: Determine Imposing and Preflight Actions
+    # ----------------------------------------------------------------
     final_synergy_impose = determine_imposing_action(req, found_product_id)
-    logger.debug(f"SynergyImpose after applying rules: {final_synergy_impose}")
-
-    # --- Apply Preflight Rules --- # <<< NEW BLOCK
     final_synergy_preflight = determine_preflight_action(req, found_product_id)
-    logger.debug(f"SynergyPreflight after applying rules: {final_synergy_preflight}")
+    logger.debug(f"SynergyImpose={final_synergy_impose}, SynergyPreflight={final_synergy_preflight} (after rules)")
 
-
-    # --- Human-readable time format ---
+    # ----------------------------------------------------------------
+    # Step 9: Prepare Response
+    # ----------------------------------------------------------------
     time_format = '%A, %Y-%m-%d %H:%M:%S %Z (%z)'
     actual_processing_time_str = actual_time_hub_tz.strftime(time_format)
     simulated_processing_time_str = simulated_time.strftime(time_format) if offset_hours != 0 else None
 
-
-    # Return comprehensive response
     return ScheduleResponse(
-        # Core Product Info
+        # Pass through request details + calculated values
         orderId=req.orderId,
-        orderDescription=req.description,
+        orderDescription=original_description, # Return original description
         currentHub=current_hub,
         currentHubId=current_hub_id,
         productId=found_product_id,
-        productGroup=product_obj["Product_Group"],
-        productCategory=product_obj["Product_Category"],
-        productionHubs=product_obj["Production_Hub"],
+        productGroup=product_obj.get("Product_Group", "Unknown"),
+        productCategory=product_obj.get("Product_Category", "Unknown"),
+        productionHubs=product_obj.get("Production_Hub", []),
         productionGroups=assigned_groups,
         preflightedWidth=req.preflightedWidth,
         preflightedHeight=req.preflightedHeight,
 
-        # Production Details
         cutoffStatus=cutoff_status,
-        productStartDays=product_obj["Start_days"],
-        productCutoff=str(product_obj["Cutoff"]),
+        productStartDays=allowed_start_days,
+        productCutoff=str(cutoff_hour),
         daysToProduceBase=base_prod_days,
         finishingDays=finishing_days,
         totalProductionDays=total_prod_days,
 
-        # Location Info
         orderPostcode=req.misDeliversToPostcode,
         chosenProductionHub=chosen_hub,
         hubTransferTo=chosen_hub_id,
 
-        # Dates
-        startDate=str(start_date),
-        adjustedStartDate=str(adjusted_start_date),
+        # Use the final calculated dates
+        startDate=str(calculated_start_date), # The date *before* weekend/holiday adjustment
+        adjustedStartDate=str(adjusted_start_date), # The date *after* weekend/holiday adjustment
         dispatchDate=str(dispatch_date),
 
-        # Processing Info
         grainDirection=grain_str,
         orderQuantity=req.misOrderQTY,
         orderKinds=req.kinds,
         totalQuantity=req.misOrderQTY * req.kinds,
 
-        # Configuration
         synergyPreflight=final_synergy_preflight,
         synergyImpose=final_synergy_impose,
         enableAutoHubTransfer=enable_auto_hub_transfer,
 
-        # Time Info <<< ADDED BLOCK
         actualProcessingTime=actual_processing_time_str,
         simulatedProcessingTime=simulated_processing_time_str
     )
+
 
 # --------------------------------------------------------------------
 # Postcode-based override (Step 1)
@@ -409,28 +456,28 @@ def lookup_hub_by_postcode(postcode: str, hub_data: list[dict]) -> Optional[dict
             return {"hubName": entry["hubName"], "hubId": entry["hubId"]}
     return None
 
-def get_next_valid_start_day(date, allowed_start_days):
+def get_first_valid_production_day(date_to_check: datetime.date, allowed_start_days: list[str]) -> datetime.date:
     """
-    Find the next allowed start day from the given date.
-    
+    Find the first allowed production day on or after the given date.
+
     Args:
-        date: datetime.date object
-        allowed_start_days: list of allowed days (e.g., ["Monday", "Wednesday"])
-    
+        date_to_check: The date to start checking from.
+        allowed_start_days: List of allowed weekdays (e.g., ["Monday", "Wednesday"]).
+
     Returns:
-        datetime.date: The next valid start date
+        datetime.date: The first valid production date.
     """
-    # Map weekday numbers to day names
     day_map = {
         0: "Monday", 1: "Tuesday", 2: "Wednesday",
         3: "Thursday", 4: "Friday", 5: "Saturday", 6: "Sunday"
     }
-    
-    current_date = date
+    current_date = date_to_check
     while True:
         current_day_name = day_map[current_date.weekday()]
         if current_day_name in allowed_start_days:
-            return current_date
+             logger.debug(f"[get_first_valid_production_day] Found valid production day: {current_date} (Allowed: {allowed_start_days})")
+             return current_date
+        # logger.debug(f"[get_first_valid_production_day] Skipping {current_date} ({current_day_name})")
         current_date += timedelta(days=1)
 
 def check_modified_run_dates(adjusted_start_date: datetime.date, product_obj: dict, chosen_hub: str) -> Optional[datetime.date]: # MODIFIED: Renamed 'state' argument to 'chosen_hub'
@@ -491,32 +538,6 @@ def check_modified_run_dates(adjusted_start_date: datetime.date, product_obj: di
     logger.debug("No applicable modified run date found.")
     return None
 
-def add_business_days(start_date, total_prod_days, closed_dates):
-    """
-    Split the range by commas, handle possible dash range (e.g. '4737-4895').
-    If 'postcode' is found or in range, return True.
-    """
-    postcodes = range_string.split(",")
-    for segment in postcodes:
-        segment = segment.strip()
-        if "-" in segment:
-            # e.g. "4737-4895"
-            start, end = segment.split("-")
-            # convert to int to compare numerically
-            try:
-                p = int(postcode)
-                s = int(start)
-                e = int(end)
-                if p >= s and p <= e:
-                    return True
-            except ValueError:
-                # if we can't parse as int, skip
-                continue
-        else:
-            # single postcode
-            if postcode == segment:
-                return True
-    return False
 
 # --------------------------------------------------------------------
 # Hub selection logic (Step 7)
@@ -653,6 +674,11 @@ def check_keywords(rule: Union[FinishingRule, CenterRule], description: str) -> 
     else:  # "any"
         return any(k in desc for k in keywords)
 
+def calculate_finishing_days_fallback(req: ScheduleRequest) -> int:
+     # Simple fallback if rules file fails - maybe add 1 day for common finishing?
+     logger.warning("Using fallback finishing days calculation (returning 0).")
+     return 0
+
 def calculate_finishing_days(req: ScheduleRequest, product_obj: dict, chosen_hub: str) -> int:
     """Calculate finishing days based on rules"""
     finishing_days = 0
@@ -754,28 +780,54 @@ def get_closed_dates_for_state(chosen_hub: str, cmyk_hubs: list[dict]) -> list[s
     # or maybe we also check if entry["State"].lower() == chosen_hub
     return []
 
-def add_business_days(start_date, days_to_add, closed_dates):
+def add_business_days(start_date: datetime.date, days_to_add: int, closed_dates: list[str]) -> Tuple[datetime.date, datetime.date]:
+    """
+    Adds business days to a start date, skipping weekends and closed dates.
+    Also adjusts the start_date forward if it falls on a non-business day.
+
+    Returns:
+        Tuple[datetime.date, datetime.date]: (adjusted_start_date, dispatch_date)
+    """
     current_date = start_date
+    logger.debug(f"[add_business_days] Initial start date: {start_date}, adding {days_to_add} days. Closed: {closed_dates}")
 
-    # Initial check to move forward if start_date is on a weekend or closed date
-    while current_date.weekday() in [5, 6] or str(current_date) in closed_dates:
+    # Adjust start_date forward if it's not a business day
+    while current_date.weekday() >= 5 or str(current_date) in closed_dates:
+        logger.debug(f"[add_business_days] Adjusting start date forward from {current_date} (Weekend or Closed)")
         current_date += timedelta(days=1)
 
-    adjusted_start_date = current_date  # Capture the adjusted start date
+    adjusted_start_date = current_date  # This is the actual first day of production
+    logger.debug(f"[add_business_days] Adjusted Start Date: {adjusted_start_date}")
 
-    days_count = 0
+    # Now add the required production days
+    days_counted = 0
+    dispatch_date = adjusted_start_date # Start counting from the adjusted start date
 
-    while days_count < days_to_add:
-        current_date += timedelta(days=1)
-        # skip weekends
-        if current_date.weekday() in [5, 6]:
+    # If days_to_add is 0, dispatch is the same as adjusted start date (after validation)
+    if days_to_add <= 0:
+         logger.debug(f"[add_business_days] Zero or negative days to add. Dispatch date is same as adjusted start date: {adjusted_start_date}")
+         return adjusted_start_date, adjusted_start_date
+
+
+    # Loop to add business days for dispatch calculation
+    # Start counting from the day *after* adjusted_start_date
+    current_check_date = adjusted_start_date
+    while days_counted < days_to_add:
+        current_check_date += timedelta(days=1)
+        if current_check_date.weekday() >= 5:  # Skip Saturday (5) and Sunday (6)
+            # logger.debug(f"[add_business_days] Skipping weekend: {current_check_date}")
             continue
-        # skip closed dates
-        if str(current_date) in closed_dates:
+        if str(current_check_date) in closed_dates:
+            # logger.debug(f"[add_business_days] Skipping closed date: {current_check_date}")
             continue
-        days_count += 1
+        days_counted += 1
+        # logger.debug(f"[add_business_days] Counted day {days_counted}: {current_check_date}")
 
-    return adjusted_start_date, current_date
+
+    dispatch_date = current_check_date # The final day is the dispatch date
+    logger.debug(f"[add_business_days] Final Dispatch Date: {dispatch_date}")
+
+    return adjusted_start_date, dispatch_date
 
 
 def find_cmyk_hub_id(chosen_hub: str, cmyk_hubs: list[dict]) -> int:

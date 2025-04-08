@@ -200,4 +200,66 @@ curl -X POST \
 printType 			
 1. Offset. 2. Digital, 3. Offset + Digital. 4. Wideformat
 
-			
+
+
+Example of how Overrides Work.
+
+Example 1: Run Moved Later (Mon -> Wed)
+Product: Runs Mondays, 12:00 Cutoff.
+Override: For this week, Monday run moved to Wednesday.
+Order In: Monday @ 10:00 AM
+Natural Run: Monday
+Override Found: Mon -> Wed
+Effective Run: Wednesday
+Cutoff Check: Mon 10:00 is before Wed -> OK for Wed run.
+Calculated Start Date: Wednesday
+Result: Order joins the Wednesday run.
+Order In: Tuesday @ 10:00 AM
+Natural Run: Monday (of this week)
+Override Found: Mon -> Wed
+Effective Run: Wednesday
+Cutoff Check: Tue 10:00 is before Wed -> OK for Wed run.
+Calculated Start Date: Wednesday
+Result: Order joins the Wednesday run.
+Order In: Wednesday @ 10:00 AM
+Natural Run: Monday (of this week)
+Override Found: Mon -> Wed
+Effective Run: Wednesday
+Cutoff Check: Wed 10:00 is before cutoff on the effective run date -> OK for Wed run.
+Calculated Start Date: Wednesday
+Result: Order joins the Wednesday run.
+Order In: Wednesday @ 2:00 PM (After Cutoff)
+Natural Run: Monday (of this week)
+Override Found: Mon -> Wed
+Effective Run: Wednesday
+Cutoff Check: Wed 14:00 is after cutoff on the effective run date -> Missed the run.
+Calculated Start Date: Next natural Monday.
+Result: Order scheduled for the following Monday.
+
+Example 2: Run Moved Earlier (Wed -> Mon)
+Product: Runs Wednesdays, 12:00 Cutoff.
+Override: For this week, Wednesday run moved to Monday.
+Order In: Monday @ 10:00 AM
+Natural Run: Wednesday
+Override Found: Wed -> Mon
+Effective Run: Monday
+Cutoff Check: Mon 10:00 is before cutoff on the effective run date -> OK for Mon run.
+Calculated Start Date: Monday
+Result: Order joins the Monday run.
+Order In: Monday @ 2:00 PM (After Cutoff)
+Natural Run: Wednesday
+Override Found: Wed -> Mon
+Effective Run: Monday
+Cutoff Check: Mon 14:00 is after cutoff on the effective run date -> Missed the run.
+Calculated Start Date: Next natural Wednesday.
+Result: Order scheduled for the following Wednesday.
+Order In: Tuesday @ 10:00 AM
+Natural Run: Wednesday
+Override Found: Wed -> Mon
+Effective Run: Monday
+Cutoff Check: Tuesday 10:00 is after the effective run date -> Missed the run.
+Calculated Start Date: Next natural Wednesday.
+Result: Order scheduled for the following Wednesday.
+
+
+If you set an print run override to a closed date , it will shift fwd to the first open date

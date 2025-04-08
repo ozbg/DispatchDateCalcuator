@@ -28,15 +28,7 @@
       "Friday"
     ],
     "Days_to_produce": 2,
-    "Modified_run_date": [
-      [
-        "2025-04-01",
-        "2025-04-23",
-        [
-          "vic"
-        ]
-      ]
-    ]
+    "Modified_run_date": []
   },
   "2": {
     "Product_Category": "Offset 450+ NV Branding Cards",
@@ -62,7 +54,15 @@
       "Friday"
     ],
     "Days_to_produce": 2,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-09",
+        "2025-04-10",
+        [
+          "vic"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -284,15 +284,7 @@
       "Monday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [
-      [
-        "2025-04-14",
-        "2025-04-16",
-        [
-          "vic"
-        ]
-      ]
-    ],
+    "Modified_run_date": [],
     "printTypes": [
       1
     ]

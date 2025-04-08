@@ -1,16 +1,16 @@
 [
   {
-    "CMHKhubID": 1,
-    "Closed_Dates": [],
     "Hub": "vic",
+    "State": "vic",
+    "CMHKhubID": 1,
+    "Timezone": "Australia/Melbourne",
     "Next_Best": [
       "nsw",
       "qld",
       "nqld",
       "wa"
     ],
-    "State": "vic",
-    "Timezone": "Australia/Melbourne"
+    "Closed_Dates": []
   },
   {
     "CMHKhubID": 1,
@@ -39,20 +39,20 @@
     "Timezone": "Australia/Melbourne"
   },
   {
-    "Hub": "nsw",
-    "State": "nsw",
     "CMHKhubID": 2,
-    "Timezone": "Australia/Sydney",
+    "Closed_Dates": [
+      "2025-03-14",
+      "2025-03-17"
+    ],
+    "Hub": "nsw",
     "Next_Best": [
       "vic",
       "qld",
       "nqld",
       "wa"
     ],
-    "Closed_Dates": [
-      "2025-03-14",
-      "2025-03-17"
-    ]
+    "State": "nsw",
+    "Timezone": "Australia/Sydney"
   },
   {
     "CMHKhubID": 2,
