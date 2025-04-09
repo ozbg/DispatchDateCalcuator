@@ -1,20 +1,26 @@
 [
   {
-    "Hub": "vic",
-    "State": "vic",
     "CMHKhubID": 1,
-    "Timezone": "Australia/Melbourne",
+    "Closed_Dates": [
+      "2025-04-18",
+      "2025-04-21"
+    ],
+    "Hub": "vic",
     "Next_Best": [
       "nsw",
       "qld",
       "nqld",
       "wa"
     ],
-    "Closed_Dates": []
+    "State": "vic",
+    "Timezone": "Australia/Melbourne"
   },
   {
     "CMHKhubID": 1,
-    "Closed_Dates": [],
+    "Closed_Dates": [
+      "2025-04-18",
+      "2025-04-21"
+    ],
     "Hub": "vic",
     "Next_Best": [
       "nsw",
@@ -27,7 +33,10 @@
   },
   {
     "CMHKhubID": 1,
-    "Closed_Dates": [],
+    "Closed_Dates": [
+      "2025-04-18",
+      "2025-04-21"
+    ],
     "Hub": "vic",
     "Next_Best": [
       "nsw",
@@ -41,8 +50,8 @@
   {
     "CMHKhubID": 2,
     "Closed_Dates": [
-      "2025-03-14",
-      "2025-03-17"
+      "2025-04-18",
+      "2025-04-21"
     ],
     "Hub": "nsw",
     "Next_Best": [
@@ -57,8 +66,8 @@
   {
     "CMHKhubID": 2,
     "Closed_Dates": [
-      "2025-03-14",
-      "2025-03-17"
+      "2025-04-18",
+      "2025-04-21"
     ],
     "Hub": "nsw",
     "Next_Best": [
@@ -72,7 +81,10 @@
   },
   {
     "CMHKhubID": 5,
-    "Closed_Dates": [],
+    "Closed_Dates": [
+      "2025-04-18",
+      "2025-04-21"
+    ],
     "Hub": "qld",
     "Next_Best": [
       "nqld",
@@ -85,7 +97,10 @@
   },
   {
     "CMHKhubID": 24,
-    "Closed_Dates": [],
+    "Closed_Dates": [
+      "2025-04-18",
+      "2025-04-21"
+    ],
     "Hub": "nqld",
     "Next_Best": [
       "qld",
@@ -97,21 +112,27 @@
     "Timezone": "Australia/Brisbane"
   },
   {
-    "CMHKhubID": 3,
-    "Closed_Dates": [],
     "Hub": "wa",
+    "State": "wa",
+    "CMHKhubID": 3,
+    "Timezone": "Australia/Perth",
     "Next_Best": [
       "vic",
       "nsw",
       "qld",
       "nqld"
     ],
-    "State": "wa",
-    "Timezone": "Australia/Perth"
+    "Closed_Dates": [
+      "2025-04-18",
+      "2025-04-21"
+    ]
   },
   {
     "CMHKhubID": 3,
-    "Closed_Dates": [],
+    "Closed_Dates": [
+      "2025-04-18",
+      "2025-04-21"
+    ],
     "Hub": "wa",
     "Next_Best": [
       "vic",
