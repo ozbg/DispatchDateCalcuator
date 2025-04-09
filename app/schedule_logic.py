@@ -386,10 +386,10 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     simulated_processing_time_str = simulated_time.strftime(time_format) if offset_hours != 0 else None
 
     # --- NEW: Handle Fallback Product 99 ---
-    dispatch_date_str = str(dispatch_date) # Convert date to string initially
+    dispatch_date_str: Optional[str] = str(dispatch_date) # Convert date to string initially, add Optional type hint
     if found_product_id == 99:
-        logger.warning("Fallback Product ID 99 detected. Setting dispatchDate to 'Unknown' and disabling auto hub transfer.")
-        dispatch_date_str = ""
+        logger.warning("Fallback Product ID 99 detected. Setting dispatchDate to null and disabling auto hub transfer.")
+        dispatch_date_str = None # Set to None, which serializes to null
         enable_auto_hub_transfer = 0
     # --- END NEW ---
 

@@ -181,7 +181,7 @@ class ScheduleResponse(BaseModel):
     # Dates
     startDate: str = Field(..., description="The initial calculated start date (YYYY-MM-DD) based on cutoff time (may be a weekend/holiday).")
     adjustedStartDate: str = Field(..., description="The actual start date (YYYY-MM-DD) after adjusting for weekends and closed dates.")
-    dispatchDate: str = Field(..., description="The calculated final dispatch date (YYYY-MM-DD) from the `adjustedStartDate` plus `totalProductionDays`, skipping weekends/closed dates.")
+    dispatchDate: Optional[str] = Field(None, description="The calculated final dispatch date (YYYY-MM-DD) from the `adjustedStartDate` plus `totalProductionDays`, skipping weekends/closed dates. Will be null for fallback product 99.") # MODIFIED: Changed to Optional[str] and updated description
 
     # Processing Info
     grainDirection: str = Field(..., description="Calculated grain direction ('Vertical', 'Horizontal', or 'Either').")
