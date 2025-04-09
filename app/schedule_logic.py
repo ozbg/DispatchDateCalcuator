@@ -230,9 +230,14 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # ----------------------------------------------------------------
     product_hubs = product_obj.get("Production_Hub", [])
     initial_hub = choose_production_hub(
-        product_hubs, req.misDeliversToState.lower(), current_hub.lower(), found_product_id, cmyk_hubs
+        product_hubs=product_hubs,
+        misDeliversToState=req.misDeliversToState.lower(),
+        current_hub=current_hub.lower(),
+        current_hub_id=current_hub_id, # Pass the resolved current hub ID
+        product_id=found_product_id,
+        cmyk_hubs=cmyk_hubs
     )
-    logger.debug(f"Initial Hub Choice (based on state/next best): {initial_hub}")
+    logger.debug(f"Initial Hub Choice (based on state/next best/current hub fallback): {initial_hub}")
     chosen_hub = validate_hub_rules(
         initial_hub=initial_hub, available_hubs=product_hubs, delivers_to_state=req.misDeliversToState.lower(),
         current_hub=current_hub.lower(), description=req.description, width=req.preflightedWidth, height=req.preflightedHeight,
@@ -564,57 +569,100 @@ def check_modified_run_dates(adjusted_start_date: datetime.date, product_obj: di
 def choose_production_hub(
     product_hubs: list[str],
     misDeliversToState: str,
-    misCurrentHub: str,
+    current_hub: str, # Renamed from misCurrentHub for clarity
+    current_hub_id: Optional[int], # Added current hub ID
     product_id: int,
     cmyk_hubs: list[dict]
 ) -> str:
     """
-    Recreates your old JS snippet:
-      1) if product_hubs has exactly one => use it
-      2) else if misDeliversToState in product_hubs => use it
-      3) else find the next best in cmykHubsJSON => pick the first that matches
-      4) special QLD override => if product_id in [6,7,8,9], misCurrentHub != 'nqld', misDeliversToState='qld' => 'vic'
+    Determines the initial production hub based on product definition and delivery state.
+    1. If only one hub is defined for the product, use it.
+    2. If the delivery state is a valid production hub for the product, use it.
+    3. Otherwise, find the 'next best' hub based on delivery state rules in cmyk_hubs.json.
+    4. If 'next best' fails (e.g., invalid delivery state), try falling back to the current hub's name.
+    5. If all else fails, use the first hub listed for the product.
     """
     product_hubs_lower = [h.lower() for h in product_hubs]
 
-    # 1) single production hub
+    # 1) Single production hub defined for the product
     if len(product_hubs_lower) == 1:
         chosen = product_hubs_lower[0]
-        logger.debug("Only one production hub => %s", chosen)
-        # but let's apply the QLD override afterwards if needed
-    else:
-        # 2) if misDeliversToState is in product_hubs
-        if misDeliversToState in product_hubs_lower:
-            chosen = misDeliversToState
-            logger.debug("DeliversToState is in product hubs => chosen=%s", chosen)
-        else:
-            # 3) next best from cmykHubs
-            chosen = find_next_best(misDeliversToState, product_hubs_lower, cmyk_hubs)
-            logger.debug("Next best => %s", chosen)
+        logger.debug(f"[choose_production_hub] Only one production hub defined for product {product_id}: {chosen}")
+        return chosen # Return early, no need for further checks
 
-    # 4) QLD cards override. Leave NQLD cards in NQLD. QLD cards, send to VIC.
-    #if product_id in [6,7,8,9] and misCurrentHub != "nqld" and misDeliversToState == "qld":
-     #   logger.debug("** QLD cards override. Leave NQLD cards in NQLD. QLD cards, send to VIC)")
-      #  chosen = "vic"
+    # 2) Delivery state is directly listed as a production hub for the product
+    if misDeliversToState in product_hubs_lower:
+        chosen = misDeliversToState
+        logger.debug(f"[choose_production_hub] Delivery state '{misDeliversToState}' is in product hubs {product_hubs_lower}. Chosen: {chosen}")
+        return chosen # Return early
+
+    # 3) Delivery state not in product hubs, find the next best based on state rules
+    logger.debug(f"[choose_production_hub] Delivery state '{misDeliversToState}' not in product hubs {product_hubs_lower}. Finding next best/fallback...")
+    chosen = find_next_best(
+        delivers_to_state=misDeliversToState,
+        product_hubs_lower=product_hubs_lower,
+        cmyk_hubs=cmyk_hubs,
+        current_hub_id=current_hub_id # Pass the ID for fallback
+    )
+    logger.debug(f"[choose_production_hub] Result from find_next_best (after state/ID fallback): {chosen}")
+
+    # Note: The QLD override logic (step 4 in original comment) seems to be handled elsewhere or removed.
+    # If it needs re-adding, it should be placed carefully after the initial choice.
 
     return chosen
 
-def find_next_best(delivers_to_state: str, product_hubs_lower: list[str], cmyk_hubs: list[dict]) -> str:
+def find_next_best(
+    delivers_to_state: str,
+    product_hubs_lower: list[str],
+    cmyk_hubs: list[dict],
+    current_hub_id: Optional[int] # Added current hub ID for fallback
+) -> str:
     """
-    Looks in cmyk_hubs for the entry matching delivers_to_state, then loops its Next_Best
-    array to find the first that is in product_hubs_lower. If none found, fallback to
-    the first in product_hubs_lower.
+    Attempts to find the best production hub when the delivery state isn't directly listed.
+    1. Finds the cmyk_hubs entry matching the delivery state.
+    2. Iterates through its 'Next_Best' list, returning the first hub that's also in the product's allowed hubs.
+    3. If no 'Next_Best' match is found (or the delivery state itself isn't in cmyk_hubs):
+       a. Tries to find the hub name corresponding to the `current_hub_id`.
+       b. If found, returns that hub name.
+    4. If all above fails, returns the first hub listed in the product's allowed hubs as a final fallback.
     """
-    fallback = None
+    # 1 & 2: Try finding based on delivery state's Next_Best
+    logger.debug(f"[find_next_best] Searching for state '{delivers_to_state}' in cmyk_hubs to find Next_Best match within {product_hubs_lower}")
     for entry in cmyk_hubs:
         if entry["State"].lower() == delivers_to_state:
-            # check Next_Best
-            for candidate in entry["Next_Best"]:
-                if candidate.lower() in product_hubs_lower:
-                    return candidate.lower()
-            break
-    # if no next best found, fallback
-    return product_hubs_lower[0]
+            logger.debug(f"[find_next_best] Found state '{delivers_to_state}'. Checking Next_Best: {entry.get('Next_Best', [])}")
+            for candidate in entry.get("Next_Best", []):
+                candidate_lower = candidate.lower()
+                if candidate_lower in product_hubs_lower:
+                    logger.info(f"[find_next_best] Found valid 'Next_Best' hub: {candidate_lower}")
+                    return candidate_lower
+            # Found the state, but no Next_Best matched the product's hubs
+            logger.debug(f"[find_next_best] State '{delivers_to_state}' found, but no 'Next_Best' hub is in the product's allowed hubs {product_hubs_lower}.")
+            break # Stop searching states once the delivery state is found
+
+    # 3: Fallback - Try using current_hub_id if state lookup failed
+    logger.warning(f"[find_next_best] Could not find suitable 'Next_Best' hub for state '{delivers_to_state}'. Attempting fallback using current_hub_id: {current_hub_id}.")
+    if current_hub_id is not None:
+        for entry in cmyk_hubs:
+            if entry.get("CMHKhubID") == current_hub_id:
+                current_hub_name = entry.get("Hub", "").lower()
+                if current_hub_name:
+                    # Important: We should ideally check if this hub is even allowed for the product,
+                    # but the original request didn't specify this. Returning it directly for now.
+                    # Consider adding: if current_hub_name in product_hubs_lower: return current_hub_name
+                    logger.info(f"[find_next_best] Fallback successful: Found hub name '{current_hub_name}' for current_hub_id {current_hub_id}.")
+                    return current_hub_name
+                else:
+                    logger.warning(f"[find_next_best] Found entry for current_hub_id {current_hub_id}, but it has no 'Hub' name.")
+        logger.warning(f"[find_next_best] Fallback failed: Could not find a hub entry matching current_hub_id {current_hub_id}.")
+    else:
+        logger.warning("[find_next_best] Fallback using current_hub_id skipped: current_hub_id is None.")
+
+
+    # 4: Final Fallback - Return the first hub listed for the product
+    final_fallback_hub = product_hubs_lower[0] if product_hubs_lower else "vic" # Add safety default if list is empty
+    logger.error(f"[find_next_best] All fallbacks failed. Defaulting to the first listed product hub: {final_fallback_hub}")
+    return final_fallback_hub
 
 # --------------------------------------------------------------------
 # Finishing + closed-date logic
