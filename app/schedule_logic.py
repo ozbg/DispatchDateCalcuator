@@ -385,6 +385,14 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     actual_processing_time_str = actual_time_hub_tz.strftime(time_format)
     simulated_processing_time_str = simulated_time.strftime(time_format) if offset_hours != 0 else None
 
+    # --- NEW: Handle Fallback Product 99 ---
+    dispatch_date_str = str(dispatch_date) # Convert date to string initially
+    if found_product_id == 99:
+        logger.warning("Fallback Product ID 99 detected. Setting dispatchDate to 'Unknown' and disabling auto hub transfer.")
+        dispatch_date_str = "Unknown"
+        enable_auto_hub_transfer = 0
+    # --- END NEW ---
+
     return ScheduleResponse(
         # Pass through request details + calculated values
         orderId=req.orderId,
@@ -413,7 +421,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         # Use the final calculated dates
         startDate=str(calculated_start_date), # The date *before* weekend/holiday adjustment
         adjustedStartDate=str(adjusted_start_date), # The date *after* weekend/holiday adjustment
-        dispatchDate=str(dispatch_date),
+        dispatchDate=dispatch_date_str, # Use the potentially overridden string value
 
         grainDirection=grain_str,
         orderQuantity=req.misOrderQTY,

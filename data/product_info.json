@@ -54,15 +54,7 @@
       "Friday"
     ],
     "Days_to_produce": 2,
-    "Modified_run_date": [
-      [
-        "2025-04-09",
-        "2025-04-10",
-        [
-          "vic"
-        ]
-      ]
-    ],
+    "Modified_run_date": [],
     "printTypes": [
       1
     ]

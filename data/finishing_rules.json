@@ -12,10 +12,12 @@
         "score"
       ],
       "excludeKeywords": [
-        "Folder"
+        "Folder",
+        "perfect"
       ],
       "matchType": "any",
-      "conditions": null
+      "conditions": null,
+      "caseSensitive": false
     },
     {
       "id": "round_corner",

@@ -178,18 +178,20 @@
     "Product_ID": 7
   },
   {
+    "Product_ID": 8,
+    "Match_All": [],
     "Exclude_All": [
       "Eco",
       "Knight",
       "Natural",
       "Coated 1 Side Board"
     ],
-    "Match_All": [],
     "Match_Any": [
       [
         "Matt Laminate 2S",
         "Matt Laminating 2S",
-        "2 sides Laminating Matt 2 Side"
+        "2 sides Laminating Matt 2 Side",
+        "Matt 2 Side"
       ],
       [
         "350gsm",
@@ -199,8 +201,7 @@
         "Branding",
         "BC"
       ]
-    ],
-    "Product_ID": 8
+    ]
   },
   {
     "Exclude_All": [
@@ -286,15 +287,15 @@
     "Product_ID": 12
   },
   {
-    "Product_ID": 13,
-    "Match_All": [],
     "Exclude_All": [],
+    "Match_All": [],
     "Match_Any": [
       [
         "Premium 2 Sided Linen",
         "Knight 2 Sided Linen"
       ]
-    ]
+    ],
+    "Product_ID": 13
   },
   {
     "Exclude_All": [],
@@ -421,21 +422,11 @@
   },
   {
     "Exclude_All": [
-      "UV",
-      "Variable",
-      "Bind",
-      "Mount",
       "Scodix",
       "Metal",
-      "Cover",
-      "Body",
-      "Perfect",
-      "Saddle",
-      "Bind",
-      "BC",
       "Branding",
       "Presentation",
-      "Mount"
+      "BC"
     ],
     "Match_All": [],
     "Match_Any": [
