@@ -389,7 +389,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     dispatch_date_str = str(dispatch_date) # Convert date to string initially
     if found_product_id == 99:
         logger.warning("Fallback Product ID 99 detected. Setting dispatchDate to 'Unknown' and disabling auto hub transfer.")
-        dispatch_date_str = "Unknown"
+        dispatch_date_str = ""
         enable_auto_hub_transfer = 0
     # --- END NEW ---
 
