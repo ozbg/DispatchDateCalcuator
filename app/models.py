@@ -157,6 +157,11 @@ class ScheduleResponse(BaseModel):
     orderDescription: Optional[str] = Field(None, description="The full description of the order item used for matching.")
     currentHub: str = Field(..., description="The resolved hub where the order originated (lowercase name).")
     currentHubId: int = Field(..., description="The resolved ID of the hub where the order originated.")
+    # --- NEW FIELDS ---
+    misDeliversToState: str = Field(..., description="The final delivery state used for hub selection (after overrides/postcode lookup).")
+    misDeliversToPostcode: str = Field(..., description="The delivery postcode for the order (passed from request).")
+    printType: int = Field(..., description="The print type ID provided in the request (1: Offset, 2: Digital, 3: Offset+Digital, 4: Wideformat).")
+    # --- END NEW FIELDS ---
     productId: int = Field(..., description="The matched product ID based on the description.")
     productGroup: str = Field(..., description="The group associated with the matched product ID.")
     productCategory: str = Field(..., description="The category associated with the matched product ID.")

@@ -404,6 +404,11 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         orderDescription=original_description, # Return original description
         currentHub=current_hub,
         currentHubId=current_hub_id,
+        # --- POPULATE NEW FIELDS ---
+        misDeliversToState=req.misDeliversToState, # Use the potentially modified state
+        misDeliversToPostcode=req.misDeliversToPostcode,
+        printType=req.printType,
+        # --- END POPULATE NEW FIELDS ---
         productId=found_product_id,
         productGroup=product_obj.get("Product_Group", "Unknown"),
         productCategory=product_obj.get("Product_Category", "Unknown"),

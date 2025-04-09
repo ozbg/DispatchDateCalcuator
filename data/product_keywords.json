@@ -178,14 +178,13 @@
     "Product_ID": 7
   },
   {
-    "Product_ID": 8,
-    "Match_All": [],
     "Exclude_All": [
       "Eco",
       "Knight",
       "Natural",
       "Coated 1 Side Board"
     ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Matt Laminate 2S",
@@ -201,7 +200,8 @@
         "Branding",
         "BC"
       ]
-    ]
+    ],
+    "Product_ID": 8
   },
   {
     "Exclude_All": [
@@ -279,7 +279,9 @@
     "Product_ID": 11
   },
   {
-    "Exclude_All": [],
+    "Exclude_All": [
+      "Roll"
+    ],
     "Match_All": [
       "Synthetic"
     ],
@@ -287,7 +289,9 @@
     "Product_ID": 12
   },
   {
-    "Exclude_All": [],
+    "Exclude_All": [
+      "Roll"
+    ],
     "Match_All": [],
     "Match_Any": [
       [
@@ -298,7 +302,9 @@
     "Product_ID": 13
   },
   {
-    "Exclude_All": [],
+    "Exclude_All": [
+      "Roll"
+    ],
     "Match_All": [
       "NaturalBoard"
     ],
@@ -317,9 +323,9 @@
       "adhesive",
       "Metallic Gold",
       "Metallic Sliver",
-      "BC",
       "Presentation",
-      "Mount"
+      "Mount",
+      "Roll"
     ],
     "Match_All": [],
     "Match_Any": [],
@@ -328,7 +334,8 @@
   {
     "Exclude_All": [
       "BC",
-      "Presentation"
+      "Presentation",
+      "Roll"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -652,7 +659,8 @@
   {
     "Exclude_All": [
       "Hi Bulk",
-      "Metallic"
+      "Metallic",
+      "Roll"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -753,8 +761,11 @@
     "Product_ID": 40
   },
   {
-    "Exclude_All": [],
+    "Product_ID": 41,
     "Match_All": [],
+    "Exclude_All": [
+      "Roll"
+    ],
     "Match_Any": [
       [
         "Knight",
@@ -765,8 +776,7 @@
         "BC",
         "Branding"
       ]
-    ],
-    "Product_ID": 41
+    ]
   },
   {
     "Exclude_All": [],
