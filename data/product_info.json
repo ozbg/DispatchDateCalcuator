@@ -378,7 +378,8 @@
     "Product_Group": "Digital Synthetic Print 1S or 2S with or without Laminating",
     "Product_ID": 12,
     "Production_Hub": [
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
