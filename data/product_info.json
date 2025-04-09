@@ -54,7 +54,15 @@
       "Friday"
     ],
     "Days_to_produce": 2,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-18",
+        "2025-04-23",
+        [
+          "vic"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -85,7 +93,15 @@
       "Friday"
     ],
     "Days_to_produce": 3,
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-04-18",
+        "2025-04-23",
+        [
+          "vic"
+        ]
+      ]
+    ]
   },
   "4": {
     "Product_Category": "Offset 450+ NV Branding Cards",
@@ -196,7 +212,19 @@
       "Thursday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-04-22",
+        "2025-04-24",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ]
   },
   "8": {
     "Product_Category": "Offset 350gsm Branding Cards",
@@ -252,7 +280,19 @@
       "Thursday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": []
+    "Modified_run_date": [
+      [
+        "2025-04-22",
+        "2025-04-24",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ]
   },
   "10": {
     "Product_Category": "Offset 450gsm Branding Card",
@@ -276,7 +316,19 @@
       "Monday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-21",
+        "2025-04-22",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -304,7 +356,19 @@
       "Thursday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-22",
+        "2025-04-24",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -487,7 +551,19 @@
       "Monday"
     ],
     "Days_to_produce": 4,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-21",
+        "2025-04-22",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -514,7 +590,19 @@
       "Monday"
     ],
     "Days_to_produce": 4,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-21",
+        "2025-04-22",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -602,7 +690,19 @@
       "Monday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-21",
+        "2025-04-22",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]
@@ -1255,7 +1355,19 @@
       "Monday"
     ],
     "Days_to_produce": 4,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-21",
+        "2025-04-22",
+        [
+          "nsw",
+          "vic",
+          "wa",
+          "qld",
+          "nqld"
+        ]
+      ]
+    ],
     "printTypes": [
       1,
       2,
