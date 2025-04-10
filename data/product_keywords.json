@@ -280,7 +280,8 @@
   },
   {
     "Exclude_All": [
-      "Roll"
+      "Roll Label",
+      "Roll-Label"
     ],
     "Match_All": [
       "Synthetic"
@@ -290,7 +291,8 @@
   },
   {
     "Exclude_All": [
-      "Roll"
+      "Roll Label",
+      "Roll-Label"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -303,7 +305,8 @@
   },
   {
     "Exclude_All": [
-      "Roll"
+      "Roll Label",
+      "Roll-Label"
     ],
     "Match_All": [
       "NaturalBoard"
@@ -325,7 +328,8 @@
       "Metallic Sliver",
       "Presentation",
       "Mount",
-      "Roll"
+      "Roll-Label",
+      "Roll Label"
     ],
     "Match_All": [],
     "Match_Any": [],
@@ -335,7 +339,8 @@
     "Exclude_All": [
       "BC",
       "Presentation",
-      "Roll"
+      "Roll Label",
+      "Roll-Label"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -631,7 +636,8 @@
   {
     "Exclude_All": [
       "Synthetic",
-      "Roll"
+      "Roll Label",
+      "Roll-Label"
     ],
     "Match_All": [],
     "Match_Any": [
@@ -657,19 +663,20 @@
     "Product_ID": 33
   },
   {
+    "Product_ID": 34,
+    "Match_All": [],
     "Exclude_All": [
       "Hi Bulk",
       "Metallic",
-      "Roll"
+      "Roll Label",
+      "Roll-Label"
     ],
-    "Match_All": [],
     "Match_Any": [
       [
         "Scodix",
         "Metal"
       ]
-    ],
-    "Product_ID": 34
+    ]
   },
   {
     "Exclude_All": [],
@@ -761,11 +768,11 @@
     "Product_ID": 40
   },
   {
-    "Product_ID": 41,
-    "Match_All": [],
     "Exclude_All": [
-      "Roll"
+      "Roll-Label",
+      "Roll Label"
     ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Knight",
@@ -776,7 +783,8 @@
         "BC",
         "Branding"
       ]
-    ]
+    ],
+    "Product_ID": 41
   },
   {
     "Exclude_All": [],

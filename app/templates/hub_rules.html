@@ -183,34 +183,25 @@
         </div>
     </div>
 
-    <!-- Size Constraints Section (No Change) -->
-    <div class="form-section">
-        <h4>Size Constraints (Optional)</h4>
-        <!-- ... Instruction Box ... -->
-         <div class="instruction-box">
-            <p class="info-text">If dimensions are set, the rule excludes this hub if the order's preflighted size (W x H or H x W) exceeds BOTH Max Width and Max Height specified here.</p>
-         </div>
-        <div class="form-group inline-group">
-            <div>
-                <label>Max Width (mm):</label>
-                <input type="number" id="maxWidth" step="0.1" class="form-control short-input">
-            </div>
-             <div>
-                <label>Max Height (mm):</label>
-                <input type="number" id="maxHeight" step="0.1" class="form-control short-input">
-            </div>
-        </div>
-    </div>
-
     <!-- Order Matching Requirements Section (Updated) -->
     <div class="form-section">
         <h4>Order Matching Requirements (Optional - All must be met)</h4>
-         <div class="info-text">
-            If any criteria here are met (AND logic), and the size constraint (if set) is also met, the rule excludes this hub.
-            However, if the Product ID is in the 'Exclude Product IDs' list, this rule will NOT exclude the hub, even if other criteria match.
-         </div>
+             <small style="flex-basis: 100%; margin-top: 5px;">Rule applies if order size (W x H or H x W) exceeds BOTH dimensions.</small>
+    <!-- Size Constraints Section (Moved into Order Matching) -->
+         <!-- End Size Constraints -->
+
 
         <div class="matching-grid"> <!-- Use grid for better layout -->
+            <!-- Size Constraints (Moved Here) -->
+             <div class="form-group">
+                <label for="maxWidth">Max Width (mm):</label>
+                <input type="number" id="maxWidth" placeholder="e.g., 1000" class="form-control">
+             </div>
+             <div class="form-group">
+                <label for="maxHeight">Max Height (mm):</label>
+                <input type="number" id="maxHeight" placeholder="e.g., 700" class="form-control">
+             </div>
+
             <!-- Quantity -->
              <div class="form-group">
                 <label for="minQuantity">Min Quantity:</label>
@@ -464,17 +455,16 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
   }
 
   function resetForm() {
-    document.getElementById('ruleId').value = '';
-    document.getElementById('description').value = '';
-    document.getElementById('hubId').value = ''; // Default to empty or a specific value like 'vic'
-    document.getElementById('priority').value = 0;
-    document.getElementById('enabled').checked = true;
     document.getElementById('startDate').value = '';
     document.getElementById('endDate').value = '';
-    document.getElementById('maxWidth').value = '';
-    document.getElementById('maxHeight').value = '';
-    document.getElementById('minQuantity').value = ''; // Added minQuantity reset
+    // Add null checks before accessing value
+    const maxWidthInput = document.getElementById('maxWidth');
+    if (maxWidthInput) maxWidthInput.value = ''; // Keep this line with check
+    const maxHeightInput = document.getElementById('maxHeight');
+    if (maxHeightInput) maxHeightInput.value = ''; // Keep this line with check
+    document.getElementById('minQuantity').value = '';
     document.getElementById('maxQuantity').value = '';
+    // Removed duplicate lines below
 
     // Clear all tag inputs and containers
     const tagInputs = [
@@ -530,8 +520,10 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
 
     // Size Constraints
     if (rule.sizeConstraints) {
-      document.getElementById('maxWidth').value = rule.sizeConstraints.maxWidth ?? '';
-      document.getElementById('maxHeight').value = rule.sizeConstraints.maxHeight ?? '';
+      const maxWidthInput = document.getElementById('maxWidth');
+      if (maxWidthInput) maxWidthInput.value = rule.sizeConstraints.maxWidth ?? '';
+      const maxHeightInput = document.getElementById('maxHeight');
+      if (maxHeightInput) maxHeightInput.value = rule.sizeConstraints.maxHeight ?? '';
     }
 
     // Order Criteria

@@ -5,7 +5,7 @@
       "description": "QLD Digital Only",
       "hubId": "nqld",
       "priority": 1,
-      "enabled": true,
+      "enabled": false,
       "startDate": null,
       "endDate": null,
       "sizeConstraints": null,
@@ -50,6 +50,24 @@
       "sizeConstraints": {
         "maxWidth": 437,
         "maxHeight": 310
+      },
+      "orderCriteria": {
+        "printTypes": [
+          2
+        ]
+      }
+    },
+    {
+      "id": "hub_rule_1744259127651_or6qw",
+      "description": "bundles test",
+      "hubId": "qld",
+      "priority": 0,
+      "enabled": true,
+      "startDate": null,
+      "endDate": null,
+      "sizeConstraints": {
+        "maxWidth": 500,
+        "maxHeight": 400
       },
       "orderCriteria": {
         "printTypes": [
