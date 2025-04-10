@@ -20,6 +20,42 @@
           1
         ]
       }
+    },
+    {
+      "id": "hub_rule_1744243060046_w1la5",
+      "description": "Exceeds QLD Digital Size",
+      "hubId": "qld",
+      "priority": 0,
+      "enabled": true,
+      "startDate": null,
+      "endDate": null,
+      "sizeConstraints": {
+        "maxWidth": 437,
+        "maxHeight": 310
+      },
+      "orderCriteria": {
+        "printTypes": [
+          2
+        ]
+      }
+    },
+    {
+      "id": "hub_rule_1744243619482_3j91w",
+      "description": "Exceeds NQLD Digital Size",
+      "hubId": "nqld",
+      "priority": 0,
+      "enabled": true,
+      "startDate": null,
+      "endDate": null,
+      "sizeConstraints": {
+        "maxWidth": 437,
+        "maxHeight": 310
+      },
+      "orderCriteria": {
+        "printTypes": [
+          2
+        ]
+      }
     }
   ]
 }

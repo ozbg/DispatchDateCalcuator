@@ -1,5 +1,5 @@
 # app/hub_selection.py
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional, Union, Set
 from datetime import datetime
 from pathlib import Path
 import json
@@ -42,7 +42,7 @@ def load_hub_rules() -> List[HubSelectionRule]:
 
     for r_idx, r_data in enumerate(rules_data):
         rule_id_log = r_data.get('id', f'RuleAtIndex_{r_idx}')
-        logger.debug(f"Processing rule {rule_id_log}")
+        # logger.debug(f"Processing rule {rule_id_log}") # Verbose
 
         # --- Parse Size Constraints ---
         size_c = None
@@ -90,6 +90,7 @@ def load_hub_rules() -> List[HubSelectionRule]:
                 orderCriteria=order_c,
                 startDate=r_data.get("startDate"),
                 endDate=r_data.get("endDate")
+                # Legacy fields are ignored during parsing now
             )
             if not rule_obj.id or not rule_obj.hubId:
                  logger.error(f"Skipping rule due to missing ID or hubId: {r_data}")
@@ -108,9 +109,9 @@ def check_size_constraints(width: float, height: float, constraints: HubSizeCons
     Check if dimensions fit within constraints in either orientation.
     Returns True if dimensions are acceptable, False if they exceed constraints.
     """
-    logger.debug(f"Checking size constraints for dimensions {width}x{height} with constraints {constraints}")
+    # logger.debug(f"Checking size constraints for dimensions {width}x{height} with constraints {constraints}") # Verbose
     if not constraints or (constraints.maxWidth is None and constraints.maxHeight is None):
-        logger.debug("No specific size constraints defined; automatically acceptable")
+        # logger.debug("No specific size constraints defined; automatically acceptable") # Verbose
         return True
     if constraints.maxWidth is None or constraints.maxHeight is None:
          logger.warning(f"Partial size constraints defined for {constraints}, may lead to unexpected behavior. Both maxWidth and maxHeight should be set.")
@@ -165,220 +166,395 @@ def check_dates(rule: Union[HubSelectionRule, ImposingRule, PreflightRule]) -> b
     # logger.debug(f"Rule {rule_id} date validity: {is_valid}") # Verbose
     return is_valid
 
+# ------------------------------------------------------------------------
+# 2) CHOOSE INITIAL PRODUCTION HUB (Moved from schedule_logic.py)
+# ------------------------------------------------------------------------
+def find_next_best(
+    delivers_to_state: str,
+    product_hubs_lower: list[str],
+    cmyk_hubs: list[dict],
+    current_hub_id: Optional[int] # Added current hub ID for fallback
+) -> str:
+    """
+    Attempts to find the best production hub when the delivery state isn't directly listed.
+    1. Finds the cmyk_hubs entry matching the delivery state.
+    2. Iterates through its 'Next_Best' list, returning the first hub that's also in the product's allowed hubs.
+    3. If no 'Next_Best' match is found (or the delivery state itself isn't in cmyk_hubs):
+       a. Tries to find the hub name corresponding to the `current_hub_id`.
+       b. If found and allowed for the product, returns that hub name.
+    4. If all above fails, returns the first hub listed in the product's allowed hubs as a final fallback.
+    """
+    # 1 & 2: Try finding based on delivery state's Next_Best
+    logger.debug(f"[find_next_best] Searching for state '{delivers_to_state}' in cmyk_hubs to find Next_Best match within {product_hubs_lower}")
+    state_hub_config = next((entry for entry in cmyk_hubs if entry["State"].lower() == delivers_to_state.lower()), None)
 
-# ... (get_equipment_data, check_equipment_requirements - if still needed) ...
+    if state_hub_config:
+        logger.debug(f"[find_next_best] Found state '{delivers_to_state}'. Checking Next_Best: {state_hub_config.get('Next_Best', [])}")
+        for candidate in state_hub_config.get("Next_Best", []):
+            candidate_lower = candidate.lower()
+            if candidate_lower in product_hubs_lower:
+                logger.info(f"[find_next_best] Found valid 'Next_Best' hub via state config: {candidate_lower}")
+                return candidate_lower
+        # Found the state, but no Next_Best matched the product's hubs
+        logger.debug(f"[find_next_best] State '{delivers_to_state}' found, but no 'Next_Best' hub is in the product's allowed hubs {product_hubs_lower}.")
+    else:
+        logger.debug(f"[find_next_best] State '{delivers_to_state}' not found in cmyk_hubs config.")
+
+
+    # 3: Fallback - Try using current_hub_id if state lookup failed
+    logger.warning(f"[find_next_best] Could not find suitable 'Next_Best' hub for state '{delivers_to_state}'. Attempting fallback using current_hub_id: {current_hub_id}.")
+    if current_hub_id is not None:
+        current_hub_config = next((entry for entry in cmyk_hubs if entry.get("CMHKhubID") == current_hub_id), None)
+        if current_hub_config:
+            current_hub_name = current_hub_config.get("Hub", "").lower()
+            if current_hub_name and current_hub_name in product_hubs_lower:
+                logger.info(f"[find_next_best] Fallback successful: Found hub name '{current_hub_name}' for current_hub_id {current_hub_id} and it is allowed for the product.")
+                return current_hub_name
+            elif current_hub_name:
+                 logger.warning(f"[find_next_best] Fallback found hub name '{current_hub_name}' for ID {current_hub_id}, but it's NOT in allowed product hubs {product_hubs_lower}.")
+            else:
+                logger.warning(f"[find_next_best] Found entry for current_hub_id {current_hub_id}, but it has no 'Hub' name.")
+        else:
+             logger.warning(f"[find_next_best] Fallback failed: Could not find a hub entry matching current_hub_id {current_hub_id}.")
+    else:
+        logger.warning("[find_next_best] Fallback using current_hub_id skipped: current_hub_id is None.")
+
+
+    # 4: Final Fallback - Return the first hub listed for the product
+    if product_hubs_lower:
+        final_fallback_hub = product_hubs_lower[0]
+        logger.error(f"[find_next_best] All fallbacks failed. Defaulting to the first listed product hub: {final_fallback_hub}")
+        return final_fallback_hub
+    else:
+        # Absolute last resort if product has no hubs defined (should not happen with fallback product)
+        logger.error("[find_next_best] CRITICAL FALLBACK: Product has no defined hubs. Defaulting to 'vic'.")
+        return "vic"
+
+
+def choose_production_hub(
+    product_hubs: list[str],
+    misDeliversToState: str,
+    current_hub: str, # The resolved current hub name (lowercase)
+    current_hub_id: Optional[int], # The resolved current hub ID
+    product_id: int,
+    cmyk_hubs: list[dict]
+) -> str:
+    """
+    Determines the *initial* candidate production hub based on product definition,
+    delivery state, and current hub location. This choice will then be validated.
+
+    1. If only one hub is defined for the product, use it.
+    2. If the delivery state is a valid production hub for the product, use it.
+    3. Otherwise, find the 'next best' hub using find_next_best helper.
+    4. Apply QLD cards override if applicable (specific product IDs, not NQLD, delivering to QLD).
+    """
+    logger.debug(f"[choose_production_hub] Choosing initial hub. ProductHubs: {product_hubs}, DeliversTo: {misDeliversToState}, CurrentHub: {current_hub}, ProductID: {product_id}")
+    product_hubs_lower = [h.lower() for h in product_hubs]
+    delivers_to_lower = misDeliversToState.lower()
+    current_hub_lower = current_hub.lower()
+
+    # Handle case where product_hubs might be empty (shouldn't happen with fallback)
+    if not product_hubs_lower:
+        logger.error(f"[choose_production_hub] Product ID {product_id} has no Production_Hub defined. Defaulting to 'vic'.")
+        return "vic"
+
+    # 1) Single production hub defined for the product
+    if len(product_hubs_lower) == 1:
+        chosen = product_hubs_lower[0]
+        logger.debug(f"[choose_production_hub] Only one production hub defined: {chosen}")
+    # 2) Delivery state is directly listed as a production hub for the product
+    elif delivers_to_lower in product_hubs_lower:
+        chosen = delivers_to_lower
+        logger.debug(f"[choose_production_hub] Delivery state '{chosen}' is in product hubs.")
+    # 3) Delivery state not in product hubs, find the next best
+    else:
+        logger.debug(f"[choose_production_hub] Delivery state '{delivers_to_lower}' not in product hubs {product_hubs_lower}. Finding next best...")
+        chosen = find_next_best(
+            delivers_to_state=delivers_to_lower,
+            product_hubs_lower=product_hubs_lower,
+            cmyk_hubs=cmyk_hubs,
+            current_hub_id=current_hub_id
+        )
+        logger.debug(f"[choose_production_hub] Result from find_next_best: {chosen}")
+
+    # 4) Apply QLD cards override *after* the initial choice
+    # Product IDs 6, 7, 8, 9 are Business Cards (Gloss, Matt, Uncoated, Premium Uncoated)
+    if product_id in [6, 7, 8, 9] and current_hub_lower != "nqld" and delivers_to_lower == "qld":
+        # If the order originates outside NQLD but delivers to QLD, force it to VIC
+        logger.info(f"Applying QLD cards override (Product ID {product_id}, Current Hub {current_hub}, DeliversTo {misDeliversToState}). Overriding initial choice '{chosen}' with 'vic'.")
+        chosen = "vic"
+    # else: # No need for else log, default behaviour is keeping 'chosen'
+    #      logger.debug(f"QLD override conditions not met. Keeping initial choice: {chosen}")
+
+    logger.info(f"[choose_production_hub] Initial hub choice determined: {chosen}")
+    return chosen
 
 
 # ------------------------------------------------------------------------
-# 2) FIND NEXT BEST HUB
+# 3) GENERATE HUB PREFERENCE LIST (NEW HELPER)
 # ------------------------------------------------------------------------
-def find_next_best_hub(
-    excluded_hub: str, # Renamed from current_hub for clarity
+def generate_hub_preference_list(
+    initial_hub: str,
     available_hubs: List[str],
     delivers_to_state: str,
     cmyk_hubs: List[dict]
-) -> str:
+) -> List[str]:
     """
-    Find the "next best" hub from the CMYK hubs list for the given state or the excluded hub.
+    Generates an ordered list of hubs to try for validation, starting with the
+    initial hub, then following Next_Best logic (state, then initial hub's config),
+    and finally adding any remaining available hubs.
+    Ensures no duplicates and all hubs are lowercase.
     """
-    logger.debug(f"Finding next best hub after excluding: {excluded_hub}, available hubs: {available_hubs}, state: {delivers_to_state}")
+    preference_list: List[str] = []
+    # Use a set for quick lookups and ensuring available hubs are lowercase and unique
+    available_hubs_set: Set[str] = {h.lower() for h in available_hubs if h}
+    initial_hub_lower = initial_hub.lower()
+    delivers_to_state_lower = delivers_to_state.lower()
 
-    available_hubs_lower = [h.lower() for h in available_hubs if h.lower() != excluded_hub.lower()] # Exclude the one we are replacing
-    if not available_hubs_lower:
-        logger.warning(f"No alternative hubs available after excluding {excluded_hub}. Returning original excluded hub.")
-        return excluded_hub.lower() # Fallback if no others are possible
+    # Function to safely add a hub if it's available and not already added
+    def add_hub(hub: str):
+        hub_lower = hub.lower()
+        if hub_lower in available_hubs_set and hub_lower not in preference_list:
+            preference_list.append(hub_lower)
 
-    # Try finding the config for the *delivers_to_state* first
-    state_hub_config = next((h for h in cmyk_hubs if h["State"].lower() == delivers_to_state.lower()), None)
+    # 1. Start with the initial hub
+    add_hub(initial_hub_lower)
+
+    # 2. Add hubs from the delivery state's Next_Best list
+    state_hub_config = next((h for h in cmyk_hubs if h["State"].lower() == delivers_to_state_lower), None)
     if state_hub_config and state_hub_config.get("Next_Best"):
-        logger.debug(f"Using Next_Best list for state '{delivers_to_state}': {state_hub_config['Next_Best']}")
+        logger.debug(f"Adding Next_Best hubs from state '{delivers_to_state_lower}' config: {state_hub_config['Next_Best']}")
         for candidate in state_hub_config["Next_Best"]:
-            if candidate.lower() in available_hubs_lower:
-                logger.debug(f"Found valid next best hub: {candidate.lower()} from state config.")
-                return candidate.lower()
+            add_hub(candidate)
 
-    # If state config didn't yield a result, try the config for the *excluded_hub*
-    excluded_hub_config = next((h for h in cmyk_hubs if h["Hub"].lower() == excluded_hub.lower()), None)
-    if excluded_hub_config and excluded_hub_config.get("Next_Best"):
-         logger.debug(f"Using Next_Best list for excluded hub '{excluded_hub}': {excluded_hub_config['Next_Best']}")
-         for candidate in excluded_hub_config["Next_Best"]:
-             if candidate.lower() in available_hubs_lower:
-                 logger.debug(f"Found valid next best hub: {candidate.lower()} from excluded hub config.")
-                 return candidate.lower()
+    # 3. Add hubs from the initial hub's Next_Best list (if different from state config)
+    #    This covers cases where the initial hub isn't the primary state hub.
+    initial_hub_config = next((h for h in cmyk_hubs if h["Hub"].lower() == initial_hub_lower), None)
+    if initial_hub_config and initial_hub_config.get("Next_Best"):
+         # Avoid logging if it's the same config as the state one already processed
+         if not (state_hub_config and state_hub_config["Hub"].lower() == initial_hub_config["Hub"].lower()):
+              logger.debug(f"Adding Next_Best hubs from initial hub '{initial_hub_lower}' config: {initial_hub_config['Next_Best']}")
+         for candidate in initial_hub_config["Next_Best"]:
+             add_hub(candidate)
 
-    # If neither config yielded a result, return the first remaining available hub
-    chosen_fallback = available_hubs_lower[0]
-    logger.debug(f"No specific next best hub found, using first available alternative: {chosen_fallback}")
-    return chosen_fallback
+    # 4. Add any remaining available hubs not already in the list
+    #    Iterate through the original available_hubs to maintain some semblance of original order if possible
+    remaining_hubs = [h for h in available_hubs if h.lower() not in preference_list]
+    if remaining_hubs:
+        logger.debug(f"Adding remaining available hubs: {remaining_hubs}")
+        for hub in remaining_hubs:
+            add_hub(hub) # add_hub handles check for availability and duplicates
+
+    # Ensure the list is not empty if there were available hubs
+    if not preference_list and available_hubs_set:
+        logger.warning(f"Preference list was empty, but available hubs exist ({available_hubs_set}). Populating with available hubs.")
+        preference_list.extend(list(available_hubs_set))
+
+    logger.debug(f"Generated Hub Preference List: {preference_list}")
+    return preference_list
 
 
 # ------------------------------------------------------------------------
-# 3) VALIDATE HUB RULES (Revised Logic)
+# 4) VALIDATE HUB RULES (Revised Iterative Logic)
 # ------------------------------------------------------------------------
 def validate_hub_rules(
     initial_hub: str,
     available_hubs: List[str],
     delivers_to_state: str,
-    current_hub: str, # The original hub from the request
+    # --- Order details needed for criteria checks ---
     description: str,
     width: float,
     height: float,
     quantity: int,
     product_id: int,
-    product_group: str,
+    product_group: str, # Added product_group
     print_type: int,
+    # --- Config data ---
     cmyk_hubs: List[dict],
 ) -> str:
     """
-    Validates hub rules to potentially exclude the initial_hub.
-    Rules are checked by priority. The first rule that matches its criteria
-    (and is not overridden by excludeProductIds) will trigger exclusion.
+    Validates potential production hubs against defined rules iteratively.
+    Starts with the initial_hub, then checks hubs from a generated preference list.
+    Returns the first hub that passes all applicable rules.
+    If no hub passes, returns the first hub from the preference list as a fallback.
     """
-    logger.debug(f"Starting hub rule validation. Initial Hub: {initial_hub}, Available: {available_hubs}, Current Hub: {current_hub}")
+    logger.info(f"--- Starting Iterative Hub Rule Validation ---")
+    logger.debug(f"Initial Hub: {initial_hub}, Available: {available_hubs}, DeliversTo: {delivers_to_state}, ProductID: {product_id}, Qty: {quantity}, Size: {width}x{height}")
+
     rules = load_hub_rules()
-    rules.sort(key=lambda x: getattr(x, 'priority', 0), reverse=True) # Use getattr for safety
-    logger.debug(f"Loaded and sorted {len(rules)} hub rules.")
+    # Sort rules by priority (highest first)
+    rules.sort(key=lambda x: getattr(x, 'priority', 0), reverse=True)
+    logger.debug(f"Loaded and sorted {len(rules)} hub rules by priority.")
 
-    for rule in rules:
-        rule_id = getattr(rule, 'id', 'Unknown') # Safe access to ID
-        # logger.debug(f"Evaluating Rule ID: {rule_id}, Priority: {getattr(rule, 'priority', 0)} for Hub: {getattr(rule, 'hubId', 'N/A')}") # Verbose
+    # Generate the ordered list of hubs to try
+    potential_hubs_to_try = generate_hub_preference_list(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
+    logger.info(f"Hub preference list for validation: {potential_hubs_to_try}")
 
-        # --- Basic Rule Checks ---
-        if not getattr(rule, 'enabled', False):
-            # logger.debug(f"Skipping rule {rule_id} (disabled).")
-            continue
+    if not potential_hubs_to_try:
+        logger.error("Cannot validate hubs: No potential hubs generated (available_hubs might be empty). Falling back to 'vic'.")
+        return "vic" # Absolute fallback
 
-        if getattr(rule, 'hubId', '').lower() != initial_hub.lower():
-            # logger.debug(f"Skipping rule {rule_id} (Rule hub '{getattr(rule, 'hubId', '')}' != Initial hub '{initial_hub}').")
-            continue
+    excluded_by_rule = {} # Store {hub_name: rule_id} for logging
 
-        if not check_dates(rule):
-            logger.debug(f"Skipping rule {rule_id} (outside valid date range).")
-            continue
+    # Iterate through the preferred hubs
+    for hub_candidate in potential_hubs_to_try:
+        logger.info(f"--- Validating Hub Candidate: {hub_candidate} ---")
+        is_candidate_valid = True # Assume valid until a rule excludes it
 
-        logger.debug(f"--- Checking Rule ID: {rule_id} ---")
+        # Check this candidate against all applicable rules
+        for rule in rules:
+            rule_id = getattr(rule, 'id', 'Unknown')
 
-        # --- Determine if Exclusion Conditions are Met ---
-        rule_would_exclude = False # Reset for each rule
+            # --- Basic Rule Checks ---
+            if not getattr(rule, 'enabled', False):
+                # logger.debug(f"Skipping rule {rule_id} (disabled).") # Verbose
+                continue
 
-        # A) Check Size Constraints
-        size_criteria_met_for_exclusion = False
-        if rule.sizeConstraints:
-            if not check_size_constraints(width, height, rule.sizeConstraints):
-                size_criteria_met_for_exclusion = True
-                logger.debug(f"Rule '{rule_id}': Size condition MET for exclusion.")
+            # Check if rule applies specifically TO this hub candidate
+            if getattr(rule, 'hubId', '').lower() != hub_candidate.lower():
+                # logger.debug(f"Skipping rule {rule_id} (Rule hub '{getattr(rule, 'hubId', '')}' != Candidate '{hub_candidate}').") # Verbose
+                continue
+
+            # Check date range AFTER confirming the rule applies to this hub
+            if not check_dates(rule):
+                logger.debug(f"Skipping rule {rule_id} for hub {hub_candidate} (outside valid date range).")
+                continue
+
+            logger.debug(f"Evaluating Rule ID: {rule_id} (Priority: {getattr(rule, 'priority', 0)}) against Hub: {hub_candidate}")
+
+            # --- Determine if Exclusion Conditions are Met for THIS rule ---
+            rule_would_exclude = False
+            size_constraint_defined = rule.sizeConstraints is not None
+            order_criteria_defined = rule.orderCriteria is not None
+
+            # A) Check Size Constraints (only if defined)
+            size_criteria_met_for_exclusion = False
+            if size_constraint_defined:
+                if not check_size_constraints(width, height, rule.sizeConstraints):
+                    size_criteria_met_for_exclusion = True
+                    logger.debug(f"Rule '{rule_id}': Size condition MET for potential exclusion of {hub_candidate}.")
+                # else: # Verbose
+                #      logger.debug(f"Rule '{rule_id}': Size condition NOT MET for {hub_candidate}.")
+
+            # B) Check Order Criteria (only if defined)
+            order_criteria_met_for_exclusion = False
+            if order_criteria_defined:
+                criteria = rule.orderCriteria
+                criteria_defined = False # Track if any specific order criteria were actually checked
+                all_positive_conditions_met = True # Assume true until a positive condition fails
+                desc_lower = description.lower()
+                pg_lower = product_group.lower() # Use lowercase product group
+
+                # Check *positive* criteria first (those that *must* be true)
+                if criteria.minQuantity is not None:
+                    criteria_defined = True
+                    if not (quantity >= criteria.minQuantity): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: MinQ fail ({quantity} < {criteria.minQuantity})")
+                if all_positive_conditions_met and criteria.maxQuantity is not None:
+                     criteria_defined = True
+                     if not (quantity <= criteria.maxQuantity): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: MaxQ fail ({quantity} > {criteria.maxQuantity})")
+                if all_positive_conditions_met and criteria.productIds:
+                    criteria_defined = True
+                    if product_id not in criteria.productIds: all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: ProdID fail ({product_id} not in {criteria.productIds})")
+                if all_positive_conditions_met and criteria.keywords:
+                    criteria_defined = True
+                    if not any(kw.lower() in desc_lower for kw in criteria.keywords): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: Keywords fail (None of {criteria.keywords} in desc)")
+                if all_positive_conditions_met and criteria.printTypes:
+                    criteria_defined = True
+                    if print_type not in criteria.printTypes: all_positive_conditions_met = False; logger.debug(f"Rule {rule.id}: PrintType fail ({print_type} not in {criteria.printTypes})")
+                if all_positive_conditions_met and criteria.productGroups:
+                    criteria_defined = True
+                    if not any(pg.lower() == pg_lower for pg in criteria.productGroups): all_positive_conditions_met = False; logger.debug(f"Rule {rule.id}: ProductGroup fail ('{pg_lower}' not in {criteria.productGroups})")
+
+
+                # Check *negative* criteria (those that must *not* be true)
+                if all_positive_conditions_met and criteria.excludeKeywords:
+                    criteria_defined = True # Still counts as defined criteria
+                    if any(kw.lower() in desc_lower for kw in criteria.excludeKeywords): all_positive_conditions_met = False; logger.debug(f"Rule '{rule_id}': ExclKeywords fail (Found one of {criteria.excludeKeywords} in desc)")
+                if all_positive_conditions_met and criteria.excludeProductGroups:
+                     criteria_defined = True
+                     if any(pg.lower() == pg_lower for pg in criteria.excludeProductGroups): all_positive_conditions_met = False; logger.debug(f"Rule '{rule_id}': ExclProductGroup fail ('{pg_lower}' is in {criteria.excludeProductGroups})")
+                # excludeProductIds is handled separately as an override below
+
+                if criteria_defined and all_positive_conditions_met:
+                    order_criteria_met_for_exclusion = True
+                    logger.debug(f"Rule '{rule_id}': Order criteria MET for potential exclusion of {hub_candidate}.")
+                elif criteria_defined:
+                    # logger.debug(f"Rule '{rule_id}': Order criteria NOT MET for {hub_candidate}.") # Verbose
+                    pass # Condition didn't match, rule doesn't exclude based on order criteria
+                # else: # No order criteria were defined in this rule section # Verbose
+                #      logger.debug(f"Rule '{rule_id}': No specific order criteria defined to check.")
+
+
+            # --- Determine if Rule Triggers Exclusion (NEW LOGIC) ---
+            if size_constraint_defined and order_criteria_defined:
+                # Both are defined: Exclude only if BOTH conditions are met
+                if size_criteria_met_for_exclusion and order_criteria_met_for_exclusion:
+                    rule_would_exclude = True
+                    logger.debug(f"Rule '{rule_id}': Excluded because BOTH size and order criteria were met.")
+                else:
+                    logger.debug(f"Rule '{rule_id}': Not excluded because BOTH size ({size_criteria_met_for_exclusion}) and order ({order_criteria_met_for_exclusion}) criteria were not met.")
+            elif size_constraint_defined:
+                # Only size defined: Exclude if size condition met
+                if size_criteria_met_for_exclusion:
+                    rule_would_exclude = True
+                    logger.debug(f"Rule '{rule_id}': Excluded because size criterion was met (only size defined).")
+                else:
+                    logger.debug(f"Rule '{rule_id}': Not excluded because size criterion was not met (only size defined).")
+            elif order_criteria_defined:
+                # Only order criteria defined: Exclude if order criteria met
+                if order_criteria_met_for_exclusion:
+                    rule_would_exclude = True
+                    logger.debug(f"Rule '{rule_id}': Excluded because order criterion was met (only order criteria defined).")
+                else:
+                    logger.debug(f"Rule '{rule_id}': Not excluded because order criterion was not met (only order criteria defined).")
             else:
-                 logger.debug(f"Rule '{rule_id}': Size condition NOT MET.")
+                # Neither defined: Rule cannot exclude based on these criteria
+                 logger.debug(f"Rule '{rule_id}': No size or order criteria defined, cannot exclude based on these.")
+                 rule_would_exclude = False
 
 
-        # B) Check Order Criteria
-        order_criteria_met_for_exclusion = False
-        if rule.orderCriteria:
-            criteria = rule.orderCriteria
-            criteria_defined = False
-            all_positive_conditions_met = True # Assume true until a positive condition fails
-            desc_lower = description.lower()
+            # --- Apply Exclusion Override and Final Decision ---
+            if rule_would_exclude:
+                 # Check the product ID exclusion override
+                 if rule.orderCriteria and rule.orderCriteria.excludeProductIds and product_id in rule.orderCriteria.excludeProductIds:
+                     logger.info(f"Rule '{rule_id}' would exclude hub {hub_candidate}, BUT exclusion overridden by excludeProductIds for Product ID {product_id}.")
+                     # This rule doesn't exclude, but others might. Continue checking other rules for this hub_candidate.
+                     continue # Skip to the next rule for this hub
+                 else:
+                     # Exclusion confirmed for this hub_candidate by this rule
+                     # Determine reason string based on what triggered the exclusion
+                     reason_parts = []
+                     if size_constraint_defined and order_criteria_defined:
+                         reason_parts.append("Size AND Order Criteria")
+                     elif size_constraint_defined:
+                          reason_parts.append("Size")
+                     elif order_criteria_defined:
+                          reason_parts.append("Order Criteria")
 
-            # Check *positive* criteria first (those that *must* be true)
-            if criteria.minQuantity is not None:
-                criteria_defined = True
-                if not (quantity >= criteria.minQuantity): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: MinQ fail")
-            if all_positive_conditions_met and criteria.maxQuantity is not None:
-                 criteria_defined = True
-                 if not (quantity <= criteria.maxQuantity): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: MaxQ fail")
-            if all_positive_conditions_met and criteria.productIds:
-                criteria_defined = True
-                if product_id not in criteria.productIds: all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: ProdID fail")
-            if all_positive_conditions_met and criteria.keywords:
-                criteria_defined = True
-                if not any(kw.lower() in desc_lower for kw in criteria.keywords): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: Keywords fail")
-            if all_positive_conditions_met and criteria.printTypes:
-                criteria_defined = True
-                if print_type not in criteria.printTypes: all_positive_conditions_met = False; logger.debug(f"Rule {rule.id}: PrintType fail")
-            # Add productGroups check here if needed
+                     reason_str = " AND ".join(reason_parts) if reason_parts else "Unknown" # Should have a reason if rule_would_exclude is True
 
-            # Check *negative* criteria (those that must *not* be true)
-            if all_positive_conditions_met and criteria.excludeKeywords:
-                criteria_defined = True # Still counts as defined criteria
-                if any(kw.lower() in desc_lower for kw in criteria.excludeKeywords): all_positive_conditions_met = False; logger.debug(f"Rule '{rule_id}': ExclKeywords fail")
-            # Add excludeProductGroups check here if needed
+                     logger.info(f"Hub Candidate '{hub_candidate}' EXCLUDED by Rule '{rule_id}'. Reason: {reason_str}.")
+                     is_candidate_valid = False
+                     excluded_by_rule[hub_candidate] = rule_id # Record why it was excluded
+                     break # Stop checking rules for this invalid candidate, move to next candidate
 
-            if criteria_defined and all_positive_conditions_met:
-                order_criteria_met_for_exclusion = True
-                logger.debug(f"Rule '{rule_id}': Order criteria MET for exclusion.")
-            elif criteria_defined:
-                logger.debug(f"Rule '{rule_id}': Order criteria NOT MET (Defined: True, All Met: False).")
-            else: # No order criteria were defined in this rule section
-                 logger.debug(f"Rule '{rule_id}': No specific order criteria defined to check.")
+            # else: # Rule conditions not met for exclusion # Verbose
+            #      logger.debug(f"Rule '{rule_id}' conditions not met for exclusion of {hub_candidate}. Continuing rule check.")
 
+        # --- End of rule loop for this candidate ---
+        if is_candidate_valid:
+            logger.info(f"Hub Candidate '{hub_candidate}' PASSED all applicable rules. Selecting this hub.")
+            return hub_candidate # Found a valid hub, return it immediately
 
-        # --- Determine if Rule Triggers Exclusion ---
-        # Rule excludes if EITHER size OR order criteria were met for exclusion
-        rule_would_exclude = size_criteria_met_for_exclusion or order_criteria_met_for_exclusion
+        # If loop finished and candidate is invalid (is_candidate_valid is False),
+        # the outer loop will proceed to the next candidate in potential_hubs_to_try
 
-        if rule_would_exclude:
-             # Check the product ID exclusion override
-             if rule.orderCriteria and rule.orderCriteria.excludeProductIds and product_id in rule.orderCriteria.excludeProductIds:
-                 logger.info(f"Rule '{rule_id}' would exclude hub, BUT exclusion overridden by excludeProductIds for Product ID {product_id}.")
-                 continue # Exclusion cancelled for THIS rule, check next rule
+    # --- End of candidate loop ---
+    # If we get here, no hub passed validation
+    logger.warning(f"No suitable hub found after checking all candidates: {potential_hubs_to_try}.")
+    logger.warning(f"Exclusion reasons: {excluded_by_rule}")
 
-             # Proceed with exclusion
-             logger.info(f"Hub '{initial_hub}' EXCLUDED by Rule '{rule_id}' (Conditions met and no override).")
-             next_hub = find_next_best_hub(initial_hub, available_hubs, delivers_to_state, cmyk_hubs)
-             logger.info(f"Switching hub from '{initial_hub}' to next best '{next_hub}'.")
-             return next_hub # EXCLUDE and RETURN
-        else:
-              # Conditions for this rule were not met for exclusion
-              logger.debug(f"Rule '{rule_id}' conditions not met for exclusion. Continuing to next rule.")
-              continue # Move to the next rule
-
-    # If loop finishes without any rule causing exclusion
-    logger.info(f"Hub '{initial_hub}' passed all applicable rules.")
-    return initial_hub
-
-# ------------------------------------------------------------------------
-# 4) CHOOSE PRODUCTION HUB (Simplified - Now relies solely on validate_hub_rules)
-# ------------------------------------------------------------------------
-# This function might become redundant if validate_hub_rules handles the full logic,
-# but keeping it for now if there's a conceptual separation needed.
-# Consider removing if validate_hub_rules fully determines the final hub.
-def choose_production_hub(
-    available_hubs: List[str],
-    delivers_to_state: str,
-    current_hub: str,
-    product_id: int, # Need product_id for QLD override check
-    cmyk_hubs: List[dict] # Need cmyk_hubs for find_next_best lookup
-) -> str:
-    """
-    Determines the *initial* best guess for the production hub based on state/next best.
-    The result of this function is then validated by validate_hub_rules.
-    """
-    logger.debug(f"Choosing initial production hub. Available: {available_hubs}, DeliversTo: {delivers_to_state}, Current: {current_hub}")
-    product_hubs_lower = [h.lower() for h in available_hubs]
-
-    # 1) single production hub defined for the product
-    if len(product_hubs_lower) == 1:
-        chosen = product_hubs_lower[0]
-        logger.debug(f"Only one production hub defined for product: {chosen}")
-        # QLD override check will happen *after* this initial choice if needed (though unlikely for single-hub products)
-    # 2) if misDeliversToState is in the product's allowed hubs
-    elif delivers_to_state.lower() in product_hubs_lower:
-        chosen = delivers_to_state.lower()
-        logger.debug(f"DeliversToState ('{chosen}') is in product hubs.")
-    # 3) else find the next best from cmykHubs config
-    else:
-        chosen = find_next_best(delivers_to_state, product_hubs_lower, cmyk_hubs)
-        logger.debug(f"Using next best hub based on state '{delivers_to_state}': {chosen}")
-
-    # 4) Apply QLD cards override *based on the initial choice*
-    # This override seems specific and might be better placed elsewhere,
-    # but mimicking the original description's flow for now.
-    if product_id in [6, 7, 8, 9] and current_hub.lower() != "nqld" and delivers_to_state.lower() == "qld":
-        logger.debug(f"Applying QLD cards override (Product ID {product_id}, Current Hub {current_hub}, DeliversTo {delivers_to_state}). Overriding initial choice '{chosen}' with 'vic'.")
-        chosen = "vic"
-    else:
-         logger.debug(f"QLD override conditions not met (ProductID: {product_id}, CurrentHub: {current_hub}, DeliversTo: {delivers_to_state}). Keeping initial choice: {chosen}")
-
-
-    logger.debug(f"Initial hub choice before validation: {chosen}")
-    return chosen
+    # Fallback: Return the first hub from the preference list
+    fallback_hub = potential_hubs_to_try[0]
+    logger.warning(f"FALLBACK: Returning the first preferred hub: {fallback_hub}")
+    return fallback_hub
