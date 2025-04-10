@@ -191,9 +191,16 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         "bc" not in req.description.lower()):
         req.description += " BC"
         logger.debug("Appended ' BC' to description based on size.")
-    if "premium uncoated" in req.description.lower() and "digital" not in req.description.lower():
-        req.description += " Digital"
-        logger.debug("Appended ' Digital' to description based on 'premium uncoated'.")
+
+    # --- NEW: Check for Premium Uncoated BC and force Digital printType ---
+    desc_lower = req.description.lower()
+    if "premium uncoated" in desc_lower and "bc" in desc_lower:
+        if req.printType != 2:
+            logger.info(f"Order description contains 'premium uncoated' and 'bc'. Overriding printType from {req.printType} to 2 (Digital).")
+            req.printType = 2
+        else:
+            logger.debug("Order description contains 'premium uncoated' and 'bc', and printType is already 2 (Digital). No change needed.")
+    # --- END NEW ---
 
 
     # ----------------------------------------------------------------
