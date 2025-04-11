@@ -2,16 +2,15 @@
   "rules": [
     {
       "id": "preflight_rule_1743660626067_qwsct",
-      "description": "PF this",
+      "description": "Preflight DigitalYO",
       "priority": 0,
       "enabled": true,
       "preflightProfileId": 1,
       "orderCriteria": {
-        "excludeProductIds": [
-          65
-        ],
         "printTypes": [
-          1
+          1,
+          2,
+          3
         ]
       },
       "startDate": null,

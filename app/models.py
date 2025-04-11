@@ -103,6 +103,7 @@ class PreflightProfile(BaseModel):
     """Represents a preflight profile definition."""
     id: int = Field(..., description="Unique numeric identifier for the profile.")
     description: str = Field(..., description="Human-readable description of the profile.")
+    preflightProfileName: str = Field(..., description="Short name/identifier for the profile, often used in integrations.")
 
 # --- PREFLIGHT RULE ---
 class PreflightRule(BaseModel):
@@ -196,6 +197,7 @@ class ScheduleResponse(BaseModel):
 
     # Configuration - Reflecting product settings
     synergyPreflight: Optional[int] = Field(None, description="Synergy preflight setting from the matched product.")
+    preflightProfileName: Optional[str] = Field(None, description="Preflight profile name from the matched product.")
     synergyImpose: Optional[int] = Field(None, description="Synergy impose setting from the matched product.")
     enableAutoHubTransfer: Optional[int] = Field(None, description="Indicates if automatic hub transfer should be enabled (1 if chosen hub differs from current hub, 0 otherwise).")
    

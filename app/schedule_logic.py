@@ -401,8 +401,9 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
     # Step 8: Determine Imposing and Preflight Actions
     # ----------------------------------------------------------------
     final_synergy_impose = determine_imposing_action(req, found_product_id)
-    final_synergy_preflight = determine_preflight_action(req, found_product_id)
-    logger.debug(f"SynergyImpose={final_synergy_impose}, SynergyPreflight={final_synergy_preflight} (after rules)")
+    # Now returns a tuple: (profile_id, profile_name)
+    final_synergy_preflight_id, final_preflight_profile_name = determine_preflight_action(req, found_product_id)
+    logger.debug(f"SynergyImpose={final_synergy_impose}, SynergyPreflightID={final_synergy_preflight_id}, PreflightProfileName={final_preflight_profile_name} (after rules)")
 
     # ----------------------------------------------------------------
     # Step 9: Prepare Response
@@ -459,7 +460,8 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         orderKinds=req.kinds,
         totalQuantity=req.misOrderQTY * req.kinds,
 
-        synergyPreflight=final_synergy_preflight,
+        synergyPreflight=final_synergy_preflight_id, # Use the ID returned by determine_preflight_action
+        preflightProfileName=final_preflight_profile_name, # Use the name returned by determine_preflight_action
         synergyImpose=final_synergy_impose,
         enableAutoHubTransfer=enable_auto_hub_transfer,
 

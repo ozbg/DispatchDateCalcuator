@@ -590,19 +590,43 @@ async def save_preflight_profiles_endpoint(request: Request):
 
         # Basic validation for each profile
         seen_ids = set()
+        seen_names = set()
         for profile in profiles_list:
-             if not isinstance(profile, dict) or "id" not in profile or "description" not in profile:
-                 raise ValueError("Each profile must be a dictionary with 'id' and 'description'.")
+             # Check structure and required fields
+             required_keys = ["id", "description", "preflightProfileName"]
+             if not isinstance(profile, dict) or not all(key in profile for key in required_keys):
+                 raise ValueError(f"Each profile must be a dictionary with 'id', 'description', and 'preflightProfileName'. Invalid profile: {profile}")
+
+             # Validate ID
              if not isinstance(profile["id"], int) or profile["id"] < 0:
                  raise ValueError(f"Profile ID must be a non-negative integer: {profile}")
-             if not isinstance(profile["description"], str) or not profile["description"].strip():
-                  raise ValueError(f"Profile description cannot be empty: {profile}")
              if profile["id"] in seen_ids:
                  raise ValueError(f"Duplicate Profile ID found: {profile['id']}")
              seen_ids.add(profile["id"])
-             if profile["id"] == 0 and profile["description"] != "Do Not Preflight":
-                 logger.warning("Overwriting description for reserved Profile ID 0.")
-                 # Optionally force description for ID 0: profile['description'] = "Do Not Preflight"
+
+             # Validate Description
+             if not isinstance(profile["description"], str) or not profile["description"].strip():
+                  raise ValueError(f"Profile description cannot be empty: {profile}")
+
+             # Validate Preflight Profile Name
+             if not isinstance(profile["preflightProfileName"], str) or not profile["preflightProfileName"].strip():
+                  raise ValueError(f"Preflight Profile Name cannot be empty: {profile}")
+             # Optional: Add regex check for valid characters if needed (e.g., no spaces)
+             # if not re.match(r"^[a-zA-Z0-9_]+$", profile["preflightProfileName"]):
+             #     raise ValueError(f"Preflight Profile Name contains invalid characters: {profile}")
+             if profile["preflightProfileName"].lower() in seen_names: # Check for case-insensitive uniqueness
+                 raise ValueError(f"Duplicate Preflight Profile Name found (case-insensitive): {profile['preflightProfileName']}")
+             seen_names.add(profile["preflightProfileName"].lower())
+
+
+             # Handle reserved ID 0
+             if profile["id"] == 0:
+                 if profile["description"] != "Do Not Preflight":
+                     logger.warning("Forcing description for reserved Profile ID 0 to 'Do Not Preflight'.")
+                     profile['description'] = "Do Not Preflight"
+                 if profile["preflightProfileName"] != "NoPreflight":
+                     logger.warning("Forcing preflightProfileName for reserved Profile ID 0 to 'NoPreflight'.")
+                     profile['preflightProfileName'] = "NoPreflight"
 
 
         save_preflight_profiles_data(profiles_list)

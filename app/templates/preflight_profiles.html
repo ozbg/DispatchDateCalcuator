@@ -32,6 +32,7 @@
             <tr>
                 <th>Profile ID</th>
                 <th>Description</th>
+                <th>Profile Name</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -57,6 +58,11 @@
                 <label for="profileDescription">Description:</label>
                 <input type="text" id="profileDescription" required class="form-control">
                 <small>Human-readable name (e.g., "Preflight Flatsheet").</small>
+            </div>
+             <div class="form-group">
+                <label for="preflightProfileName">Profile Name:</label>
+                <input type="text" id="preflightProfileName" required class="form-control">
+                <small>Short identifier, often used in integrations (e.g., "PreflightFlatsheet", no spaces recommended).</small>
             </div>
         </div>
 
@@ -119,6 +125,7 @@ function renderProfilesTable() {
         const row = tbody.insertRow();
         row.insertCell().textContent = profile.id;
         row.insertCell().textContent = profile.description;
+        row.insertCell().textContent = profile.preflightProfileName; // Add profile name cell
 
         const actionCell = row.insertCell();
         // ID 0 is reserved and shouldn't be edited/deleted easily
@@ -146,6 +153,7 @@ function showAddForm() {
     document.getElementById('profileId').value = '';
     document.getElementById('profileId').disabled = false; // Allow editing ID for new profiles
     document.getElementById('profileDescription').value = '';
+    document.getElementById('preflightProfileName').value = ''; // Clear profile name
     document.getElementById('originalProfileId').value = ''; // Clear hidden field
     document.getElementById('profileEditor').style.display = 'block';
     document.getElementById('profileId').focus();
@@ -158,8 +166,12 @@ function editProfile(id) {
     editingProfileOriginalId = profile.id; // Store the original ID
     document.getElementById('modalTitle').textContent = 'Edit Profile';
     document.getElementById('profileId').value = profile.id;
-    document.getElementById('profileId').disabled = false; // Allow editing ID, but need validation
+    // Disable editing ID for profile 0
+    document.getElementById('profileId').disabled = (profile.id === 0);
     document.getElementById('profileDescription').value = profile.description;
+    document.getElementById('preflightProfileName').value = profile.preflightProfileName; // Populate profile name
+    // Disable editing name for profile 0
+    document.getElementById('preflightProfileName').disabled = (profile.id === 0);
     document.getElementById('originalProfileId').value = profile.id; // Store in hidden field
     document.getElementById('profileEditor').style.display = 'block';
     document.getElementById('profileDescription').focus();
@@ -172,13 +184,15 @@ function closeEditor() {
 async function saveProfile() {
     const profileIdInput = document.getElementById('profileId');
     const descriptionInput = document.getElementById('profileDescription');
+    const profileNameInput = document.getElementById('preflightProfileName'); // Get name input
     const originalId = editingProfileOriginalId; // Get original ID if editing
 
     const newIdStr = profileIdInput.value.trim();
     const newDescription = descriptionInput.value.trim();
+    const newProfileName = profileNameInput.value.trim(); // Get name value
 
-    if (!newIdStr || !newDescription) {
-        alert('Profile ID and Description are required.');
+    if (!newIdStr || !newDescription || !newProfileName) { // Check name too
+        alert('Profile ID, Description, and Profile Name are required.');
         return;
     }
 
@@ -211,8 +225,21 @@ async function saveProfile() {
         alert(`Profile ID ${newId} already exists. Please choose a unique ID.`);
         return;
     }
+     if (newId === 0 && newProfileName !== "NoPreflight") {
+         alert("Profile Name for ID 0 must be 'NoPreflight'.");
+         profileNameInput.value = "NoPreflight"; // Reset input
+         return;
+     }
 
-    const profileData = { id: newId, description: newDescription };
+    // Check for Name collision (case-insensitive)
+    const nameExists = profiles.some(p => p.preflightProfileName.toLowerCase() === newProfileName.toLowerCase() && p.id !== originalId);
+    if (nameExists) {
+        alert(`Profile Name "${newProfileName}" already exists (case-insensitive). Please choose a unique name.`);
+        return;
+    }
+
+
+    const profileData = { id: newId, description: newDescription, preflightProfileName: newProfileName }; // Add name to data
 
     // Find index of profile being edited (if any)
     const profileIndex = profiles.findIndex(p => p.id === originalId);

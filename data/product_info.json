@@ -1142,7 +1142,22 @@
       "Friday"
     ],
     "Days_to_produce": 1,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-18",
+        "2025-04-22",
+        [
+          "nsw"
+        ]
+      ],
+      [
+        "2025-04-25",
+        "2025-04-28",
+        [
+          "nsw"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]

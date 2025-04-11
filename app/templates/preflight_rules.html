@@ -64,14 +64,16 @@
         <tr>
           <td>{{ rule.priority }}</td>
           <td>
-              {# Find profile description based on ID #}
-              {% set profile_desc = "Unknown Profile" %}
+              {# Find profile name and description based on ID #}
+              {% set found_profile = namespace(name="Unknown Name", desc="Unknown Profile") %} {# Use namespace for mutable variables inside loop #}
               {% for profile in preflight_profiles %}
                   {% if profile.id == rule.preflightProfileId %}
-                      {% set profile_desc = profile.description %}
+                      {% set found_profile.name = profile.preflightProfileName %}
+                      {% set found_profile.desc = profile.description %}
+                      {# Optional: break #} {# Exit loop once found if desired #}
                   {% endif %}
               {% endfor %}
-              {{ profile_desc }} ({{ rule.preflightProfileId }})
+              {{ found_profile.name }} ({{ found_profile.desc }} / ID: {{ rule.preflightProfileId }})
           </td>
           <td>{{ rule.description }}</td>
           <td>
@@ -153,9 +155,10 @@
                 <select id="preflightProfileId" required class="form-control short-input">
                     <!-- Options populated by JS -->
                      <option value="">-- Select Profile --</option>
-                    {% for profile in preflight_profiles %}
-                        <option value="{{ profile.id }}">{{ profile.description }} ({{ profile.id }})</option>
-                    {% endfor %}
+                   {% for profile in preflight_profiles %}
+                       {# JS will populate this dynamically, but keep Jinja loop for initial render/no-JS fallback #}
+                       <option value="{{ profile.id }}">{{ profile.preflightProfileName }} ({{ profile.description }} / {{ profile.id }})</option>
+                   {% endfor %}
                 </select>
                 <small>Profile to apply if rule matches.</small>
              </div>
@@ -513,10 +516,13 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
   function populatePreflightDropdown(selectedValue = '') {
     const select = document.getElementById('preflightProfileId');
     select.innerHTML = '<option value="">-- Select Profile --</option>'; // Reset options
+    // Sort profiles for dropdown consistency (e.g., by ID or name)
+    preflightProfiles.sort((a, b) => a.id - b.id);
     preflightProfiles.forEach(profile => {
       const option = document.createElement('option');
       option.value = profile.id;
-      option.textContent = `${profile.description} (${profile.id})`;
+      // Display Name (Description / ID)
+      option.textContent = `${profile.preflightProfileName} (${profile.description} / ${profile.id})`;
       if (String(profile.id) === String(selectedValue)) { // Compare as strings
           option.selected = true;
       }

@@ -1,18 +1,22 @@
 [
-    {
-      "id": 0,
-      "description": "Do Not Preflight"
-    },
-    {
-      "id": 1,
-      "description": "Preflight Flatsheet"
-    },
-    {
-      "id": 2,
-      "description": "Preflight Wideformat"
-    },
-    {
-      "id": 3,
-      "description": "Preflight Booklets"
-    }
-  ]
+  {
+    "description": "Do Not Preflight",
+    "id": 0,
+    "preflightProfileName": "NoPreflight"
+  },
+  {
+    "id": 1,
+    "description": "Preflight Digital",
+    "preflightProfileName": "PreflightDigitalYOYO"
+  },
+  {
+    "description": "Preflight Wideformat",
+    "id": 2,
+    "preflightProfileName": "PreflightWideformat"
+  },
+  {
+    "description": "Preflight Booklets",
+    "id": 3,
+    "preflightProfileName": "PreflightBooklets"
+  }
+]
