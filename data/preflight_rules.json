@@ -1,12 +1,44 @@
 {
   "rules": [
     {
+      "description": "Preflight Digital",
+      "enabled": true,
+      "endDate": null,
       "id": "preflight_rule_1743660626067_qwsct",
-      "description": "Preflight DigitalYO",
+      "orderCriteria": {
+        "excludeKeywords": [
+          "PUR",
+          "Bind",
+          "Bound",
+          "Saddle",
+          "wiro",
+          "wire"
+        ],
+        "printTypes": [
+          1,
+          2,
+          3
+        ]
+      },
+      "preflightProfileId": 1,
+      "priority": 0,
+      "startDate": null
+    },
+    {
+      "id": "preflight_rule_1744333685190_2oekm",
+      "description": "Preflight Booklet",
       "priority": 0,
       "enabled": true,
-      "preflightProfileId": 1,
+      "preflightProfileId": 3,
       "orderCriteria": {
+        "keywords": [
+          "PUR",
+          "Bind",
+          "Bound",
+          "Saddle",
+          "wire",
+          "wiro"
+        ],
         "printTypes": [
           1,
           2,
@@ -15,6 +47,20 @@
       },
       "startDate": null,
       "endDate": null
+    },
+    {
+      "description": "Preflight Wideformat",
+      "enabled": true,
+      "endDate": null,
+      "id": "preflight_rule_1744333703385_cg4vx",
+      "orderCriteria": {
+        "printTypes": [
+          4
+        ]
+      },
+      "preflightProfileId": 2,
+      "priority": 0,
+      "startDate": null
     }
   ]
 }

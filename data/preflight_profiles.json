@@ -7,16 +7,16 @@
   {
     "id": 1,
     "description": "Preflight Digital",
-    "preflightProfileName": "PreflightDigitalYOYO"
+    "preflightProfileName": "E:/lib/CMYKhub_Preflight_Live.kfp"
   },
   {
-    "description": "Preflight Wideformat",
     "id": 2,
-    "preflightProfileName": "PreflightWideformat"
+    "description": "Preflight Wideformat",
+    "preflightProfileName": "E:/lib/CMYKhub_Preflight_Live_Wideformat.kfpx"
   },
   {
-    "description": "Preflight Booklets",
     "id": 3,
-    "preflightProfileName": "PreflightBooklets"
+    "description": "Preflight Booklets",
+    "preflightProfileName": "E:/lib/CMYKhub_Preflight_Live_Booklet.kfpx"
   }
 ]
