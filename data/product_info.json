@@ -125,7 +125,15 @@
       "Wednesday"
     ],
     "Days_to_produce": 3,
-    "Modified_run_date": [],
+    "Modified_run_date": [
+      [
+        "2025-04-16",
+        "2025-04-23",
+        [
+          "vic"
+        ]
+      ]
+    ],
     "printTypes": [
       1
     ]

@@ -204,13 +204,15 @@
     "Product_ID": 8
   },
   {
+    "Product_ID": 9,
+    "Match_All": [],
     "Exclude_All": [
       "Eco",
       "Knight",
       "Natural",
-      "Coated 1 Side Board"
+      "Coated 1 Side Board",
+      "Magnet"
     ],
-    "Match_All": [],
     "Match_Any": [
       [
         "Gloss Laminate 1S",
@@ -225,8 +227,7 @@
         "Branding",
         "BC"
       ]
-    ],
-    "Product_ID": 9
+    ]
   },
   {
     "Exclude_All": [
@@ -663,20 +664,20 @@
     "Product_ID": 33
   },
   {
-    "Product_ID": 34,
-    "Match_All": [],
     "Exclude_All": [
       "Hi Bulk",
       "Metallic",
       "Roll Label",
       "Roll-Label"
     ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Scodix",
         "Metal"
       ]
-    ]
+    ],
+    "Product_ID": 34
   },
   {
     "Exclude_All": [],
