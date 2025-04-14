@@ -29,7 +29,8 @@
     "misDeliversToState": "qld",
     "orderNotes": [],
     "additionalProductionDays": 0,
-    "timeOffsetHours": 0
+    "timeOffsetHours": 0,
+    "orderPrice": 150.75
 }</textarea>
             </div>
             <div class="button-group">
@@ -177,6 +178,10 @@
                         <td>Total Quantity</td>
                         <td id="totalQuantity"></td>
                     </tr>
+                    <tr> {# <<< ADDED #}
+                        <td>Order Price</td> {# <<< ADDED #}
+                        <td id="orderPrice"></td> {# <<< ADDED #}
+                    </tr> {# <<< ADDED #}
 
                     <!-- Configuration -->
                     <tr><td colspan="2" class="section-header">System Configuration</td></tr>
@@ -664,6 +669,7 @@ async function runTest() {
         setContent('orderQuantity', result.orderQuantity);
         setContent('orderKinds', result.orderKinds);
         setContent('totalQuantity', result.totalQuantity);
+        setContent('orderPrice', result.orderPrice); // <<< ADDED
 
         // Configuration
         setContent('synergyPreflight', result.synergyPreflight);

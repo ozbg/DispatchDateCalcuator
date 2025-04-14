@@ -75,6 +75,7 @@ class ScheduleRequest(BaseModel):
     centerId: Optional[int] = Field(None, description="Optional specific Center ID for evaluating Center Rules in finishing_rules.json.")
     additionalProductionDays: Optional[int] = Field(0, description="Manually specified additional days to add to production time.", example=0)
     timeOffsetHours: Optional[int] = Field(0, description="Simulate running the request N hours forward (+) or backward (-) from the actual processing time.", example=0)
+    orderPrice: Optional[float] = Field(None, description="Optional price of the order item.", example=150.75)
 
 class OrderMatchingCriteria(BaseModel):
     """Defines criteria used in HubSelectionRules and ImposingRules to match specific orders."""
@@ -87,6 +88,8 @@ class OrderMatchingCriteria(BaseModel):
     productGroups: Optional[List[str]] = Field(None, description="Rule applies if the order's product group is in this list (case-insensitive).")
     excludeProductGroups: Optional[List[str]] = Field(None, description="Rule applies if the order's product group is *not* in this list (case-insensitive).")
     printTypes: Optional[List[int]] = Field(None, description="Rule applies if the order's printType is in this list.")
+    priceLessThan: Optional[float] = Field(None, description="Rule applies if orderPrice is less than this value.")
+    priceGreaterThan: Optional[float] = Field(None, description="Rule applies if orderPrice is greater than this value.")
 
 class ImposingRule(BaseModel):
     """Defines a rule used to determine the SynergyImpose action."""
@@ -170,6 +173,7 @@ class ScheduleResponse(BaseModel):
     productionGroups: Optional[List[str]] = Field(None, description="List of production group names matched based on the order description.")
     preflightedWidth: Optional[float] = Field(None, description="Width of the product in mm (passed from request).")
     preflightedHeight: Optional[float] = Field(None, description="Height of the product in mm (passed from request).")
+    orderPrice: Optional[float] = Field(None, description="Price of the order item (passed from request).")
 
     # Production Details
     cutoffStatus: str = Field(..., description="Indicates if the order was received 'Before Cutoff' or 'After Cutoff' based on the hub's time.")

@@ -101,6 +101,13 @@
                 {% if rule.orderCriteria.printTypes %}
                   <li>Print Types: {{ rule.orderCriteria.printTypes|join(", ") }}</li>
                 {% endif %}
+                {# NEW: Display Price Conditions #}
+                {% if rule.orderCriteria.priceLessThan is not none %}
+                  <li>Price Less Than: {{ rule.orderCriteria.priceLessThan }}</li>
+                {% endif %}
+                {% if rule.orderCriteria.priceGreaterThan is not none %}
+                  <li>Price Greater Than: {{ rule.orderCriteria.priceGreaterThan }}</li>
+                {% endif %}
             </ul>
              {% else %}
                 <span>No Constraints</span>
@@ -260,6 +267,17 @@
                 </div>
                  <small>Order Print Type must be in this list.</small>
             </div>
+
+            <!-- NEW: Price Conditions -->
+             <div class="form-group">
+                <label for="priceLessThan">Price Less Than (&lt;):</label>
+                <input type="number" step="0.01" id="priceLessThan" placeholder="e.g., 100.00" class="form-control">
+             </div>
+             <div class="form-group">
+                <label for="priceGreaterThan">Price Greater Than (&gt;):</label>
+                <input type="number" step="0.01" id="priceGreaterThan" placeholder="e.g., 50.00" class="form-control">
+             </div>
+
         </div> <!-- end matching-grid -->
     </div> <!-- end form-section -->
 
@@ -494,6 +512,9 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
     document.getElementById('excludeProductGroupInput').value = '';
     document.getElementById('printTypeTags').innerHTML = '';
     document.getElementById('printTypeInput').value = '';
+    // NEW: Clear price fields
+    document.getElementById('priceLessThan').value = '';
+    document.getElementById('priceGreaterThan').value = '';
   }
 
   // --- Populate Modal for Editing ---
@@ -533,6 +554,9 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
         (criteria.productGroups || []).forEach(pg => addTag(pg, 'productGroupTags'));
         (criteria.excludeProductGroups || []).forEach(pg => addTag(pg, 'excludeProductGroupTags'));
         (criteria.printTypes || []).forEach(pt => addTag(String(pt), 'printTypeTags'));
+        // NEW: Load price fields
+        document.getElementById('priceLessThan').value = criteria.priceLessThan ?? '';
+        document.getElementById('priceGreaterThan').value = criteria.priceGreaterThan ?? '';
     }
 
     document.getElementById('ruleEditor').style.display = 'block';
@@ -657,6 +681,9 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
     const productGroups = getTagsArray('productGroupTags');
     const excludeProductGroups = getTagsArray('excludeProductGroupTags');
     const printTypes = getNumericTagsArray('printTypeTags').filter(num => [1,2,3,4].includes(num)); // Validate print types
+    // NEW: Get price values
+    const priceLt = document.getElementById('priceLessThan').value.trim();
+    const priceGt = document.getElementById('priceGreaterThan').value.trim();
 
     // Only add criteria if they have a value
     if (minQty) criteriaFields.minQuantity = parseInt(minQty);
@@ -668,6 +695,16 @@ select.form-control { appearance: none; background-image: url("data:image/svg+xm
     if (productGroups.length > 0) criteriaFields.productGroups = productGroups;
     if (excludeProductGroups.length > 0) criteriaFields.excludeProductGroups = excludeProductGroups;
     if (printTypes.length > 0) criteriaFields.printTypes = printTypes;
+    // NEW: Add price fields if valid floats
+    if (priceLt) {
+        const priceLtFloat = parseFloat(priceLt);
+        if (!isNaN(priceLtFloat)) criteriaFields.priceLessThan = priceLtFloat;
+    }
+    if (priceGt) {
+        const priceGtFloat = parseFloat(priceGt);
+        if (!isNaN(priceGtFloat)) criteriaFields.priceGreaterThan = priceGtFloat;
+    }
+
 
     // Assign criteria object only if it's not empty
     if (Object.keys(criteriaFields).length > 0) {

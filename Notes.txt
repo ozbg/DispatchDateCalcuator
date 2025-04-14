@@ -264,3 +264,247 @@ Result: Order scheduled for the following Wednesday.
 
 
 If you set an print run override to a closed date , it will shift fwd to the first open date
+
+
+
+
+
+Plan for implementing Roles
+
+<chatName="UserManagementRBAC"/>
+Okay, let's break down the implementation plan for adding user management, roles, and permissions to the OpsLogic application.
+
+**Core Requirements:**
+
+1.  **Authentication:** Users need to log in.
+2.  **Roles:** Define "Admin" and "Operator" roles.
+3.  **Permissions:** Control access based on roles (Admin: Full Control, Operator: View Only).
+4.  **User Management:** Admins need a UI to create, edit (roles), and delete users.
+5.  **Permission Management:** Admins need a way to define what roles can access which pages/features (View vs. Edit).
+6.  **UI Adaptation:** Existing pages need to adapt to the user's permissions (hide/disable edit controls for Operators).
+7.  **View-Only Log Page:** A dedicated page showing only the debug logs from the API Test page.
+
+**Architectural Decisions:**
+
+1.  **View vs. Edit Pages:** Instead of duplicating templates (e.g., `products_view.html`, `products_edit.html`), we will use **dynamic templates**. A single template will be used for each feature page (e.g., `products.html`). The backend route serving the template will determine if the current user has 'edit' permissions for that feature. A boolean flag (e.g., `can_edit`) will be passed to the Jinja template. Inside the template, `{% if can_edit %}` blocks will conditionally render edit buttons, forms, and enable/disable input fields. This significantly reduces duplication and maintenance effort.
+2.  **Permission Model:** We'll implement Role-Based Access Control (RBAC).
+    *   **Roles:** Admin, Operator.
+    *   **Permissions:** Define granular permissions like `products:view`, `products:edit`, `users:manage`, `logs:view`.
+    *   **Mapping:** Roles will be mapped to a set of permissions.
+3.  **Data Storage:** To maintain consistency with the project's current structure, we will use JSON files for storing user and role/permission data initially.
+    *   `users.json`: Stores user details (username, hashed password, role).
+    *   `roles_permissions.json`: Defines roles and the permissions associated with each.
+    *   *Note:* For larger applications or more complex permission needs, a database would be more suitable, but JSON fits the current pattern.
+4.  **Authentication:** Leverage the existing Basic Auth mechanism but enhance it to fetch user roles from `users.json` and verify hashed passwords.
+5.  **Authorization:** Implement FastAPI dependencies to check user roles/permissions before allowing access to routes.
+
+**Implementation Plan:**
+
+**Phase 1: Authentication & Basic Role Setup**
+
+1.  **Data Structure (`users.json` - New File):**
+    *   Location: `/data/users.json`
+    *   Structure: A dictionary where keys are usernames.
+        ```json
+        {
+          "admin": {
+            "username": "admin",
+            "hashed_password": "bcrypt_hashed_password_for_admin", // Use passlib to generate
+            "role": "Admin"
+          },
+          "operator1": {
+            "username": "operator1",
+            "hashed_password": "bcrypt_hashed_password_for_operator1",
+            "role": "Operator"
+          }
+        }
+        ```
+    *   *Action:* Create this file with at least one initial Admin user (hash the password securely).
+
+2.  **Password Hashing (`auth.py` & `data_manager.py`):**
+    *   File: `app/auth.py`, `app/data_manager.py`
+    *   Add `passlib` to `requirements.txt`.
+    *   In `auth.py`:
+        *   Import `CryptContext` from `passlib.context`.
+        *   Instantiate `pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")`.
+        *   Modify `get_current_user`:
+            *   Remove dependency on `USER_CREDENTIALS` from `config.py`.
+            *   Load user data from `users.json` using a new function in `data_manager.py`.
+            *   Use `pwd_context.verify(credentials.password, user_data["hashed_password"])` for password verification.
+            *   Return the user's role along with the username: `{"username": credentials.username, "role": user_data["role"]}`.
+            *   Handle cases where the user is not found.
+    *   In `data_manager.py`:
+        *   Add `load_users()` function to read `users.json`.
+        *   Add `save_users()` function to write `users.json`.
+        *   Add `hash_password(password: str) -> str` function using `pwd_context.hash()`.
+
+3.  **Configuration (`config.py`):**
+    *   Remove the `USER_CREDENTIALS` variable and its loading logic.
+
+**Phase 2: Role-Based Access Control (RBAC)**
+
+1.  **Data Structure (`roles_permissions.json` - New File):**
+    *   Location: `/data/roles_permissions.json`
+    *   Structure: Defines roles and their associated permissions.
+        ```json
+        {
+          "Admin": [
+            "users:manage", // Special permission for user management page
+            "roles:manage", // Special permission for role management page (if implemented)
+            "products:view", "products:edit",
+            "product_keywords:view", "product_keywords:edit",
+            "cmyk_hubs:view", "cmyk_hubs:edit",
+            "schedule_overrides:view", "schedule_overrides:edit",
+            "finishing_rules:view", "finishing_rules:edit",
+            "hub_rules:view", "hub_rules:edit",
+            "preflight_profiles:view", "preflight_profiles:edit",
+            "preflight_rules:view", "preflight_rules:edit",
+            "imposing_rules:view", "imposing_rules:edit",
+            "production_groups:view", "production_groups:edit",
+            "api_test:view", "api_test:use", // Separate view/use for API test page
+            "logs:view" // Permission for the new log view page
+          ],
+          "Operator": [
+            "products:view",
+            "product_keywords:view",
+            "cmyk_hubs:view",
+            "schedule_overrides:view",
+            "finishing_rules:view",
+            "hub_rules:view",
+            "preflight_profiles:view",
+            "preflight_rules:view",
+            "imposing_rules:view",
+            "production_groups:view",
+            "api_test:view", // Can view the API test page structure
+            "logs:view"      // Can view the dedicated log page
+            // Operators cannot use the API test or edit anything
+          ]
+        }
+        ```
+    *   *Action:* Create this file defining the initial permissions for Admin and Operator.
+
+2.  **Authorization Dependency (`auth.py` or new `permissions.py`):**
+    *   Create a new dependency function, e.g., `require_permission(required_permission: str)`.
+    *   Inside `require_permission`:
+        *   `user = Depends(get_current_user)`: Get the authenticated user and their role.
+        *   Load `roles_permissions.json` (use a cached function in `data_manager.py` for efficiency).
+        *   Get the permissions for the user's role.
+        *   Check if `required_permission` is in the role's permissions list.
+        *   If not authorized, raise `HTTPException(status_code=403, detail="Not authorized")`.
+        *   Return the user object if authorized (optional, can be useful).
+    *   In `data_manager.py`: Add `load_roles_permissions()` function.
+
+3.  **Route Protection (`main.py`):**
+    *   Modify *all* existing routes (GET for pages, POST for saving/deleting).
+    *   Add the `Depends(require_permission("permission_name"))` to the route definition.
+    *   Example (Products Page):
+        ```python
+        @app.get("/products", response_class=HTMLResponse, tags=["UI"],
+                 dependencies=[Depends(require_permission("products:view"))]) # View permission needed
+        async def products_html(request: Request, user: dict = Depends(get_current_user)): # Also get user here
+            # ... existing logic ...
+            user_permissions = get_permissions_for_role(user['role']) # Helper to get permissions
+            can_edit = "products:edit" in user_permissions
+            return templates.TemplateResponse("products.html", {
+                "request": request,
+                # ... other context ...
+                "can_edit": can_edit, # Pass flag to template
+                "user_role": user['role'] # Pass role for nav bar
+            })
+        ```
+    *   Example (Save Product):
+        ```python
+        @app.post("/products/edit/{product_id}",
+                  dependencies=[Depends(require_permission("products:edit"))]) # Edit permission needed
+        async def update_product(request: Request, product_id: str):
+            # ... existing logic ...
+        ```
+    *   *Action:* Apply appropriate permission checks (`:view` for GET routes serving HTML, `:edit` for POST/DELETE routes modifying data) to *all* relevant routes in `main.py`. Update GET routes to fetch the user, determine `can_edit`, and pass it to the template.
+
+**Phase 3: UI Adaptation & New Pages**
+
+1.  **Dynamic Templates (All `.html` files in `app/templates/`):**
+    *   Modify all templates that have editing capabilities (e.g., `products.html`, `cmyk_hubs.html`, `finishing_rules.html`, etc.).
+    *   Wrap all edit controls (Add buttons, Edit buttons, Delete buttons, Save buttons within modals, form inputs within modals *if* they are for editing) in `{% if can_edit %}` ... `{% endif %}` blocks.
+    *   For tables, ensure the "Actions" column header and the `<td>` containing edit/delete buttons are wrapped.
+    *   For forms/modals used for *both* adding and editing, you might need finer control. The "Save" button might always be visible, but the backend route it posts to will handle the permission check. Input fields might need to be conditionally `disabled` or `readonly` if `not can_edit`.
+        ```html
+        <!-- Example: Edit button in a table row -->
+        <td>
+            {% if can_edit %}
+            <button onclick="editProduct('{{ id }}')" class="edit-btn">Edit</button>
+            <button onclick="deleteProduct('{{ id }}')" class="delete-btn">Delete</button>
+            {% else %}
+            <span>View Only</span> {# Or leave empty #}
+            {% endif %}
+        </td>
+
+        <!-- Example: Add button -->
+        {% if can_edit %}
+        <button onclick="showAddForm()" class="add-btn">Add New Product</button>
+        {% endif %}
+
+        <!-- Example: Input field in modal -->
+        <input type="text" id="productCategory" required {% if not can_edit %}readonly{% endif %}>
+        ```
+    *   *Action:* Systematically review and modify all templates with edit functionality.
+
+2.  **Navigation Bar (`base.html`):**
+    *   Modify the route serving `base.html` (likely the root `/` or specific page routes) to pass the `user_role`.
+    *   In `base.html`, add conditional logic to show Admin-only links:
+        ```html
+        <nav>
+            <a href="/">Home</a>
+            <a href="/products">Product Schedule</a>
+            <!-- ... other links ... -->
+            <a href="/logs/view">View Logs</a> {# New link for log view page #}
+            {% if user_role == 'Admin' %}
+            <a href="/users/manage">User Management</a> {# Admin only #}
+            <!-- <a href="/roles/manage">Role Management</a> {# Optional Admin only #} -->
+            {% endif %}
+            <a href="/api-test">API Test</a> {# Keep for Admin, maybe Operator view? #}
+        </nav>
+        ```
+    *   *Action:* Update `base.html` and ensure `user_role` is passed from relevant routes.
+
+3.  **User Management Page (`users_manage.html` - New File):**
+    *   Location: `app/templates/users_manage.html`
+    *   Content:
+        *   A table listing existing users (username, role).
+        *   Buttons next to each user: "Edit Role", "Delete", "Reset Password" (optional).
+        *   A form/modal to add a new user (username, password, role selection dropdown).
+        *   A form/modal to edit a user's role.
+    *   JavaScript to handle showing modals, submitting forms via fetch to new backend endpoints.
+
+4.  **Log View Page (`logs_view.html` - New File):**
+    *   Location: `app/templates/logs_view.html`
+    *   Content:
+        *   Copy the "Debug Panel" section (HTML, CSS, JS) from `api_test.html`.
+        *   Remove the Request Payload, Response Output, and Formatted Response sections.
+        *   Ensure the JavaScript correctly fetches logs from `/debug-logs`.
+        *   Include necessary base template extension (`{% extends "base.html" %}`).
+
+5.  **New Routes (`main.py`):**
+    *   `/users/manage` (GET):
+        *   Permission: `users:manage`
+        *   Logic: Load users from `users.json`. Render `users_manage.html`, passing the user list.
+    *   `/users/save` (POST):
+        *   Permission: `users:manage`
+        *   Logic: Receive user data (username, password, role) from request body. Hash the password. Load `users.json`, add/update the user, save `users.json`. Return success/error JSON. Handle username conflicts.
+    *   `/users/delete/{username}` (POST):
+        *   Permission: `users:manage`
+        *   Logic: Load `users.json`, remove the user by `username`, save `users.json`. Return success/error JSON. Prevent deleting the last admin?
+    *   `/logs/view` (GET):
+        *   Permission: `logs:view`
+        *   Logic: Render `logs_view.html`. Pass `user_role` for the nav bar.
+
+**Phase 4: Refinement & Testing**
+
+1.  **API Test Page Access:** Decide if Operators should see the `/api-test` page structure (view-only) or if it should be Admin-only. Adjust the `api_test:view` permission in `roles_permissions.json` and the `require_permission` dependency on the `/api-test` route accordingly. If Operators can view, ensure the "Run API Test" button is hidden using `{% if can_edit %}` (map `can_edit` based on `api_test:use` permission).
+2.  **Error Handling:** Ensure robust error handling (e.g., file not found, JSON decode errors, permission errors) in `data_manager.py` and `main.py`.
+3.  **Security:**
+    *   **Password Hashing:** Crucial. Never store plain text passwords.
+    *   **Input Validation:** Sanitize and validate all input from forms/API requests.
+    *   **Authorization Checks:** Double-check that *all* routes modifying data have the correct `:edit` permission check.
+
+This plan provides a phased approach. Start with authentication and basic roles, then implement RBAC and permission checks, followed by UI adaptations and new management pages. Remember to handle password hashing securely from the beginning.

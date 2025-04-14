@@ -438,6 +438,7 @@ def process_order(req: ScheduleRequest) -> Optional[ScheduleResponse]:
         productionGroups=assigned_groups,
         preflightedWidth=req.preflightedWidth,
         preflightedHeight=req.preflightedHeight,
+        orderPrice=req.orderPrice, # Copy order price from request
 
         cutoffStatus=cutoff_status,
         productStartDays=allowed_start_days,

@@ -85,6 +85,16 @@ def check_order_criteria(criteria: OrderMatchingCriteria, req: ScheduleRequest, 
             logger.debug(f"Criteria Check Failed: Print Type {req.printType} not in {criteria.printTypes}")
             return False
 
+    # Price checks
+    if criteria.priceLessThan is not None:
+        if req.orderPrice is None or req.orderPrice >= criteria.priceLessThan:
+            logger.debug(f"Criteria Check Failed: Order Price {req.orderPrice} is not less than {criteria.priceLessThan}")
+            return False
+    if criteria.priceGreaterThan is not None:
+        if req.orderPrice is None or req.orderPrice <= criteria.priceGreaterThan:
+            logger.debug(f"Criteria Check Failed: Order Price {req.orderPrice} is not greater than {criteria.priceGreaterThan}")
+            return False
+
     # If we passed all checks
     logger.debug("All defined orderCriteria matched.")
     return True

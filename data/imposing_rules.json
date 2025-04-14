@@ -1,32 +1,43 @@
 {
   "rules": [
     {
-      "id": "impose_rule_1743659089066_9v3ju",
-      "description": "North QLD Cards Manually Impose as Gang Runs",
-      "priority": 1,
-      "enabled": true,
-      "imposingAction": 2,
-      "orderCriteria": {
-        "printTypes": [
-          1
-        ]
-      },
-      "startDate": null,
-      "endDate": null
-    },
-    {
-      "description": "Digital Boolklets",
+      "description": "Manual Impose Digital Books under $1000",
       "enabled": true,
       "endDate": null,
       "id": "impose_rule_1743559250917_4qbn3",
-      "imposingAction": 1,
+      "imposingAction": 2,
       "orderCriteria": {
+        "keywords": [
+          "Saddle",
+          "PUR",
+          "Bound"
+        ],
+        "priceLessThan": 1000,
         "printTypes": [
           2
         ]
       },
       "priority": 0,
       "startDate": null
+    },
+    {
+      "id": "impose_rule_1744615529871_ckck3",
+      "description": "Auto Impose Flat Digital Sheet",
+      "priority": 0,
+      "enabled": true,
+      "imposingAction": 1,
+      "orderCriteria": {
+        "excludeKeywords": [
+          "Pur",
+          "Bound",
+          "Saddle"
+        ],
+        "printTypes": [
+          2
+        ]
+      },
+      "startDate": null,
+      "endDate": null
     }
   ]
 }
