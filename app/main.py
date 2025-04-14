@@ -501,12 +501,16 @@ async def imposing_rules_page(request: Request):
     """Serves the HTML page for managing imposing rules."""
     try:
         rules = get_imposing_rules_data() # Get list of rules
-        logger.debug(f"Loaded {len(rules)} imposing rules for UI.")
+        hubs_data = get_cmyk_hubs_data() # Get hubs data
+        # Extract hub names, remove duplicates using set, then sort
+        hub_names = sorted(list(set([hub['Hub'] for hub in hubs_data])))
+        logger.debug(f"Loaded {len(rules)} imposing rules and {len(hub_names)} unique hubs for UI.")
         return templates.TemplateResponse(
             "imposing_rules.html",
             {
                 "request": request,
                 "rules": rules,
+                "hub_names": hub_names, # Pass hub names to the template
             }
         )
     except Exception as e:

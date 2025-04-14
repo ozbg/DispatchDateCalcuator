@@ -90,6 +90,7 @@ class OrderMatchingCriteria(BaseModel):
     printTypes: Optional[List[int]] = Field(None, description="Rule applies if the order's printType is in this list.")
     priceLessThan: Optional[float] = Field(None, description="Rule applies if orderPrice is less than this value.")
     priceGreaterThan: Optional[float] = Field(None, description="Rule applies if orderPrice is greater than this value.")
+    chosenProductionHubs: Optional[List[str]] = Field(None, description="Rule applies if the final chosen production hub is in this list (case-insensitive).")
 
 class ImposingRule(BaseModel):
     """Defines a rule used to determine the SynergyImpose action."""

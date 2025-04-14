@@ -12,10 +12,10 @@ logger.setLevel(logging.DEBUG)
 
 DEFAULT_IMPOSING_ACTION = 0 # 0 = No Impose
 
-# MODIFIED: Updated function signature
-def check_order_criteria(criteria: OrderMatchingCriteria, req: ScheduleRequest, order_product_id: Optional[int], product_group: Optional[str]) -> bool:
+# MODIFIED: Updated function signature to include chosen_production_hub
+def check_order_criteria(criteria: OrderMatchingCriteria, req: ScheduleRequest, order_product_id: Optional[int], product_group: Optional[str], chosen_production_hub: str) -> bool:
     """
-    Checks if the order matches the given criteria using the directly provided product ID and group.
+    Checks if the order matches the given criteria using the directly provided product ID, group, and chosen hub.
     Returns True if all defined criteria match, False otherwise.
     """
     if not criteria:
@@ -95,12 +95,25 @@ def check_order_criteria(criteria: OrderMatchingCriteria, req: ScheduleRequest, 
             logger.debug(f"Criteria Check Failed: Order Price {req.orderPrice} is not greater than {criteria.priceGreaterThan}")
             return False
 
+    # Chosen Production Hubs check
+    if criteria.chosenProductionHubs:
+        # Ensure comparison is case-insensitive
+        chosen_hub_lower = chosen_production_hub.lower()
+        allowed_hubs_lower = [h.lower() for h in criteria.chosenProductionHubs]
+        if chosen_hub_lower not in allowed_hubs_lower:
+            logger.debug(f"Criteria Check Failed: Chosen Production Hub '{chosen_hub_lower}' not in allowed list {allowed_hubs_lower}")
+            return False
+        else:
+            logger.debug(f"Criteria Check Passed: Chosen Production Hub '{chosen_hub_lower}' is in allowed list {allowed_hubs_lower}")
+
+
     # If we passed all checks
     logger.debug("All defined orderCriteria matched.")
     return True
 
 
-def determine_imposing_action(req: ScheduleRequest, product_id: int) -> int:
+# MODIFIED: Added chosen_hub argument
+def determine_imposing_action(req: ScheduleRequest, product_id: int, chosen_hub: str) -> int:
     """
     Determines the SynergyImpose action based on matching imposing rules.
     Args:
@@ -138,13 +151,13 @@ def determine_imposing_action(req: ScheduleRequest, product_id: int) -> int:
             continue
 
         if not check_dates(rule):
-             logger.debug(f"Skipping rule {rule.id} (outside valid date range).")
-             continue
+            logger.debug(f"Skipping rule {rule.id} (outside valid date range).")
+            continue
 
-        # --- MODIFIED: Pass the integer product_id and fetched product_group ---
-        if check_order_criteria(rule.orderCriteria, req, product_id, order_product_group):
-            logger.info(f"Imposing rule {rule.id} matched. Setting action to {rule.imposingAction}.")
-            return rule.imposingAction
+        # --- MODIFIED: Pass product_id, product_group, AND chosen_hub ---
+        if check_order_criteria(rule.orderCriteria, req, product_id, order_product_group, chosen_hub):
+             logger.info(f"Imposing rule {rule.id} matched. Setting action to {rule.imposingAction}.")
+             return rule.imposingAction
         else:
              logger.debug(f"Rule {rule.id} did not match order criteria.")
 

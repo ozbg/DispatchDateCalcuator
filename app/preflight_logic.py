@@ -11,11 +11,12 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 DEFAULT_PREFLIGHT_PROFILE_ID = 0 # 0 = Do Not Preflight
-DEFAULT_PREFLIGHT_PROFILE_NAME = "NoPreflight" # Default name
+DEFAULT_PREFLIGHT_PROFILE_ID = 0 # 0 = Do Not Preflight
 
-def determine_preflight_action(req: ScheduleRequest, product_id: int) -> Tuple[int, Optional[str]]:
+# MODIFIED: Added chosen_hub argument
+def determine_preflight_action(req: ScheduleRequest, product_id: int, chosen_hub: str) -> Tuple[int, Optional[str]]:
     """
-    Determines the SynergyPreflight profile ID and name based on matching preflight rules.
+    Determines the SynergyPreflight profile ID based on matching preflight rules.
     Args:
         req: The incoming ScheduleRequest object.
         product_id: The matched product ID for the order.
@@ -55,34 +56,37 @@ def determine_preflight_action(req: ScheduleRequest, product_id: int) -> Tuple[i
 
         if not check_dates(rule):
              logger.debug(f"Skipping rule {rule.id} (outside valid date range).")
-             continue
+             continue # Correct indentation
 
         # Check criteria match
         criteria_match = False
         if rule.orderCriteria:
-            criteria_match = check_order_criteria(rule.orderCriteria, req, product_id, order_product_group)
+            # MODIFIED: Pass chosen_hub here
+            if check_order_criteria(rule.orderCriteria, req, product_id, order_product_group, chosen_hub):
+                criteria_match = True
+            else:
+                logger.debug(f"Rule {rule.id} did not match order criteria.")
+                continue # Skip to next rule if criteria defined but don't match
         else:
-            # If a rule has no criteria, it matches any order (unless disabled or out of date)
+            # No criteria defined, so it matches this part
             criteria_match = True
             logger.debug(f"Rule {rule.id} has no orderCriteria defined, considering it a match.")
 
+        # If criteria matched (or none were defined)
         if criteria_match:
-            matched_profile_id = rule.preflightProfileId
-            matched_profile = profile_map.get(matched_profile_id)
+            logger.info(f"Preflight rule {rule.id} matched. Setting profile ID to {rule.preflightProfileId}.")
+            matched_profile = profile_map.get(rule.preflightProfileId)
             if matched_profile:
-                profile_name = matched_profile.preflightProfileName
-                logger.info(f"Preflight rule {rule.id} matched. Setting action to Profile ID {matched_profile_id} (Name: {profile_name}).")
-                return matched_profile_id, profile_name
+                return matched_profile.id, matched_profile.preflightProfileName
             else:
-                logger.warning(f"Preflight rule {rule.id} matched, but Profile ID {matched_profile_id} not found in profiles data. Returning ID with default name.")
+                logger.warning(f"Preflight rule {rule.id} matched, but Profile ID {rule.preflightProfileId} not found in profiles data. Returning ID with default name.")
                 # Return the ID specified by the rule, but indicate the name is missing/default
-                return matched_profile_id, f"UnknownProfile_{matched_profile_id}" # Or return None, or DEFAULT_PREFLIGHT_PROFILE_NAME
-        else:
-            logger.debug(f"Rule {rule.id} did not match order criteria.")
+                return rule.preflightProfileId, f"UnknownProfile_{rule.preflightProfileId}"
 
 
     logger.debug("No preflight rules matched. Using default action.")
     # Return default ID and Name
     default_profile = profile_map.get(DEFAULT_PREFLIGHT_PROFILE_ID)
-    default_name = default_profile.preflightProfileName if default_profile else DEFAULT_PREFLIGHT_PROFILE_NAME
+    # Use a fixed default name string for consistency if profile 0 isn't found
+    default_name = default_profile.preflightProfileName if default_profile else "NoPreflight"
     return DEFAULT_PREFLIGHT_PROFILE_ID, default_name

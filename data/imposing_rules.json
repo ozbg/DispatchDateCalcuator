@@ -7,6 +7,13 @@
       "id": "impose_rule_1743559250917_4qbn3",
       "imposingAction": 2,
       "orderCriteria": {
+        "chosenProductionHubs": [
+          "nqld",
+          "nsw",
+          "qld",
+          "vic",
+          "wa"
+        ],
         "keywords": [
           "Saddle",
           "PUR",
@@ -34,6 +41,13 @@
         ],
         "printTypes": [
           2
+        ],
+        "chosenProductionHubs": [
+          "nqld",
+          "nsw",
+          "qld",
+          "vic",
+          "wa"
         ]
       },
       "startDate": null,
