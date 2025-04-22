@@ -34,7 +34,7 @@
     <h4>Add New Schedule Override</h4>
     <form id="overrideForm">
         <div class="form-group">
-            <label for="productID">Select Products to Override Schedule:</label>
+            
             <select id="productID" multiple required class="form-control product-select"></select>
             <small>Select one or more products. Hold Ctrl/Cmd to select multiple.</small>
         </div>
@@ -114,14 +114,24 @@
     .form-group small { display: block; color: #6c757d; margin-top: 0.3rem; font-size: 0.8rem; }
     .form-control { width: 100%; padding: 0.5rem 0.75rem; font-size: 0.95rem; border: 1px solid #ced4da; border-radius: 0.25rem; transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; box-sizing: border-box; background-color: #fff; }
     select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 16px 12px; padding-right: 2.5rem; }
-    select.form-control.product-select { height: 250px; /* Specific height for multi-select */ appearance: auto; /* Override arrow for multi-select */ background-image: none; } /* Keep multi-select appearance */
+    select.form-control.product-select {
+        height: 250px; /* Specific height for multi-select */
+        appearance: auto; /* Override arrow for multi-select */
+        background-image: none;
+        font-family: inherit; /* Match body font */
+        font-size: 0.9rem; /* Match table font size */
+        color: #212529; /* Match standard text color */
+        padding-top: 0.75rem; /* Increase top/bottom padding for spacing */
+        padding-bottom: 0.75rem;
+        /* Direct line-height on option is not reliable, padding gives visual space */
+    }
     .form-control:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
     .form-row-flex { display: flex; gap: 1.5rem; flex-wrap: wrap; } /* For side-by-side elements like dates */
     .flex-item { flex: 1; min-width: 200px; } /* Allow items to grow and wrap */
     .checkbox-group-container { padding: 0.75rem; border: 1px solid #ced4da; border-radius: 0.25rem; background-color: #fff; }
 
     /* Button Styling (from finishing_rules) */
-    .button-group { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
+    .button-group { display: flex; justify-content: flex-start; /* Changed to left-align */ gap: 0.6rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #dee2e6; }
     .primary-btn, .secondary-btn { padding: 0.5rem 1rem; font-size: 0.95em; font-weight: 500; border-radius: 0.25rem; cursor: pointer; border: none; transition: all 0.15s ease-in-out; }
     .primary-btn { background: #198754; color: white; } /* Green for add/save */
     .primary-btn:hover { background: #157347; }
@@ -323,6 +333,39 @@ function saveEditedOverride(row, productId, index) {
         alert("New Print Date cannot be earlier than Original Print Date.");
         return;
     }
+
+    // --- BEGIN DUPLICATE/CONFLICT CHECK ---
+    const newOriginalPrintDate = newOverride[0];
+    const existingOverrides = product_info[productId]?.Modified_run_date || [];
+    let conflictMessage = null; // Variable to hold the specific conflict message
+
+    const conflictExists = existingOverrides.some((ovr, i) => {
+        // Skip the override being edited and ensure it's valid
+        if (i === index || !ovr || ovr.length < 2) {
+            return false;
+        }
+
+        // Check 1: Does the new original date match an EXISTING original date?
+        if (ovr[0] === newOriginalPrintDate) {
+            conflictMessage = `Error: An override for Product ID ${productId} with the Original Print Date ${newOriginalPrintDate} already exists. Please choose a different date or edit the existing override.`;
+            return true; // Found a conflict
+        }
+
+        // Check 2: Does the new original date match an EXISTING NEW date?
+        if (ovr[1] === newOriginalPrintDate) {
+            conflictMessage = `Error: Another override for Product ID ${productId} (Original Date: ${ovr[0]}) is already set to move TO the date ${newOriginalPrintDate}. Please edit that override instead of creating a new one starting from this date.`;
+            return true; // Found a conflict
+        }
+
+        return false; // No conflict found for this specific override 'ovr'
+    });
+
+    if (conflictExists) {
+        alert(conflictMessage); // Show the specific message
+        return; // Prevent saving
+    }
+    // --- END DUPLICATE/CONFLICT CHECK ---
+
 
     // Update the data structure
     if (product_info[productId] && product_info[productId].Modified_run_date) {
