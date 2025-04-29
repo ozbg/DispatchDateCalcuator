@@ -67,19 +67,20 @@
     },
     {
       "id": "banding_large",
-      "description": "Banding, Shrink Wrap, Rubber Band (QTY > 10k)",
+      "description": "Banding, Shrink Wrap, Rubber Band (QTY > 10k) - Disabled LA 29 April",
+      "addDays": 1,
+      "enabled": false,
       "keywords": [
         "banding",
         "shrink wrapping",
         "rubber band"
       ],
+      "excludeKeywords": [],
       "matchType": "any",
-      "caseSensitive": false,
-      "addDays": 1,
       "conditions": {
         "quantityGreaterThan": 10000
       },
-      "enabled": true
+      "caseSensitive": false
     },
     {
       "id": "padding_non_standard",
@@ -200,7 +201,7 @@
           29,
           30
         ],
-        "quantityGreaterOrEqual": 500
+        "quantityGreaterThan": 500
       },
       "caseSensitive": false
     },

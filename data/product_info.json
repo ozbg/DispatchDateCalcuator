@@ -625,7 +625,8 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -653,7 +654,8 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 16,
     "SynergyPreflight": 1,
@@ -685,7 +687,8 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -725,7 +728,8 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -771,7 +775,8 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -803,7 +808,8 @@
     "Production_Hub": [
       "nsw",
       "vic",
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 16,
     "SynergyPreflight": 1,

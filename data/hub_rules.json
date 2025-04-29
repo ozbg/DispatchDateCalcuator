@@ -1,23 +1,20 @@
 {
   "rules": [
     {
-      "id": "rule_1743058416061",
-      "description": "QLD Digital Only",
+      "id": "hub_rule_1745892030952_64j5g",
+      "description": "Exceeds NQLD Digital QTY",
       "hubId": "nqld",
-      "priority": 1,
-      "enabled": false,
+      "priority": 0,
+      "enabled": true,
       "startDate": null,
       "endDate": null,
       "sizeConstraints": null,
       "orderCriteria": {
-        "excludeProductIds": [
-          63,
-          64,
-          65,
-          66
-        ],
+        "maxQuantity": 2000,
         "printTypes": [
-          1
+          1,
+          2,
+          3
         ]
       }
     },
@@ -53,7 +50,9 @@
       },
       "orderCriteria": {
         "printTypes": [
-          2
+          2,
+          1,
+          3
         ]
       }
     },

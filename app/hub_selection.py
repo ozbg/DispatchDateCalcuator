@@ -449,9 +449,7 @@ def validate_hub_rules(
                 if criteria.minQuantity is not None:
                     criteria_defined = True
                     if not (quantity >= criteria.minQuantity): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: MinQ fail ({quantity} < {criteria.minQuantity})")
-                if all_positive_conditions_met and criteria.maxQuantity is not None:
-                     criteria_defined = True
-                     if not (quantity <= criteria.maxQuantity): all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: MaxQ fail ({quantity} > {criteria.maxQuantity})")
+                # REMOVED MaxQuantity check from here - handled separately below
                 if all_positive_conditions_met and criteria.productIds:
                     criteria_defined = True
                     if product_id not in criteria.productIds: all_positive_conditions_met = False; logger.debug(f"Rule {rule_id}: ProdID fail ({product_id} not in {criteria.productIds})")
@@ -465,7 +463,6 @@ def validate_hub_rules(
                     criteria_defined = True
                     if not any(pg.lower() == pg_lower for pg in criteria.productGroups): all_positive_conditions_met = False; logger.debug(f"Rule {rule.id}: ProductGroup fail ('{pg_lower}' not in {criteria.productGroups})")
 
-
                 # Check *negative* criteria (those that must *not* be true)
                 if all_positive_conditions_met and criteria.excludeKeywords:
                     criteria_defined = True # Still counts as defined criteria
@@ -475,14 +472,34 @@ def validate_hub_rules(
                      if any(pg.lower() == pg_lower for pg in criteria.excludeProductGroups): all_positive_conditions_met = False; logger.debug(f"Rule '{rule_id}': ExclProductGroup fail ('{pg_lower}' is in {criteria.excludeProductGroups})")
                 # excludeProductIds is handled separately as an override below
 
+                # --- NEW: Check maxQuantity separately ---
+                max_quantity_exceeded = False
+                if criteria.maxQuantity is not None:
+                    criteria_defined = True # Mark that maxQ was checked
+                    if quantity > criteria.maxQuantity:
+                        max_quantity_exceeded = True
+                        logger.debug(f"Rule {rule_id}: MaxQ condition MET ({quantity} > {criteria.maxQuantity})")
+                    # else: # No need to log if not exceeded, as it doesn't cause failure here
+
+                # --- Determine if order criteria are met for exclusion (Revised Logic) ---
+                order_criteria_met_for_exclusion = False
                 if criteria_defined and all_positive_conditions_met:
-                    order_criteria_met_for_exclusion = True
-                    logger.debug(f"Rule '{rule_id}': Order criteria MET for potential exclusion of {hub_candidate}.")
+                    # All *other* positive/negative conditions passed.
+                    # Now check if the maxQuantity condition (if defined) also allows exclusion.
+                    if criteria.maxQuantity is not None:
+                        # If maxQ is defined, it must be exceeded for the rule to apply based on order criteria
+                        if max_quantity_exceeded:
+                            order_criteria_met_for_exclusion = True
+                            logger.debug(f"Rule '{rule_id}': Order criteria MET (incl. MaxQ exceeded) for potential exclusion.")
+                        else:
+                             logger.debug(f"Rule '{rule_id}': Order criteria NOT MET (MaxQ defined but not exceeded).")
+                    else:
+                        # If maxQ is not defined, meeting other criteria is enough
+                        order_criteria_met_for_exclusion = True
+                        logger.debug(f"Rule '{rule_id}': Order criteria MET (MaxQ not defined) for potential exclusion.")
                 elif criteria_defined:
-                    # logger.debug(f"Rule '{rule_id}': Order criteria NOT MET for {hub_candidate}.") # Verbose
-                    pass # Condition didn't match, rule doesn't exclude based on order criteria
-                # else: # No order criteria were defined in this rule section # Verbose
-                #      logger.debug(f"Rule '{rule_id}': No specific order criteria defined to check.")
+                     logger.debug(f"Rule '{rule_id}': Order criteria NOT MET (one or more positive/negative conditions failed).")
+                # else: # No criteria defined, already handled
 
 
             # --- Determine if Rule Triggers Exclusion (NEW LOGIC) ---
