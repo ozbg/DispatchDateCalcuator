@@ -529,6 +529,7 @@
     "Production_Hub": [
       "nsw",
       "vic",
+      "wa",
       "qld",
       "nqld"
     ],
@@ -558,6 +559,7 @@
     "Production_Hub": [
       "nsw",
       "vic",
+      "wa",
       "qld",
       "nqld"
     ],
@@ -591,6 +593,7 @@
     "Production_Hub": [
       "nsw",
       "vic",
+      "wa",
       "qld",
       "nqld"
     ],
@@ -620,6 +623,7 @@
     "Production_Hub": [
       "nsw",
       "vic",
+      "wa",
       "qld",
       "nqld"
     ],
@@ -650,6 +654,7 @@
     "Production_Hub": [
       "nsw",
       "vic",
+      "wa",
       "qld",
       "nqld"
     ],
@@ -683,6 +688,7 @@
     "Production_Hub": [
       "nsw",
       "vic",
+      "wa",
       "qld",
       "nqld"
     ],
@@ -1360,7 +1366,9 @@
     "Product_Group": "WA Digital Synthetic Print 1S or 2S with or without Laminating",
     "Product_ID": 49,
     "Production_Hub": [
-      "wa"
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1387,7 +1395,10 @@
     "Product_Group": "WA Digital 350gsm Knight 2 Sided Linen Print 1S or 2S with or without Laminating",
     "Product_ID": 50,
     "Production_Hub": [
-      "wa"
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1414,7 +1425,8 @@
     "Product_Group": "WA Digital 290gsm Natural Board Print Print 1S or 2S with or without Laminating",
     "Product_ID": 51,
     "Production_Hub": [
-      "wa"
+      "wa",
+      "qld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1441,7 +1453,11 @@
     "Product_Group": "WA Digital Standard Stock Print Print 1S or 2S with or without Laminating",
     "Product_ID": 52,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1468,7 +1484,11 @@
     "Product_Group": "WA Offset 113gsm,115gsm,128gsm Gloss 1S or 2S",
     "Product_ID": 53,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1495,7 +1515,11 @@
     "Product_Group": "WA Offset 150gsm Gloss 1S or 2S",
     "Product_ID": 54,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 16,
     "SynergyPreflight": 1,
@@ -1522,7 +1546,11 @@
     "Product_Group": "WA Offset 150gsm,170gsm  Silk/Matt 1S or 2S",
     "Product_ID": 55,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1549,7 +1577,11 @@
     "Product_Group": "WA Offset 170gsm,200gsm,250gsm Gloss 1S or 2S",
     "Product_ID": 56,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1576,7 +1608,11 @@
     "Product_Group": "WA Offset 310gsm,350gsm Artboard - 300gsm Gloss/Silk/Matt",
     "Product_ID": 57,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": 1,
@@ -1603,7 +1639,11 @@
     "Product_Group": "WA Offset 100gsm Laser 1S or 2S",
     "Product_ID": 58,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 16,
     "SynergyPreflight": 1,
@@ -1630,7 +1670,11 @@
     "Product_Group": "WA Offset 113,128,200,250gsm Silk/Matt 1S or 2S",
     "Product_ID": 59,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": null,
@@ -1707,7 +1751,11 @@
     "Product_Group": "WA Envelopes",
     "Product_ID": 62,
     "Production_Hub": [
-      "wa"
+      "nsw",
+      "vic",
+      "wa",
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "SynergyPreflight": null,
