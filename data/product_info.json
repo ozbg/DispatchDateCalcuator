@@ -930,7 +930,8 @@
       "nsw",
       "vic",
       "wa",
-      "qld"
+      "qld",
+      "nqld"
     ],
     "Cutoff": 12,
     "printTypes": [

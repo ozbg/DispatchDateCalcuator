@@ -72,6 +72,7 @@
                 <label><input type="checkbox" value="info" checked> Info</label>
                 <label><input type="checkbox" value="warning" checked> Warning</label>
                 <label><input type="checkbox" value="error" checked> Error</label>
+                <button onclick="clearDebugLogs()" class="secondary-btn" style="margin-left: 1rem; padding: 0.4rem 0.8rem; font-size: 0.9em;">Clear</button>
             </div>
         </div>
         <div id="debugOutput" class="debug-content">
@@ -124,7 +125,7 @@
 
     .code-area {
         font-family: monospace;
-        font-size: 0.9em; /* Slightly smaller for more content */
+        font-size: 1.17em; /* Slightly smaller for more content */
         line-height: 1.4;
         padding: 0.75rem;
         border: 1px solid #ced4da;
@@ -137,8 +138,8 @@
         overflow: auto; /* Add scrollbars if needed */
         min-height: 200px; /* Ensure a minimum usable height */
     }
-    textarea#requestPayload { min-height: 250px; } /* Give request slightly more default space */
-    pre#responseOutput { white-space: pre-wrap; word-wrap: break-word; }
+    pre#responseOutput { white-space: pre-wrap; word-wrap: break-word; font-size: 1.17em; } /* 30% bigger font for JSON response */
+
 
     /* Form Styles */
     .form-group { margin-bottom: 1rem; }
@@ -146,7 +147,7 @@
     .form-control {
         width: 100%;
         padding: 0.5rem 0.75rem;
-        font-size: 0.95rem;
+        font-size: 1.17rem;
         border: 1px solid #ced4da;
         border-radius: 0.25rem;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -267,7 +268,7 @@
         border-radius: 0.25rem;
         max-height: 400px;
         overflow-y: auto;
-        font-size: 0.85em;
+        font-size: 1.105em; /* 30% bigger font for debug messages */
         line-height: 1.5;
     }
     .debug-content .log-entry { margin-bottom: 0.3rem; padding-bottom: 0.3rem; border-bottom: 1px dotted #eee; }
@@ -382,6 +383,14 @@ function escapeHtml(unsafe) {
          .replace(/'/g, "&#039;");
 }
 
+
+// --- Clear Debug Logs Function ---
+function clearDebugLogs() {
+    const debugOutput = document.getElementById('debugOutput');
+    if (debugOutput) {
+        debugOutput.innerHTML = '<p class="placeholder-text">Debug messages cleared. Run API test to see new messages...</p>';
+    }
+}
 
 // --- API Test Functions ---
 

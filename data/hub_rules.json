@@ -2,10 +2,10 @@
   "rules": [
     {
       "id": "hub_rule_1745892030952_64j5g",
-      "description": "Exceeds NQLD Digital QTY",
+      "description": "Exceeds NQLD Digital QTY (request to disable Luke A 30.5.25)",
       "hubId": "nqld",
       "priority": 0,
-      "enabled": true,
+      "enabled": false,
       "startDate": null,
       "endDate": null,
       "sizeConstraints": null,

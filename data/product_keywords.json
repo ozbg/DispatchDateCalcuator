@@ -204,8 +204,6 @@
     "Product_ID": 8
   },
   {
-    "Product_ID": 9,
-    "Match_All": [],
     "Exclude_All": [
       "Eco",
       "Knight",
@@ -213,6 +211,7 @@
       "Coated 1 Side Board",
       "Magnet"
     ],
+    "Match_All": [],
     "Match_Any": [
       [
         "Gloss Laminate 1S",
@@ -227,7 +226,8 @@
         "Branding",
         "BC"
       ]
-    ]
+    ],
+    "Product_ID": 9
   },
   {
     "Exclude_All": [
@@ -788,13 +788,13 @@
     "Product_ID": 41
   },
   {
-    "Exclude_All": [],
+    "Product_ID": 44,
     "Match_All": [
-      "Mounted",
-      "Strut"
+      "Strut",
+      "Mount"
     ],
-    "Match_Any": [],
-    "Product_ID": 44
+    "Exclude_All": [],
+    "Match_Any": []
   },
   {
     "Exclude_All": [],
