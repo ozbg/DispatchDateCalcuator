@@ -6,22 +6,95 @@
     <link rel="stylesheet" href="/static/css/style.css"/>
     <!-- Include Font Awesome for icons used in modals -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+      /* Consistent header and navigation styling - dark theme like original */
+      header {
+        background-color: #000000;
+        border-bottom: 1px solid #495057;
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+      
+      header h1 {
+        margin: 0;
+        padding: 0 1rem;
+        font-size: 2.5rem;
+        color: white;
+        line-height: 1.2;
+      }
+      
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 0 1rem;
+        align-items: center;
+      }
+      
+      nav a {
+        text-decoration: none;
+        padding: 0.5rem 0.75rem;
+        background-color: #000000;
+        color: white;
+        border-radius: 0.25rem;
+        font-size: 1rem;
+        white-space: nowrap;
+        transition: background-color 0.15s ease-in-out;
+        line-height: 1.2;
+      }
+      
+      nav a:hover {
+        background-color: #131314;
+      }
+      
+      .container {
+        margin: 0 auto;
+        padding: 0 1rem;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      
+      @media (max-width: 768px) {
+        header {
+          flex-direction: column;
+          align-items: stretch;
+          text-align: center;
+        }
+        
+        header h1 {
+          margin-bottom: 0.5rem;
+        }
+        
+        nav {
+          justify-content: center;
+          padding: 0.5rem 1rem;
+        }
+        
+        nav a {
+          font-size: 0.8rem;
+          padding: 0.4rem 0.6rem;
+        }
+      }
+    </style>
   </head>
   <body>
     <header>
       <h1>OpsLogic</h1>
       <nav>
-        <a href="/">Home</a>
         <a href="/products">Product Schedule</a>
         <a href="/product-keywords">Product Matching</a>
         <a href="/cmyk-hubs">CMYK Hubs</a>
         <a href="/schedule-overrides">Schedule Overrides</a>
         <a href="/finishing-rules">Finishing Rules</a>
         <a href="/hub-rules">Hub Rules</a>
-        <a href="/preflight-profiles">Preflight Profiles</a> <!-- <<< ADDED LINK -->
-        <a href="/preflight-rules">Preflight Rules</a>   <!-- <<< ADDED LINK -->
+        <a href="/preflight-profiles">Preflight Profiles</a>
+        <a href="/preflight-rules">Preflight Rules</a>
         <a href="/imposing-rules">Imposing Rules</a>
-        <a href="/production-groups">Production Groups</a>
         <a href="/api-test">API Test</a>
       </nav>
     </header>

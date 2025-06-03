@@ -316,16 +316,32 @@
 .rule-box li { margin-bottom: 0.25rem; }
 .example { font-style: italic; color: #6c757d; font-size: 0.875em; margin-top: 0.5rem;}
 
-/* Add Button */
-.add-btn { background: #198754; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 1rem; transition: background-color 0.15s ease-in-out; margin-bottom: 1.5rem; display: inline-block; }
-.add-btn:hover { background: #157347; }
+/* Standardized Add Button */
+.add-btn {
+    background: #6c7b7d;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.add-btn:hover {
+    background: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
 
 /* Table */
 .rules-container { padding: 0 5px; } /* Reduced padding */
-.rules-table { width: 100%; margin-bottom: 2rem; border-collapse: collapse; font-size: 0.9rem; border: 1px solid #dee2e6; border-radius: 8px; overflow: hidden; /* Helps with radius */ box-shadow: 0 2px 5px rgba(0,0,0,0.07); }
-.rules-table th, .rules-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #dee2e6; vertical-align: top; }
-.rules-table tr:last-child td { border-bottom: none; }
-.rules-table thead th { background: #e9ecef; font-weight: 600; border-bottom-width: 2px; color: #495057; }
+.rules-table { width: 100%; margin-bottom: 2rem; border-collapse: collapse; }
+.rules-table th, .rules-table td { padding: 12px; text-align: left; border: 1px solid #ddd; vertical-align: top; }
+.rules-table th { background: #f8f9fa; }
 .rules-table tbody tr:hover { background-color: #f8f9fa; }
 .constraints-list { list-style: none; margin: 0; padding: 0; font-size: 0.85em; }
 .constraints-list li { margin-bottom: 0.25rem; word-break: break-word; }
@@ -337,10 +353,87 @@
 .filter-row th { padding: 0.5rem; background: #f8f9fa; }
 
 /* Action Buttons in Table */
-.rules-table .edit-btn { background: #0d6efd; margin-right: 0.3rem; padding: 0.25rem 0.5rem; font-size: 0.8em; color:white; border:none; border-radius: 0.2rem; cursor: pointer; }
-.rules-table .edit-btn:hover { background: #0b5ed7; }
-.rules-table .delete-btn { background: #dc3545; padding: 0.25rem 0.5rem; font-size: 0.8em; color:white; border:none; border-radius: 0.2rem; cursor: pointer; }
-.rules-table .delete-btn:hover { background: #c82333; }
+.rules-table .edit-btn {
+    background-image: linear-gradient(#f7f8fa ,#e7e9ec);
+    border-color: #adb1b8 #a2a6ac #8d9096;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+    box-shadow: rgba(255,255,255,.6) 0 1px 0 inset;
+    box-sizing: border-box;
+    color: #000000;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Amazon Ember",Arial,sans-serif;
+    font-size: 13px;
+    height: 29px;
+    outline: 0;
+    overflow: hidden;
+    padding: 0 11px;
+    text-align: center;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+    margin-right: 5px;
+}
+.rules-table .delete-btn {
+    background-image: linear-gradient(#f7f8fa ,#e7e9ec);
+    border-color: #adb1b8 #a2a6ac #8d9096;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 3px;
+    box-shadow: rgba(255,255,255,.6) 0 1px 0 inset;
+    box-sizing: border-box;
+    color: #8B0000;
+    cursor: pointer;
+    display: inline-block;
+    font-family: "Amazon Ember",Arial,sans-serif;
+    font-size: 13px;
+    height: 29px;
+    outline: 0;
+    overflow: hidden;
+    padding: 0 11px;
+    text-align: center;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    white-space: nowrap;
+}
+.rules-table .edit-btn:active {
+    border-bottom-color: #a2a6ac;
+}
+.rules-table .edit-btn:active:hover {
+    border-bottom-color: #a2a6ac;
+}
+.rules-table .edit-btn:hover {
+    border-color: #a2a6ac #979aa1 #82858a;
+    background-image: linear-gradient(#f0f8f0, #e8f5e8);
+}
+.rules-table .edit-btn:focus {
+    border-color: #e77600;
+    box-shadow: rgba(228, 121, 17, .5) 0 0 3px 2px;
+    outline: 0;
+}
+.rules-table .delete-btn:active {
+    border-bottom-color: #a2a6ac;
+}
+.rules-table .delete-btn:active:hover {
+    border-bottom-color: #a2a6ac;
+}
+.rules-table .delete-btn:hover {
+    border-color: #a2a6ac #979aa1 #82858a;
+    background-image: linear-gradient(#fdf0f0, #f8e8e8);
+}
+.rules-table .delete-btn:focus {
+    border-color: #e77600;
+    box-shadow: rgba(228, 121, 17, .5) 0 0 3px 2px;
+    outline: 0;
+}
 
 /* Modal Base */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); overflow-y: auto; z-index: 1000; }

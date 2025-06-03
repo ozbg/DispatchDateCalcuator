@@ -90,8 +90,9 @@
 
     .api-test-container {
         padding: 1rem;
-        max-width: 1600px; /* Allow wider layout */
         margin: 20px auto;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .main-layout {
@@ -208,7 +209,7 @@
         width: 100%;
         border-collapse: collapse;
         font-size: 0.9em; /* Adjust as needed */
-        table-layout: fixed; /* Helps with column widths */
+        table-layout: auto; /* Allow flexible column widths */
     }
     .response-table th,
     .response-table td {
@@ -221,11 +222,11 @@
     .response-table th {
         background-color: #e9ecef;
         font-weight: 600;
-        width: 20%; /* Adjust width for labels */
+        min-width: 120px; /* Minimum width for labels */
     }
      .response-table td {
-        width: 30%; /* Adjust width for values */
         background-color: #fff;
+        min-width: 150px; /* Minimum width for values */
     }
     .response-table .hub-value { font-weight: bold; color: #0056b3; } /* Highlight hub values */
     .response-table .date-value { font-style: italic; color: #5a6268; } /* Style dates */
@@ -282,7 +283,7 @@
     .debug-content .placeholder-text { color: #6c757d; font-style: italic; }
 
     /* Responsive Adjustments */
-    @media (max-width: 1200px) {
+    @media (max-width: 1000px) {
         .main-layout {
             flex-direction: column;
         }
